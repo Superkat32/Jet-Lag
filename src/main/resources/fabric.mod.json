@@ -17,6 +17,8 @@
 	"entrypoints": {
 		"main": [
 			"net.superkat.ExampleMod"
+		], "client": [
+			"net.superkat.ExampleModClient"
 		]
 	},
 	"mixins": [
