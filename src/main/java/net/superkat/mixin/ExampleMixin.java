@@ -27,8 +27,8 @@ public abstract class ExampleMixin extends DrawableHelper {
 
 	@Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;renderOverlay(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/util/Identifier;F)V"))
 	private void init(MatrixStack matrices, float tickDelta, CallbackInfo ci) {
-		renderSpeedlineOverlay(matrices, speedlineTexture , 1, 0);
-		renderSpeedlineOverlay(matrices, speedlineTexture2 , 1, 1);
+		renderSpeedlineOverlay(matrices, speedlineDebugTexture , 1, 0);
+//		renderSpeedlineOverlay(matrices, speedlineTexture2 , 1, 1);
 //		renderSpeedlineOverlay(matrices, speedlineTexture, 1, 180F);
 //		renderSpeedlineOverlay(matrices, speedlineTexture, 1, 270F);
 //		renderSpeedlineOverlay(matrices, speedlineTexture, 1, 50F);
@@ -42,15 +42,30 @@ public abstract class ExampleMixin extends DrawableHelper {
 	public void renderSpeedlineOverlay(MatrixStack matrices, Identifier texture, float opacity, int direction) {
 		matrices.push();
 
-		switch(direction) {
-			case 0 -> {
-				matrices.translate((System.currentTimeMillis() % 5000) / 5000F * 2900, (System.currentTimeMillis() % 5000) / 5000F * 3100, 0);
-			}
-			case 1 -> {
-				matrices.translate((System.currentTimeMillis() % 5000) / 5000F * -2900, (System.currentTimeMillis() % 5000) / 5000F * 3100, 0);
-			}
-		}
+//		switch(direction) {
+//			case 0 -> {
+//				matrices.translate((System.currentTimeMillis() % 5000) / 5000F * 2900, (System.currentTimeMillis() % 5000) / 5000F * 3100, 0);
+//			}
+//			case 1 -> {
+//				matrices.translate((System.currentTimeMillis() % 5000) / 5000F * -2900, (System.currentTimeMillis() % 5000) / 5000F * 3100, 0);
+//			}
+//		}
 
+//		matrices.translate(0, 0, 0);
+//		matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(0));
+//		matrices.translate(0, 0, 0);
+
+//		matrices.translate(90, 90, 0);
+//		matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(90));
+//		matrices.translate(-90, -90, 0);
+
+//		matrices.translate(213, 120, 0);
+//		matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(180));
+//		matrices.translate(-213, -120, 0);
+
+//		matrices.translate(120, 120, 0);
+//		matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(270));
+//		matrices.translate(-120, -120, 0);
 
 		RenderSystem.disableDepthTest();
 		RenderSystem.depthMask(false);
