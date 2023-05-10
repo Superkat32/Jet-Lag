@@ -72,57 +72,57 @@ public abstract class ExampleMixin extends DrawableHelper {
 		int yMovement = 0;
 
 		switch(path) {
-			case 1 -> { // moves towards bottom-right
+			case 1 -> {
 				xMovement = 500;
 				yMovement = 600;
 				texture = line1;
 			}
-			case 2 -> { // moves towards bottom-right
+			case 2 -> {
 				xMovement = 200;
 				yMovement = 600;
 				texture = line2;
 			}
-			case 3 -> { // moves towards bottom
+			case 3 -> {
 				xMovement = 75;
 				yMovement = 600;
 				texture = line3;
 			}
-			case 4 -> { // moves towards bottom
+			case 4 -> {
 				xMovement = 15;
 				yMovement = 600;
 				texture = line4;
 			}
-			case 5 -> { // moves towards bottom
+			case 5 -> {
 				xMovement = -300;
 				yMovement = 600;
 				texture = line5;
 			}
-			case 6 -> { // moves towards bottom
+			case 6 -> {
 				xMovement = -500;
 				yMovement = 600;
 				texture = line6;
 			}
-			case 7 -> { // moves towards bottom
+			case 7 -> {
 				xMovement = -500;
 				yMovement = 500;
 				texture = line7;
 			}
-			case 8 -> { // moves towards bottom
+			case 8 -> {
 				xMovement = -500;
 				yMovement = -600;
 				texture = line8;
 			}
-			case 9 -> { // moves towards bottom
+			case 9 -> {
 				xMovement = -500;
 				yMovement = -600;
 				texture = line9;
 			}
-			case 10 -> { // moves towards bottom
+			case 10 -> {
 				xMovement = -300;
 				yMovement = -600;
 				texture = line10;
 			}
-			case 11 -> { // moves towards bottom
+			case 11 -> {
 				xMovement = -115;
 				yMovement = -600;
 				texture = line11;
