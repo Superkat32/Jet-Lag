@@ -6,8 +6,11 @@ import net.superkat.particles.SpeedlinesParticle;
 
 public class ExampleModClient implements ClientModInitializer {
 
+//    SpeedlineRenderer speedlineRenderer;
+
     @Override
     public void onInitializeClient() {
         ParticleFactoryRegistry.getInstance().register(ExampleMod.MY_PARTICLE, SpeedlinesParticle.Factory::new);
+//        HudRenderCallback.EVENT.register(((matrixStack, tickDelta) -> speedlineRenderer.renderTestItem(matrixStack)));
     }
 }
