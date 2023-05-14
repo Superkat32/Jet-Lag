@@ -8,8 +8,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import static net.superkat.ExampleMod.LOGGER;
-
 //@Environment(EnvType.CLIENT)
 //@Mixin(ClientPlayerEntity.class)
 @Mixin(InGameHud.class)
@@ -37,7 +35,7 @@ public class ExampleMixin {
 //	@Inject(method = "onTrackedDataSet", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/MinecraftClient;getSoundManager()Lnet/minecraft/client/sound/SoundManager;"))
 	@Inject(method = "render", at = @At("RETURN"))
 	private void init(MatrixStack matrices, float tickDelta, CallbackInfo ci) {
-		LOGGER.info("mixin activated");
+//		LOGGER.info("mixin activated");
 		lineRenderer.renderTestItem(matrices);
 //		LOGGER.info(String.valueOf(this.getAbilities().getFlySpeed()));
 
