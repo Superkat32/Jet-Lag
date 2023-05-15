@@ -31,6 +31,7 @@ public class SpeedlineRenderer extends DrawableHelper {
     }
 
     //TODO - Replace with config boolean later
+    //TODO - Add config boolean that allows the user to choose how the speedlines render whenever a screen is open(normal, transparent, off)
     private boolean draw = true;
     public void renderTestItem(MatrixStack matrixStack) {
         //Only allows the mod to draw the speedlines if:

@@ -3,7 +3,9 @@
 	"package": "net.superkat.mixin",
 	"compatibilityLevel": "JAVA_17",
 	"mixins": [
-      "InGameHudMixin"
+		"InGameHudMixin",
+		"OtherTestMixin",
+		"TestMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
