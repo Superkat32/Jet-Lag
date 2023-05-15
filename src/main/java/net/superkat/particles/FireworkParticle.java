@@ -7,10 +7,10 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.particle.DefaultParticleType;
 
 @Environment(EnvType.CLIENT)
-public class SpeedlinesParticle extends SpriteBillboardParticle {
+public class FireworkParticle extends SpriteBillboardParticle {
     private final SpriteProvider spriteProvider;
 
-    SpeedlinesParticle(ClientWorld world, double x, double y, double z, double velocityX, double velocityY, double velocityZ, SpriteProvider spriteProvider) {
+    FireworkParticle(ClientWorld world, double x, double y, double z, double velocityX, double velocityY, double velocityZ, SpriteProvider spriteProvider) {
         super(world, x, y, z);
 //        this.velocityMultiplier = 0.6F;
         this.spriteProvider = spriteProvider;
@@ -59,7 +59,7 @@ public class SpeedlinesParticle extends SpriteBillboardParticle {
         }
 
         public Particle createParticle(DefaultParticleType defaultParticleType, ClientWorld clientWorld, double d, double e, double f, double g, double h, double i) {
-            SpeedlinesParticle speedlinesParticle = new SpeedlinesParticle(clientWorld, d, e, f, g, h, i, this.spriteProvider);
+            FireworkParticle speedlinesParticle = new FireworkParticle(clientWorld, d, e, f, g, h, i, this.spriteProvider);
             speedlinesParticle.setSprite(this.spriteProvider);
             return speedlinesParticle;
         }

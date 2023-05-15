@@ -12,10 +12,10 @@ import org.slf4j.LoggerFactory;
 public class JetLagMain implements ModInitializer {
     public static final String MOD_ID = "jetlag";
     public static final Logger LOGGER = LoggerFactory.getLogger("jetlag");
-    public static final DefaultParticleType MY_PARTICLE = FabricParticleTypes.simple();
+    public static final DefaultParticleType FIREWORKPARTICLE = FabricParticleTypes.simple();
 
     @Override
     public void onInitialize() {
-        Registry.register(Registries.PARTICLE_TYPE, new Identifier(MOD_ID, "my_particle"), MY_PARTICLE);
+        Registry.register(Registries.PARTICLE_TYPE, new Identifier(MOD_ID, "fireworkparticle"), FIREWORKPARTICLE);
     }
 }

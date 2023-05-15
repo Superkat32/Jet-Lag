@@ -26,20 +26,17 @@ public abstract class TestMixin extends ProjectileEntity {
         super(entityType, world);
     }
 
-    @Shadow public abstract void handleStatus(byte status);
-
     @Shadow @Nullable private LivingEntity shooter;
 
     @Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;addParticle(Lnet/minecraft/particle/ParticleEffect;DDDDDD)V"))
     public void init(World instance, ParticleEffect parameters, double x, double y, double z, double velocityX, double velocityY, double velocityZ) {
-//        LOGGER.info("TestMixin started!");
         //Works this way to prevent the game from crashing if a normal firework is used on a block
         try {
             if (this.shooter != null) {
                 if (this.shooter.isPlayer() && this.shooter.isFallFlying()) {
-                    LOGGER.info("Player used firework in flight");
-                    world.addParticle(JetLagMain.MY_PARTICLE, this.getX(), this.getY(), this.getZ(), this.random.nextGaussian() * 0.05, this.getVelocity().y * 0.5, this.random.nextGaussian() * 0.05);
-                    world.addParticle(JetLagMain.MY_PARTICLE, this.getX(), this.getY(), this.getZ(), this.random.nextGaussian() * 0.07, this.getVelocity().y * 0.7, this.random.nextGaussian() * 0.07);
+//                    LOGGER.info("Player used firework in flight");
+                    world.addParticle(JetLagMain.FIREWORKPARTICLE, this.getX(), this.getY(), this.getZ(), this.random.nextGaussian() * 0.05, this.getVelocity().y * 0.5, this.random.nextGaussian() * 0.05);
+                    world.addParticle(JetLagMain.FIREWORKPARTICLE, this.getX(), this.getY(), this.getZ(), this.random.nextGaussian() * 0.07, this.getVelocity().y * 0.7, this.random.nextGaussian() * 0.07);
                 }
             }
             else {
@@ -55,7 +52,5 @@ public abstract class TestMixin extends ProjectileEntity {
                 LOGGER.warn("Exception: " + e);
             }
         }
-//            else {
-//        }
     }
 }
