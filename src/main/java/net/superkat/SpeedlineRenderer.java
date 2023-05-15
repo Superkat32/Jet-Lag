@@ -13,35 +13,51 @@ import static net.superkat.ExampleMod.LOGGER;
 @Environment(EnvType.CLIENT)
 public class SpeedlineRenderer extends DrawableHelper {
     public Identifier defaultTexture = new Identifier("jetlag", "textures/overlay/texturefail.png");
-    public Identifier line1 = new Identifier("jetlag", "textures/overlay/line1.png");
-    public Identifier line2 = new Identifier("jetlag", "textures/overlay/line2.png");
-    public Identifier line3 = new Identifier("jetlag", "textures/overlay/line3.png");
-    public Identifier line4 = new Identifier("jetlag", "textures/overlay/line4.png");
-    public Identifier line5 = new Identifier("jetlag", "textures/overlay/line5.png");
-    public Identifier line6 = new Identifier("jetlag", "textures/overlay/line6.png");
-    public Identifier line7 = new Identifier("jetlag", "textures/overlay/line7.png");
-    public Identifier line8 = new Identifier("jetlag", "textures/overlay/line8.png");
-    public Identifier line9 = new Identifier("jetlag", "textures/overlay/line9.png");
-    public Identifier line10 = new Identifier("jetlag", "textures/overlay/line10.png");
-    public Identifier line11 = new Identifier("jetlag", "textures/overlay/line11.png");
-    public Identifier line12 = new Identifier("jetlag", "textures/overlay/line12.png");
-    public Identifier line13 = new Identifier("jetlag", "textures/overlay/line13.png");
-    public Identifier line14 = new Identifier("jetlag", "textures/overlay/line14.png");
-    public Identifier line15 = new Identifier("jetlag", "textures/overlay/line15.png");
-    public Identifier line16 = new Identifier("jetlag", "textures/overlay/line16.png");
+    public Identifier line1 = new Identifier("jetlag", "textures/overlay/frame1.png");
+    public Identifier line2 = new Identifier("jetlag", "textures/overlay/frame2.png");
+    public Identifier line3 = new Identifier("jetlag", "textures/overlay/frame3.png");
+    public Identifier line4 = new Identifier("jetlag", "textures/overlay/frame4.png");
+    public Identifier line5 = new Identifier("jetlag", "textures/overlay/frame5.png");
+    public Identifier line6 = new Identifier("jetlag", "textures/overlay/frame6.png");
+    public Identifier line7 = new Identifier("jetlag", "textures/overlay/frame7.png");
+    public Identifier line8 = new Identifier("jetlag", "textures/overlay/frame8.png");
+    public Identifier line9 = new Identifier("jetlag", "textures/overlay/frame9.png");
+    public Identifier line10 = new Identifier("jetlag", "textures/overlay/frame10.png");
+    public Identifier line11 = new Identifier("jetlag", "textures/overlay/frame11.png");
+    public Identifier line12 = new Identifier("jetlag", "textures/overlay/frame12.png");
+//    public Identifier line13 = new Identifier("jetlag", "textures/overlay/line13.png");
+//    public Identifier line14 = new Identifier("jetlag", "textures/overlay/line14.png");
+//    public Identifier line15 = new Identifier("jetlag", "textures/overlay/line15.png");
+//    public Identifier line16 = new Identifier("jetlag", "textures/overlay/line16.png");
     public Identifier speedlineDebugTexture = new Identifier("jetlag", "textures/overlay/speedline1.png");
 
     private static MinecraftClient client;
     public int tick = 0;
-    public int textureSwitchTick = 1;
+    public int textureSwitchTick = 0;
+    public int textureSwitchTickTime = 3;
     public SpeedlineRenderer() {
         client = MinecraftClient.getInstance();
     }
 
     private boolean draw = true;
     public void renderTestItem(MatrixStack matrixStack) {
-        if (draw && client.player.isFallFlying() && !client.player.isOnGround()) {
-            renderSpeedlineOverlay(matrixStack, defaultTexture);
+        if (draw && client.player.isFallFlying() && !client.player.isOnGround() && client.currentScreen == null) {
+            double velX = Math.abs(client.player.getVelocity().getX());
+            double velY = Math.abs(client.player.getVelocity().getY());
+            double velZ = Math.abs(client.player.getVelocity().getZ());
+            if(velX >= 0.5 || velY >= 0.5 || velZ >= 0.5) {
+                if(velX >= 1.25 || velY >= 1.25 || velZ >= 1.25) {
+                    renderSpeedlineOverlay(matrixStack, defaultTexture, 0.75F);
+                } else if(velX >= 1.1 || velY >= 1.1 || velZ >= 1.1) {
+                    renderSpeedlineOverlay(matrixStack, defaultTexture, 0.40F);
+                } else if(velX >= 0.85 || velY >= 0.85 || velZ >= 0.85) {
+                    renderSpeedlineOverlay(matrixStack, defaultTexture, 0.25F);
+                } else if(velX >= 0.7 || velY >= 0.7 || velZ >= 0.7) {
+                    renderSpeedlineOverlay(matrixStack, defaultTexture, 0.15F);
+                } else {
+                    renderSpeedlineOverlay(matrixStack, defaultTexture, 0.07F);
+                }
+            }
 //            this.renderSpeedlineOverlay(matrixStack, defaultTexture, 1, 1);
 //            this.renderSpeedlineOverlay(matrixStack, defaultTexture, 1, 2);
 //            this.renderSpeedlineOverlay(matrixStack, defaultTexture, 1, 3);
@@ -86,10 +102,11 @@ public class SpeedlineRenderer extends DrawableHelper {
         }
     }
 
-    public void renderSpeedlineOverlay(MatrixStack matrices, Identifier texture) {
+    public void renderSpeedlineOverlay(MatrixStack matrices, Identifier texture, float opacity) {
 //        MinecraftClient client = MinecraftClient.getInstance();
         int scaledWidth = client.getWindow().getScaledWidth();
         int scaledHeight = client.getWindow().getScaledHeight();
+//        LOGGER.info(String.valueOf(client.player.getVelocity()));
 //        MatrixStack matrices = new MatrixStack();
         matrices.push();
 
@@ -211,56 +228,49 @@ public class SpeedlineRenderer extends DrawableHelper {
 
         //Rendering animation
         //NOTE - There is a bug/side effect where if the player's FPS is less than 60, the animation slows down
-        if(tick <= 85) {
-            LOGGER.info(String.valueOf(tick));
-            LOGGER.info("Texture switch tick: " + String.valueOf(textureSwitchTick));
+        if(tick <= 70) {
+//            LOGGER.info(String.valueOf(tick));
+//            LOGGER.info("Texture switch tick: " + String.valueOf(textureSwitchTick));
             matrices.translate(0, 0, (System.currentTimeMillis() % 5000) / 5000F);
             tick++;
-            if(tick == 79) {
+            if(tick == 48) {
                 tick = 0;
-                textureSwitchTick = 1;
+//                textureSwitchTick = 1;
             }
 //            if(tick == textureSwitchTick) {
-                if(textureSwitchTick == 1) {
-                    textureSwitchTick += 4;
-                } else {
-                    textureSwitchTick += 5;
-                }
-                LOGGER.info("test");
-                if(tick <= 5) {
+//                if(textureSwitchTick == 1) {
+//                    textureSwitchTick += 4;
+//                } else {
+//                    textureSwitchTick += 5;
+//                }
+//                LOGGER.info("test");
+                if(tick <= 4) {
                     texture = line1;
-                } else if (tick <= 10) {
+                } else if (tick <= 8) {
                     texture = line2;
-                } else if (tick <= 15) {
+                } else if (tick <= 12) {
                     texture = line3;
-                } else if (tick <= 20) {
+                } else if (tick <= 16) {
                     texture = line4;
-                } else if (tick <= 25) {
+                } else if (tick <= 20) {
                     texture = line5;
-                } else if (tick <= 30) {
+                } else if (tick <= 24) {
                     texture = line6;
-                } else if (tick <= 35) {
+                } else if (tick <= 28) {
                     texture = line7;
-                } else if (tick <= 40) {
+                } else if (tick <= 32) {
                     texture = line8;
-                } else if (tick <= 45) {
+                } else if (tick <= 36) {
                     texture = line9;
-                } else if (tick <= 50) {
+                } else if (tick <= 40) {
                     texture = line10;
-                } else if (tick <= 55) {
+                } else if (tick <= 44) {
                     texture = line11;
-                } else if (tick <= 60) {
+                } else if (tick <= 48) {
                     texture = line12;
-                } else if (tick <= 65) {
-                    texture = line13;
-                } else if (tick <= 70) {
-                    texture = line14;
-                } else if (tick <= 75) {
-                    texture = line15;
-                } else if (tick <= 80) {
-                    texture = line16;
                 } else {
                     texture = defaultTexture;
+                    LOGGER.warn("Default texture has been activated");
                 }
 //            }
 //            if(tick == 50) {
@@ -319,12 +329,13 @@ public class SpeedlineRenderer extends DrawableHelper {
 //		matrices.translate(-120, -120, 0);
         RenderSystem.disableDepthTest();
         RenderSystem.depthMask(false);
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1F);
+        RenderSystem.enableBlend(); // Required to allow the transparency to not act weird with chat and stuff
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, opacity);
         RenderSystem.setShaderTexture(0, texture);
         DrawableHelper.drawTexture(matrices, 0, 0, -90, 0.0F, 0.0F, scaledWidth, scaledHeight, scaledWidth, scaledHeight);
         RenderSystem.depthMask(true);
         RenderSystem.enableDepthTest();
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, opacity);
         matrices.pop();
     }
 }
