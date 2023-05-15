@@ -9,7 +9,7 @@ import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ExampleMod implements ModInitializer {
+public class JetLagMain implements ModInitializer {
     public static final String MOD_ID = "jetlag";
     public static final Logger LOGGER = LoggerFactory.getLogger("jetlag");
     public static final DefaultParticleType MY_PARTICLE = FabricParticleTypes.simple();

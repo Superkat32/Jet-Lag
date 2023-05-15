@@ -16,9 +16,9 @@
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"net.superkat.ExampleMod"
+          "net.superkat.JetLagMain"
 		], "client": [
-			"net.superkat.ExampleModClient"
+			"net.superkat.JetLagClient"
 		]
 	},
 	"mixins": [

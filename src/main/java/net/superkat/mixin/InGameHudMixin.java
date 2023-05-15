@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(InGameHud.class)
-public class ExampleMixin {
+public class InGameHudMixin {
 	private static final SpeedlineRenderer lineRenderer = new SpeedlineRenderer();
 	@Inject(method = "render", at = @At("RETURN"))
 	private void init(MatrixStack matrices, float tickDelta, CallbackInfo ci) {
