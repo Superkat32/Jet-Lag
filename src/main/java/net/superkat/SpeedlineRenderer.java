@@ -8,8 +8,6 @@ import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 
-import static net.superkat.ExampleMod.LOGGER;
-
 @Environment(EnvType.CLIENT)
 public class SpeedlineRenderer extends DrawableHelper {
     public Identifier defaultTexture = new Identifier("jetlag", "textures/overlay/texturefail.png");
@@ -35,7 +33,7 @@ public class SpeedlineRenderer extends DrawableHelper {
     //TODO - Replace with config boolean later
     private boolean draw = true;
     public void renderTestItem(MatrixStack matrixStack) {
-        //Only allows the mod to draw the speedlines if
+        //Only allows the mod to draw the speedlines if:
         //the config boolean(currently draw boolean) is true
         //the player is flying with an elytra
         //the player isn't on the ground
@@ -80,37 +78,12 @@ public class SpeedlineRenderer extends DrawableHelper {
             //Works by detecting when the current tick is less than or equal to a pre-determined number
             //On the last tick of the last frame of animation, the tick number resets to repeat the animation loop
             //Somewhat janky, especially when playing the game on lower frame rates, but at least it works(better than what I could do otherwise)
-            if(tick == 48) {
+            Identifier[] textures = {line1, line2, line3, line4, line5, line6, line7, line8, line9, line10, line11, line12};
+            if(tick == textures.length * 4) {
                 tick = 0;
             }
-            if(tick <= 4) {
-                texture = line1;
-            } else if (tick <= 8) {
-                texture = line2;
-            } else if (tick <= 12) {
-                texture = line3;
-            } else if (tick <= 16) {
-                texture = line4;
-            } else if (tick <= 20) {
-                texture = line5;
-            } else if (tick <= 24) {
-                texture = line6;
-            } else if (tick <= 28) {
-                texture = line7;
-            } else if (tick <= 32) {
-                texture = line8;
-            } else if (tick <= 36) {
-                texture = line9;
-            } else if (tick <= 40) {
-                texture = line10;
-            } else if (tick <= 44) {
-                texture = line11;
-            } else if (tick <= 48) {
-                texture = line12;
-            } else {
-                texture = defaultTexture;
-                LOGGER.warn("Default texture has been activated");
-            }
+            int frame = tick / 4 % textures.length;
+            texture = textures[frame];
         }
         RenderSystem.disableDepthTest();
         RenderSystem.depthMask(false);
