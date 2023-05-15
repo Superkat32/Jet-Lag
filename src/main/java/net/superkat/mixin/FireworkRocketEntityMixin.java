@@ -20,9 +20,9 @@ import static net.superkat.JetLagMain.LOGGER;
 
 @Environment(EnvType.CLIENT)
 @Mixin(FireworkRocketEntity.class)
-public abstract class TestMixin extends ProjectileEntity {
+public abstract class FireworkRocketEntityMixin extends ProjectileEntity {
 
-    public TestMixin(EntityType<? extends ProjectileEntity> entityType, World world) {
+    public FireworkRocketEntityMixin(EntityType<? extends ProjectileEntity> entityType, World world) {
         super(entityType, world);
     }
 
