@@ -1,5 +1,8 @@
 {
   "textures": [
-    "jetlag:myparticletexture"
+    "jetlag:firework1",
+    "jetlag:firework2",
+    "jetlag:firework3",
+    "jetlag:firework4"
   ]
 }

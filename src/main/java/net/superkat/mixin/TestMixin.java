@@ -38,7 +38,8 @@ public abstract class TestMixin extends ProjectileEntity {
             if (this.shooter != null) {
                 if (this.shooter.isPlayer() && this.shooter.isFallFlying()) {
                     LOGGER.info("Player used firework in flight");
-                    world.addParticle(JetLagMain.MY_PARTICLE, this.getX(), this.getY(), this.getZ(), this.random.nextGaussian() * 0.05, -this.getVelocity().y * 0.5, this.random.nextGaussian() * 0.05);
+                    world.addParticle(JetLagMain.MY_PARTICLE, this.getX(), this.getY(), this.getZ(), this.random.nextGaussian() * 0.05, this.getVelocity().y * 0.5, this.random.nextGaussian() * 0.05);
+                    world.addParticle(JetLagMain.MY_PARTICLE, this.getX(), this.getY(), this.getZ(), this.random.nextGaussian() * 0.07, this.getVelocity().y * 0.7, this.random.nextGaussian() * 0.07);
                 }
             }
             else {
