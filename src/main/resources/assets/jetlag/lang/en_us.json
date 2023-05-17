@@ -2,9 +2,15 @@
   "jetlag.title": "Jet Lag Config",
 
   "jetlag.category.default": "Visual",
+  "jetlag.category.default.tooltip": "Config options related to visual effects",
 
   "jetlag.screeneffects.group": "Screen Effects",
   "jetlag.screeneffects.group.tooltip": "All options related to screen effects",
   "jetlag.speedlines": "Speed Lines",
-  "jetlag.speedlines.tooltip": "The white lines that appear on-screen when flying swiftly"
+  "jetlag.speedlines.tooltip": "The white lines that appear on-screen when flying swiftly",
+
+  "jetlag.particles.group": "Particles",
+  "jetlag.particles.group.tooltip": "All options related to particles",
+  "jetlag.altfirework": "Alternative Firework Particles",
+  "jetlag.altfirework.tooltip": "Cartoon like smoke particles for fireworks only activated while flying"
 }

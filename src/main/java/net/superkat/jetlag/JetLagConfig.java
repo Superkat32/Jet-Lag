@@ -18,11 +18,13 @@ public class JetLagConfig {
     public static final ConfigInstance<JetLagConfig> INSTANCE = new GsonConfigInstance<>(JetLagConfig.class, Path.of("./config/jetlag.json"));
 
     @ConfigEntry public static boolean showSpeedlines = true;
+    @ConfigEntry public static boolean altFireworkParticles = true;
 
     public static Screen makeScreen(Screen parent) {
         return YetAnotherConfigLib.create(INSTANCE, (defaults, config, builder) -> {
             var defaultCategoryBuilder = ConfigCategory.createBuilder()
-                    .name(Text.translatable("jetlag.category.default"));
+                    .name(Text.translatable("jetlag.category.default"))
+                    .tooltip(Text.translatable("jetlag.category.default.tooltip"));
 
             var screenEffectsGroup = OptionGroup.createBuilder()
                     .name(Text.translatable("jetlag.screeneffects.group"))
@@ -39,6 +41,22 @@ public class JetLagConfig {
                     .build();
             screenEffectsGroup.option(showSpeedlines);
             defaultCategoryBuilder.group(screenEffectsGroup.build());
+
+            var particlesGroup = OptionGroup.createBuilder()
+                    .name(Text.translatable("jetlag.particles.group"))
+                    .tooltip(Text.translatable("jetlag.particles.group.tooltip"));
+            var altFireworkParticles = Option.createBuilder(boolean.class)
+                    .name(Text.translatable("jetlag.altfirework"))
+                    .tooltip(Text.translatable("jetlag.altfirework.tooltip"))
+                    .binding(
+                            defaults.altFireworkParticles,
+                            () -> config.altFireworkParticles,
+                            val -> config.altFireworkParticles = val
+                    )
+                    .controller(booleanOption -> new BooleanController(booleanOption, true))
+                    .build();
+            particlesGroup.option(altFireworkParticles);
+            defaultCategoryBuilder.group(particlesGroup.build());
 
             return builder
                     .title(Text.translatable("jetlag.title"))
