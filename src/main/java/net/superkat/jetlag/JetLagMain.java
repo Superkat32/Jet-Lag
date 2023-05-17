@@ -1,4 +1,4 @@
-package net.superkat;
+package net.superkat.jetlag;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.particle.v1.FabricParticleTypes;

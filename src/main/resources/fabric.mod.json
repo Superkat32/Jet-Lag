@@ -16,9 +16,11 @@
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-          "net.superkat.JetLagMain"
+			"net.superkat.jetlag.JetLagMain"
 		], "client": [
-			"net.superkat.JetLagClient"
+			"net.superkat.jetlag.JetLagClient"
+		], "modmenu": [
+			"net.superkat.jetlag.ModMenuIntegration"
 		]
 	},
 	"mixins": [
@@ -28,7 +30,8 @@
 		"fabricloader": ">=0.14.19",
 		"minecraft": "~1.19.4",
 		"java": ">=17",
-		"fabric-api": "*"
+		"fabric-api": "*",
+		"yet_another_config_lib": "^2.5.0+1.19.4"
 	},
 	"suggests": {
 		"another-mod": "*"

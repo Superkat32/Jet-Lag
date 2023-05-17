@@ -1,8 +1,8 @@
-package net.superkat.mixin;
+package net.superkat.jetlag.mixin;
 
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.util.math.MatrixStack;
-import net.superkat.SpeedlineRenderer;
+import net.superkat.jetlag.SpeedlineRenderer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;

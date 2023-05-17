@@ -1,4 +1,4 @@
-package net.superkat.mixin;
+package net.superkat.jetlag.mixin;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -9,14 +9,14 @@ import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.world.World;
-import net.superkat.JetLagMain;
+import net.superkat.jetlag.JetLagMain;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-import static net.superkat.JetLagMain.LOGGER;
+import static net.superkat.jetlag.JetLagMain.LOGGER;
 
 @Environment(EnvType.CLIENT)
 @Mixin(FireworkRocketEntity.class)

@@ -1,4 +1,4 @@
-package net.superkat.particles;
+package net.superkat.jetlag.particles;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
