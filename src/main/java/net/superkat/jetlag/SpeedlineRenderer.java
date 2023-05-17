@@ -8,6 +8,8 @@ import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 
+import static net.superkat.jetlag.JetLagConfig.showSpeedlines;
+
 @Environment(EnvType.CLIENT)
 public class SpeedlineRenderer extends DrawableHelper {
     public Identifier defaultTexture = new Identifier("jetlag", "textures/overlay/texturefail.png");
@@ -32,14 +34,13 @@ public class SpeedlineRenderer extends DrawableHelper {
 
     //TODO - Replace with config boolean later
     //TODO - Add config boolean that allows the user to choose how the speedlines render whenever a screen is open(normal, transparent, off)
-    private boolean draw = true;
     public void renderTestItem(MatrixStack matrixStack) {
         //Only allows the mod to draw the speedlines if:
         //the config boolean(currently draw boolean) is true
         //the player is flying with an elytra
         //the player isn't on the ground
         //the screen isn't anything(e.g. pause screen, inventory screen, chat screen, etc.)
-        if (draw && client.player.isFallFlying() && !client.player.isOnGround() && client.currentScreen == null) {
+        if (showSpeedlines && client.player.isFallFlying() && !client.player.isOnGround() && client.currentScreen == null) {
             //The mod knows when to draw the speedlines depending on the player's velocity in any direction
             double velX = Math.abs(client.player.getVelocity().getX());
             double velY = Math.abs(client.player.getVelocity().getY());
