@@ -17,28 +17,28 @@ public class JetLagConfig {
 
     public static final ConfigInstance<JetLagConfig> INSTANCE = new GsonConfigInstance<>(JetLagConfig.class, Path.of("./config/jetlag.json"));
 
-    @ConfigEntry public static boolean myBoolean = true;
+    @ConfigEntry public static boolean showSpeedlines = true;
 
     public static Screen makeScreen(Screen parent) {
         return YetAnotherConfigLib.create(INSTANCE, (defaults, config, builder) -> {
             var defaultCategoryBuilder = ConfigCategory.createBuilder()
                     .name(Text.translatable("jetlag.category.default"));
 
-            var testGroup = OptionGroup.createBuilder()
-                    .name(Text.translatable("jetlag.test.group"))
-                    .tooltip(Text.translatable("jetlag.test.group.tooltip"));
-            var myBoolean = Option.createBuilder(boolean.class)
-                    .name(Text.translatable("jetlag.myboolean"))
-                    .tooltip(Text.translatable("jetlag.myboolean.tooltip"))
+            var screenEffectsGroup = OptionGroup.createBuilder()
+                    .name(Text.translatable("jetlag.screeneffects.group"))
+                    .tooltip(Text.translatable("jetlag.screeneffects.group.tooltip"));
+            var showSpeedlines = Option.createBuilder(boolean.class)
+                    .name(Text.translatable("jetlag.speedlines"))
+                    .tooltip(Text.translatable("jetlag.speedlines.tooltip"))
                     .binding(
-                            defaults.myBoolean,
-                            () -> config.myBoolean,
-                            val -> config.myBoolean = val
+                            defaults.showSpeedlines,
+                            () -> config.showSpeedlines,
+                            val -> config.showSpeedlines = val
                     )
                     .controller(booleanOption -> new BooleanController(booleanOption, true))
                     .build();
-            testGroup.option(myBoolean);
-            defaultCategoryBuilder.group(testGroup.build());
+            screenEffectsGroup.option(showSpeedlines);
+            defaultCategoryBuilder.group(screenEffectsGroup.build());
 
             return builder
                     .title(Text.translatable("jetlag.title"))
