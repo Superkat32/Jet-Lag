@@ -22,7 +22,7 @@ public class FireworkParticle extends SpriteBillboardParticle {
         this.x = x;
         this.y = y;
         this.z = z;
-        this.collidesWithWorld = false;
+        this.collidesWithWorld = true;
         this.alpha = 0.85F;
         this.setSpriteForAge(spriteProvider);
     }
