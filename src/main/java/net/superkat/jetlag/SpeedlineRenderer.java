@@ -25,6 +25,18 @@ public class SpeedlineRenderer extends DrawableHelper {
     public Identifier line10 = new Identifier("jetlag", "textures/overlay/frame10.png");
     public Identifier line11 = new Identifier("jetlag", "textures/overlay/frame11.png");
     public Identifier line12 = new Identifier("jetlag", "textures/overlay/frame12.png");
+    public Identifier line1_2 = new Identifier("jetlag", "textures/overlay2/2frame1.png");
+    public Identifier line2_2 = new Identifier("jetlag", "textures/overlay2/2frame2.png");
+    public Identifier line3_2 = new Identifier("jetlag", "textures/overlay2/2frame3.png");
+    public Identifier line4_2 = new Identifier("jetlag", "textures/overlay2/2frame4.png");
+    public Identifier line5_2 = new Identifier("jetlag", "textures/overlay2/2frame5.png");
+    public Identifier line6_2 = new Identifier("jetlag", "textures/overlay2/2frame6.png");
+    public Identifier line7_2 = new Identifier("jetlag", "textures/overlay2/2frame7.png");
+    public Identifier line8_2 = new Identifier("jetlag", "textures/overlay2/2frame8.png");
+    public Identifier line9_2 = new Identifier("jetlag", "textures/overlay2/2frame9.png");
+    public Identifier line10_2 = new Identifier("jetlag", "textures/overlay2/2frame10.png");
+    public Identifier line11_2 = new Identifier("jetlag", "textures/overlay2/2frame11.png");
+    public Identifier line12_2 = new Identifier("jetlag", "textures/overlay2/2frame12.png");
 
     private static MinecraftClient client;
     public int tick = 0;
@@ -81,6 +93,7 @@ public class SpeedlineRenderer extends DrawableHelper {
             //On the last tick of the last frame of animation, the tick number resets to repeat the animation loop
             //Somewhat janky, especially when playing the game on lower frame rates, but at least it works(better than what I could do otherwise)
             Identifier[] textures = {line1, line2, line3, line4, line5, line6, line7, line8, line9, line10, line11, line12};
+            Identifier[] textures2 = {line1_2, line2_2, line3_2, line4_2, line5_2, line6_2, line7_2, line8_2, line9_2, line10_2, line11_2, line12_2};
             if(tick == textures.length * 4) {
                 tick = 0;
             }
