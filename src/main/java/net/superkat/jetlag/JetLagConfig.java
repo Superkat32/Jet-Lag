@@ -18,6 +18,7 @@ public class JetLagConfig {
     public static final ConfigInstance<JetLagConfig> INSTANCE = new GsonConfigInstance<>(JetLagConfig.class, Path.of("./config/jetlag.json"));
 
     @ConfigEntry public static boolean showSpeedlines = true;
+    @ConfigEntry public static boolean altSpeedlineTextures = false;
     @ConfigEntry public static boolean altFireworkParticles = true;
 
     public static Screen makeScreen(Screen parent) {
@@ -39,7 +40,18 @@ public class JetLagConfig {
                     )
                     .controller(booleanOption -> new BooleanController(booleanOption, true))
                     .build();
+            var altSpeedlines = Option.createBuilder(boolean.class)
+                    .name(Text.translatable("jetlag.speedlines.alt"))
+                    .tooltip(Text.translatable("jetlag.speedlines.alt.tooltip"))
+                    .binding(
+                            defaults.altSpeedlineTextures,
+                            () -> config.altSpeedlineTextures,
+                            val -> config.altSpeedlineTextures = val
+                    )
+                    .controller(booleanOption -> new BooleanController(booleanOption, true))
+                    .build();
             screenEffectsGroup.option(showSpeedlines);
+            screenEffectsGroup.option(altSpeedlines);
             defaultCategoryBuilder.group(screenEffectsGroup.build());
 
             var particlesGroup = OptionGroup.createBuilder()

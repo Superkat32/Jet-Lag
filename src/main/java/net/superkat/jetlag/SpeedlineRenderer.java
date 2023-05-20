@@ -94,11 +94,19 @@ public class SpeedlineRenderer extends DrawableHelper {
             //Somewhat janky, especially when playing the game on lower frame rates, but at least it works(better than what I could do otherwise)
             Identifier[] textures = {line1, line2, line3, line4, line5, line6, line7, line8, line9, line10, line11, line12};
             Identifier[] textures2 = {line1_2, line2_2, line3_2, line4_2, line5_2, line6_2, line7_2, line8_2, line9_2, line10_2, line11_2, line12_2};
-            if(tick == textures.length * 4) {
-                tick = 0;
+            if(JetLagConfig.altSpeedlineTextures) {
+                if(tick == textures.length * 4) {
+                    tick = 0;
+                }
+                int frame = tick / 4 % textures.length;
+                texture = textures[frame];
+            } else {
+                if(tick == textures2.length * 4) {
+                    tick = 0;
+                }
+                int frame = tick / 4 % textures2.length;
+                texture = textures2[frame];
             }
-            int frame = tick / 4 % textures.length;
-            texture = textures[frame];
         }
         RenderSystem.disableDepthTest();
         RenderSystem.depthMask(false);
