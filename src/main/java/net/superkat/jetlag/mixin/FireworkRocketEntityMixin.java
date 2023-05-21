@@ -38,6 +38,19 @@ public abstract class FireworkRocketEntityMixin extends ProjectileEntity {
                     if (this.shooter.isPlayer() && this.shooter.isFallFlying()) {
                         world.addParticle(JetLagMain.FIREWORKPARTICLE, this.getX(), this.getY(), this.getZ(), this.random.nextGaussian() * 0.05, this.getVelocity().y * 0.5, this.random.nextGaussian() * 0.05);
                         world.addParticle(JetLagMain.FIREWORKPARTICLE, this.getX(), this.getY(), this.getZ(), this.random.nextGaussian() * 0.07, this.getVelocity().y * 0.7, this.random.nextGaussian() * 0.07);
+                        if(this.age == 2) {
+                            int windAmount = this.random.nextBetween(4, 7);
+                            for (int i = 0; i < windAmount; i++) {
+                                int windgust = this.random.nextBetween(1, 3);
+                                if(windgust == 1) {
+                                    world.addParticle(JetLagMain.WIND1, this.getX() + this.random.nextBetween(-2, 2), this.getY() + this.random.nextBetween(-2, 2), this.getZ() + this.random.nextBetween(-2, 2), this.random.nextGaussian() * 0.07, this.getVelocity().y * 0.7, this.random.nextGaussian() * 0.07);
+                                } else if (windgust == 2) {
+                                    world.addParticle(JetLagMain.WIND2, this.getX() + this.random.nextBetween(-2, 2), this.getY() + this.random.nextBetween(-2, 2), this.getZ() + this.random.nextBetween(-2, 2), this.random.nextGaussian() * 0.07, this.getVelocity().y * 0.7, this.random.nextGaussian() * 0.07);
+                                }else if (windgust == 3) {
+                                    world.addParticle(JetLagMain.WIND3, this.getX() + this.random.nextBetween(-2, 2), this.getY() + this.random.nextBetween(-2, 2), this.getZ() + this.random.nextBetween(-2, 2), this.random.nextGaussian() * 0.07, this.getVelocity().y * 0.7, this.random.nextGaussian() * 0.07);
+                                }
+                            }
+                        }
                     }
                 }
                 else {
