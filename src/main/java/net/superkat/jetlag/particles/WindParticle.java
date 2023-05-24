@@ -15,7 +15,7 @@ public class WindParticle extends SpriteBillboardParticle {
 //        this.velocityMultiplier = 0.6F;
         this.spriteProvider = spriteProvider;
         this.maxAge = 15 + this.random.nextBetween(0, 7);
-        this.scale = 0.55F + this.random.nextFloat() / 2;
+        this.scale = 0.55F + this.random.nextFloat();
         this.velocityX = 0;
         this.velocityY = 0;
         this.velocityZ = 0;
