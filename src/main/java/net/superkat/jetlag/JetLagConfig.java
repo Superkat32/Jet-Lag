@@ -19,6 +19,7 @@ public class JetLagConfig {
 
     @ConfigEntry public boolean showSpeedlines = true;
     @ConfigEntry public boolean altSpeedlineTextures = false;
+    @ConfigEntry public boolean windGusts = true;
     @ConfigEntry public boolean altFireworkParticles = true;
 
     public static Screen makeScreen(Screen parent) {
@@ -57,6 +58,16 @@ public class JetLagConfig {
             var particlesGroup = OptionGroup.createBuilder()
                     .name(Text.translatable("jetlag.particles.group"))
                     .tooltip(Text.translatable("jetlag.particles.group.tooltip"));
+            var showWindGusts = Option.createBuilder(boolean.class)
+                    .name(Text.translatable("jetlag.wind"))
+                    .tooltip(Text.translatable("jetlag.wind.tooltip"))
+                    .binding(
+                            defaults.windGusts,
+                            () -> config.windGusts,
+                            val -> config.windGusts = val
+                    )
+                    .controller(booleanOption -> new BooleanController(booleanOption, true))
+                    .build();
             var altFireworkParticles = Option.createBuilder(boolean.class)
                     .name(Text.translatable("jetlag.altfirework"))
                     .tooltip(Text.translatable("jetlag.altfirework.tooltip"))
@@ -67,6 +78,7 @@ public class JetLagConfig {
                     )
                     .controller(booleanOption -> new BooleanController(booleanOption, true))
                     .build();
+            particlesGroup.option(showWindGusts);
             particlesGroup.option(altFireworkParticles);
             defaultCategoryBuilder.group(particlesGroup.build());
 

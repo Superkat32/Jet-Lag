@@ -31,14 +31,18 @@ public abstract class FireworkRocketEntityMixin extends ProjectileEntity {
 
     @Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;addParticle(Lnet/minecraft/particle/ParticleEffect;DDDDDD)V"))
     public void init(World instance, ParticleEffect parameters, double x, double y, double z, double velocityX, double velocityY, double velocityZ) {
-        if(INSTANCE.getConfig().altFireworkParticles) {
+        if(INSTANCE.getConfig().altFireworkParticles || INSTANCE.getConfig().windGusts) {
             //Works this way to prevent the game from crashing if a normal firework is used on a block
             try {
                 if (this.shooter != null) {
                     if (this.shooter.isPlayer() && this.shooter.isFallFlying()) {
-                        world.addParticle(JetLagMain.FIREWORKPARTICLE, this.getX(), this.getY(), this.getZ(), this.random.nextGaussian() * 0.05, this.getVelocity().y * 0.5, this.random.nextGaussian() * 0.05);
-                        world.addParticle(JetLagMain.FIREWORKPARTICLE, this.getX(), this.getY(), this.getZ(), this.random.nextGaussian() * 0.07, this.getVelocity().y * 0.7, this.random.nextGaussian() * 0.07);
-                        if(this.age == 2) {
+                        if(INSTANCE.getConfig().altFireworkParticles) {
+                            world.addParticle(JetLagMain.FIREWORKPARTICLE, this.getX(), this.getY(), this.getZ(), this.random.nextGaussian() * 0.05, this.getVelocity().y * 0.5, this.random.nextGaussian() * 0.05);
+                            world.addParticle(JetLagMain.FIREWORKPARTICLE, this.getX(), this.getY(), this.getZ(), this.random.nextGaussian() * 0.07, this.getVelocity().y * 0.7, this.random.nextGaussian() * 0.07);
+                        } else {
+                            this.world.addParticle(ParticleTypes.FIREWORK, this.getX(), this.getY(), this.getZ(), this.random.nextGaussian() * 0.05, -this.getVelocity().y * 0.5, this.random.nextGaussian() * 0.05);
+                        }
+                        if(this.age == 2 && INSTANCE.getConfig().windGusts) {
                             int windAmount = this.random.nextBetween(4, 7);
                             for (int i = 0; i < windAmount; i++) {
                                 int windgust = this.random.nextBetween(1, 3);

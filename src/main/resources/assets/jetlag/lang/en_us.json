@@ -13,6 +13,8 @@
 
   "jetlag.particles.group": "Particles",
   "jetlag.particles.group.tooltip": "All options related to particles",
+  "jetlag.wind": "Wind Gusts",
+  "jetlag.wind.tooltip": "Cartoony wind gusts whenever using a firework whilst flying",
   "jetlag.altfirework": "Alternative Firework Particles",
   "jetlag.altfirework.tooltip": "Cartoon like smoke particles for fireworks only activated while flying"
 }
