@@ -3,13 +3,12 @@
 	"id": "jetlag",
 	"version": "${version}",
 	"name": "Jet Lag",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"description": "Experience kinetic energy in style!",
 	"authors": [
-		"Me!"
+		"Superkat32"
 	],
 	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+		"sources": "https://github.com/Superkat32/Jet-Lag"
 	},
 	"license": "MIT",
 	"icon": "assets/jetlag/icon.png",
