@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-import static net.superkat.jetlag.JetLagConfig.altFireworkParticles;
+import static net.superkat.jetlag.JetLagConfig.INSTANCE;
 import static net.superkat.jetlag.JetLagMain.LOGGER;
 
 @Environment(EnvType.CLIENT)
@@ -31,7 +31,7 @@ public abstract class FireworkRocketEntityMixin extends ProjectileEntity {
 
     @Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;addParticle(Lnet/minecraft/particle/ParticleEffect;DDDDDD)V"))
     public void init(World instance, ParticleEffect parameters, double x, double y, double z, double velocityX, double velocityY, double velocityZ) {
-        if(altFireworkParticles) {
+        if(INSTANCE.getConfig().altFireworkParticles) {
             //Works this way to prevent the game from crashing if a normal firework is used on a block
             try {
                 if (this.shooter != null) {

@@ -8,7 +8,7 @@ import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 
-import static net.superkat.jetlag.JetLagConfig.showSpeedlines;
+import static net.superkat.jetlag.JetLagConfig.INSTANCE;
 
 @Environment(EnvType.CLIENT)
 public class SpeedlineRenderer extends DrawableHelper {
@@ -52,7 +52,7 @@ public class SpeedlineRenderer extends DrawableHelper {
         //the player is flying with an elytra
         //the player isn't on the ground
         //the screen isn't anything(e.g. pause screen, inventory screen, chat screen, etc.)
-        if (showSpeedlines && client.player.isFallFlying() && !client.player.isOnGround() && client.currentScreen == null) {
+        if (INSTANCE.getConfig().showSpeedlines && client.player.isFallFlying() && !client.player.isOnGround() && client.currentScreen == null) {
             //The mod knows when to draw the speedlines depending on the player's velocity in any direction
             double velX = Math.abs(client.player.getVelocity().getX());
             double velY = Math.abs(client.player.getVelocity().getY());
@@ -94,7 +94,7 @@ public class SpeedlineRenderer extends DrawableHelper {
             //Somewhat janky, especially when playing the game on lower frame rates, but at least it works(better than what I could do otherwise)
             Identifier[] textures = {line1, line2, line3, line4, line5, line6, line7, line8, line9, line10, line11, line12};
             Identifier[] textures2 = {line1_2, line2_2, line3_2, line4_2, line5_2, line6_2, line7_2, line8_2, line9_2, line10_2, line11_2, line12_2};
-            if(JetLagConfig.altSpeedlineTextures) {
+            if(INSTANCE.getConfig().altSpeedlineTextures) {
                 if(tick == textures.length * 4) {
                     tick = 0;
                 }

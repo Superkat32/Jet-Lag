@@ -5,7 +5,6 @@ import dev.isxander.yacl.api.Option;
 import dev.isxander.yacl.api.OptionGroup;
 import dev.isxander.yacl.api.YetAnotherConfigLib;
 import dev.isxander.yacl.config.ConfigEntry;
-import dev.isxander.yacl.config.ConfigInstance;
 import dev.isxander.yacl.config.GsonConfigInstance;
 import dev.isxander.yacl.gui.controllers.BooleanController;
 import net.minecraft.client.gui.screen.Screen;
@@ -15,11 +14,12 @@ import java.nio.file.Path;
 
 public class JetLagConfig {
 
-    public static final ConfigInstance<JetLagConfig> INSTANCE = new GsonConfigInstance<>(JetLagConfig.class, Path.of("./config/jetlag.json"));
+//    public static final ConfigInstance<JetLagConfig> INSTANCE = new GsonConfigInstance<>(JetLagConfig.class, Path.of("./config/jetlag.json"));
+    public static final GsonConfigInstance<JetLagConfig> INSTANCE = GsonConfigInstance.<JetLagConfig>createBuilder(JetLagConfig.class).setPath(Path.of("./config/jetlag.json")).build();
 
-    @ConfigEntry public static boolean showSpeedlines = true;
-    @ConfigEntry public static boolean altSpeedlineTextures = false;
-    @ConfigEntry public static boolean altFireworkParticles = true;
+    @ConfigEntry public boolean showSpeedlines = true;
+    @ConfigEntry public boolean altSpeedlineTextures = false;
+    @ConfigEntry public boolean altFireworkParticles = true;
 
     public static Screen makeScreen(Screen parent) {
         return YetAnotherConfigLib.create(INSTANCE, (defaults, config, builder) -> {
