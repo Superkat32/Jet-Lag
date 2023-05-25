@@ -21,6 +21,7 @@ public class JetLagConfig {
     @ConfigEntry public boolean altSpeedlineTextures = false;
     @ConfigEntry public boolean windGusts = true;
     @ConfigEntry public boolean altFireworkParticles = true;
+    @ConfigEntry public boolean alwaysUseAltFireworkParticles = false;
 
     public static Screen makeScreen(Screen parent) {
         return YetAnotherConfigLib.create(INSTANCE, (defaults, config, builder) -> {
@@ -78,8 +79,20 @@ public class JetLagConfig {
                     )
                     .controller(booleanOption -> new BooleanController(booleanOption, true))
                     .build();
+            var alwaysUseAltFireworkParticles = Option.createBuilder(boolean.class)
+                    .name(Text.translatable("jetlag.altfireworkeverywhere"))
+                    .tooltip(Text.translatable("jetlag.altfireworkeverywhere.tooltip"))
+                    .tooltip(Text.translatable("jetlag.altfireworkeverywhere.tooltip.examples"))
+                    .binding(
+                            defaults.alwaysUseAltFireworkParticles,
+                            () -> config.alwaysUseAltFireworkParticles,
+                            val -> config.alwaysUseAltFireworkParticles = val
+                    )
+                    .controller(booleanOption -> new BooleanController(booleanOption, true))
+                    .build();
             particlesGroup.option(showWindGusts);
             particlesGroup.option(altFireworkParticles);
+            particlesGroup.option(alwaysUseAltFireworkParticles);
             defaultCategoryBuilder.group(particlesGroup.build());
 
             return builder

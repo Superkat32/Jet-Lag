@@ -31,10 +31,14 @@ public abstract class FireworkRocketEntityMixin extends ProjectileEntity {
 
     @Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;addParticle(Lnet/minecraft/particle/ParticleEffect;DDDDDD)V"))
     public void init(World instance, ParticleEffect parameters, double x, double y, double z, double velocityX, double velocityY, double velocityZ) {
-        if(INSTANCE.getConfig().altFireworkParticles || INSTANCE.getConfig().windGusts) {
+        if(INSTANCE.getConfig().altFireworkParticles || INSTANCE.getConfig().windGusts || INSTANCE.getConfig().alwaysUseAltFireworkParticles) {
             //Works this way to prevent the game from crashing if a normal firework is used on a block
             try {
-                if (this.shooter != null) {
+                if (INSTANCE.getConfig().alwaysUseAltFireworkParticles) {
+                    world.addParticle(JetLagMain.FIREWORKPARTICLE, this.getX(), this.getY(), this.getZ(), this.random.nextGaussian() * 0.05, this.getVelocity().y * 0.5, this.random.nextGaussian() * 0.05);
+                    world.addParticle(JetLagMain.FIREWORKPARTICLE, this.getX(), this.getY(), this.getZ(), this.random.nextGaussian() * 0.07, this.getVelocity().y * 0.7, this.random.nextGaussian() * 0.07);
+                }
+                else if (this.shooter != null) {
                     if (this.shooter.isPlayer() && this.shooter.isFallFlying()) {
                         if(INSTANCE.getConfig().altFireworkParticles) {
                             world.addParticle(JetLagMain.FIREWORKPARTICLE, this.getX(), this.getY(), this.getZ(), this.random.nextGaussian() * 0.05, this.getVelocity().y * 0.5, this.random.nextGaussian() * 0.05);

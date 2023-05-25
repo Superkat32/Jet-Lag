@@ -16,5 +16,8 @@
   "jetlag.wind": "Wind Gusts",
   "jetlag.wind.tooltip": "Cartoony wind gusts whenever using a firework whilst flying",
   "jetlag.altfirework": "Alternative Firework Particles",
-  "jetlag.altfirework.tooltip": "Cartoon like smoke particles for fireworks only activated while flying"
+  "jetlag.altfirework.tooltip": "Cartoon like smoke particles for fireworks only activated while flying",
+  "jetlag.altfireworkeverywhere": "Always Use Alternative Firework Particles",
+  "jetlag.altfireworkeverywhere.tooltip": "Always use the alternative firework particles, even if the user isn't flying",
+  "jetlag.altfireworkeverywhere.tooltip.examples": "e.g. shooting a firework using a crossbow"
 }
