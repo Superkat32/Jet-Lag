@@ -16,6 +16,7 @@ public class JetLagMain implements ModInitializer {
     public static final DefaultParticleType WIND1 = FabricParticleTypes.simple();
     public static final DefaultParticleType WIND2 = FabricParticleTypes.simple();
     public static final DefaultParticleType WIND3 = FabricParticleTypes.simple();
+    public static final DefaultParticleType MY_PARTICLE = FabricParticleTypes.simple();
 
     @Override
     public void onInitialize() {
@@ -23,5 +24,6 @@ public class JetLagMain implements ModInitializer {
         Registry.register(Registries.PARTICLE_TYPE, new Identifier(MOD_ID, "wind1"), WIND1);
         Registry.register(Registries.PARTICLE_TYPE, new Identifier(MOD_ID, "wind2"), WIND2);
         Registry.register(Registries.PARTICLE_TYPE, new Identifier(MOD_ID, "wind3"), WIND3);
+        Registry.register(Registries.PARTICLE_TYPE, new Identifier(MOD_ID, "my_particle"), MY_PARTICLE);
     }
 }

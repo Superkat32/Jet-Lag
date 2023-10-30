@@ -34,13 +34,6 @@ public class WindParticle extends SpriteBillboardParticle {
         if (this.age++ >= this.maxAge || this.scale <= 0) {
             this.markDead();
         } else {
-//            velocityX *= 1.025;
-//            velocityY *= 1.025;
-//            velocityZ *= 1.025;
-//            if(this.age >= this.maxAge * 0.85) {
-//                this.scale *= 0.92;
-//                this.alpha *= 0.90;
-//            }
             this.move(this.velocityX, this.velocityY, this.velocityZ);
             this.setSpriteForAge(this.spriteProvider);
         }
