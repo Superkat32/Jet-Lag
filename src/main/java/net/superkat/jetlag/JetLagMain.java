@@ -20,6 +20,8 @@ public class JetLagMain implements ModInitializer {
 
     @Override
     public void onInitialize() {
+        JetLagConfig.load();
+
         Registry.register(Registries.PARTICLE_TYPE, new Identifier(MOD_ID, "fireworkparticle"), FIREWORKPARTICLE);
         Registry.register(Registries.PARTICLE_TYPE, new Identifier(MOD_ID, "wind1"), WIND1);
         Registry.register(Registries.PARTICLE_TYPE, new Identifier(MOD_ID, "wind2"), WIND2);
