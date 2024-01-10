@@ -1,4 +1,4 @@
-package net.superkat.jetlag;
+package net.superkat.jetlag.rendering;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;

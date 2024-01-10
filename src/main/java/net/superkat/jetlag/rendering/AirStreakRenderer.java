@@ -1,4 +1,4 @@
-package net.superkat.jetlag;
+package net.superkat.jetlag.rendering;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
@@ -10,33 +10,32 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
+import net.superkat.jetlag.airstreak.JetLagClientPlayerEntity;
 import org.joml.Matrix4f;
 
-public class JetLagUtils {
-
+public class AirStreakRenderer {
     public static final Identifier BEAM_TEXTURE = new Identifier("textures/entity/beacon_beam.png");
-    public static float wingAngle = 0f;
-    private Vec3d point1 = new Vec3d(5, 5, 5);
-    private Vec3d point2 = null;
 
     public static void renderAirStreaks(WorldRenderContext context, ClientPlayerEntity player) {
         Camera camera = context.camera();
 
-        Vec3d originPos = new Vec3d(0, -55, 0);
-        Vec3d targetPos = player.getPos();
+//        Vec3d originPos = new Vec3d(0, -55, 0);
+//        Vec3d targetPos = player.getPos();
 //        Vec3d targetPos = new Vec3d(5, -55, 5);
-        Vec3d transformedPos = originPos.subtract(camera.getPos());
+//        Vec3d transformedPos = originPos.subtract(camera.getPos());
         MatrixStack matrixStack = new MatrixStack();
         matrixStack.push();
-        matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
-        matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(camera.getYaw() + 180f));
-        matrixStack.translate(transformedPos.x, transformedPos.y, transformedPos.z);
+//        matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
+//        matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(camera.getYaw() + 180f));
+//        matrixStack.translate(transformedPos.x, transformedPos.y, transformedPos.z);
 
-        Matrix4f posMatrix = matrixStack.peek().getPositionMatrix();
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
 
-        renderAirStreak(matrixStack, buffer, originPos, targetPos);
+        JetLagClientPlayerEntity jetLagPlayer = (JetLagClientPlayerEntity) player;
+        renderAirStreak(matrixStack, buffer, jetLagPlayer);
+
+//        renderAirStreak(matrixStack, buffer, originPos, targetPos);
 
         RenderSystem.setShader(GameRenderer::getPositionColorTexProgram);
         RenderSystem.setShaderTexture(0, BEAM_TEXTURE);
@@ -49,35 +48,45 @@ public class JetLagUtils {
         matrixStack.pop();
     }
 
-    private static void renderAirStreak(MatrixStack matrixStack, BufferBuilder buffer, Vec3d origin, Vec3d target) {
-
+    private static void renderAirStreak(MatrixStack matrixStack, BufferBuilder buffer, JetLagClientPlayerEntity player) {
+        Vec3d origin;
+        Vec3d target;
         buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR_TEXTURE);
-
-        ClientPlayerEntity player = MinecraftClient.getInstance().player;
         matrixStack.push();
-        drawCube(matrixStack, buffer, origin, target);
-        matrixStack.pop();
+        AirStreak playerAirStreaks = player.jetLag$getPlayerAirStreaks();
+        if(playerAirStreaks != null) {
+            for (int i = 0; i < playerAirStreaks.points.size() - 1; i++) {
+                origin = playerAirStreaks.points.get(i);
+                target = playerAirStreaks.points.get(i + 1);
 
+                Camera camera = MinecraftClient.getInstance().gameRenderer.getCamera();
+                Vec3d transformedPos = origin.subtract(camera.getPos());
+                matrixStack.push();
+                matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
+                matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(camera.getYaw() + 180f));
+                matrixStack.translate(transformedPos.x, transformedPos.y, transformedPos.z);
+
+                drawCube(matrixStack, buffer, origin, target);
+                matrixStack.pop();
+            }
+        }
+        matrixStack.pop();
     }
 
     private static void drawCube(MatrixStack matrixStack, BufferBuilder buffer, Vec3d origin, Vec3d target) {
         Vec3d vec3d = target.subtract(origin);
-        float y = (float)(vec3d.length() + 1.0); //needs to be calculated here
+        float y = (float)(vec3d.length()); //needs to be calculated here
         vec3d = vec3d.normalize();
         float n = (float)Math.acos(vec3d.y);
         float o = (float)Math.atan2(vec3d.z, vec3d.x);
         matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees((1.5707964F - o) * 57.295776F));
         matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(n * 57.295776F));
-        float size = 1 * 0.05F * -1.5F; //Controls the overall size of the cube - the bigger the first number, the smaller the cube
-        float leftX = MathHelper.cos(size + 3.1415927F) * 0.2F; // left - using in x equals left(when facing north)
-        float rightX = MathHelper.cos(size + 0.0F) * 0.2F; //right - using in x equals right(when facing north)
-        float topY = MathHelper.sin(size + 4.712389F) * 0.2F; //top y - using in z equals top
-        float bottomY = MathHelper.sin(size + 1.5707964F) * 0.2F; //bottom y - using in z equals bottom
+        float value = MathHelper.cos(1) * 0.2f; //multiplying here to reduce the size of the beam
         Matrix4f matrix4f = matrixStack.peek().getPositionMatrix();
 
-        drawTopAndBottom(buffer, matrix4f, leftX, topY, rightX, bottomY, y);
-        drawSides(buffer, matrix4f, leftX, bottomY, rightX, topY, y);
-        drawEdges(buffer, matrix4f, leftX, topY, rightX, bottomY, y);
+        drawTopAndBottom(buffer, matrix4f, value, value, -value, -value, y);
+        drawSides(buffer, matrix4f, value, value, -value, -value, y);
+        drawEdges(buffer, matrix4f, value, value, -value, -value, y);
     }
 
     private static void drawEdges(BufferBuilder buffer, Matrix4f matrix, float x1, float z1, float x2, float z2, float y) {

@@ -1,4 +1,4 @@
-package net.superkat.jetlag;
+package net.superkat.jetlag.config;
 
 import com.terraformersmc.modmenu.api.ModMenuApi;
 

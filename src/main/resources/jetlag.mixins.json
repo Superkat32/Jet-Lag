@@ -3,14 +3,13 @@
   "package": "net.superkat.jetlag.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "FireworkRocketEntityMixin",
-    "InGameHudMixin"
+    "FireworkRocketEntityMixin"
   ],
   "injectors": {
     "defaultRequire": 1
   },
   "client": [
-    "ElytraFeatureRendererMixin",
+    "ClientPlayerEntityMixin",
     "PlayerEntityRendererMixin",
     "TestMixin"
   ]
