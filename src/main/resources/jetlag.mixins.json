@@ -10,6 +10,7 @@
   },
   "client": [
     "ClientPlayerEntityMixin",
+    "ElytraEntityModelMixin",
     "PlayerEntityRendererMixin",
     "TestMixin"
   ]

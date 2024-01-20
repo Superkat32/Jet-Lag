@@ -10,6 +10,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
+import net.superkat.jetlag.airstreak.AirStreak;
 import net.superkat.jetlag.airstreak.JetLagClientPlayerEntity;
 import org.joml.Matrix4f;
 
@@ -17,25 +18,15 @@ public class AirStreakRenderer {
     public static final Identifier BEAM_TEXTURE = new Identifier("textures/entity/beacon_beam.png");
 
     public static void renderAirStreaks(WorldRenderContext context, ClientPlayerEntity player) {
-        Camera camera = context.camera();
-
-//        Vec3d originPos = new Vec3d(0, -55, 0);
-//        Vec3d targetPos = player.getPos();
-//        Vec3d targetPos = new Vec3d(5, -55, 5);
-//        Vec3d transformedPos = originPos.subtract(camera.getPos());
         MatrixStack matrixStack = new MatrixStack();
         matrixStack.push();
-//        matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
-//        matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(camera.getYaw() + 180f));
-//        matrixStack.translate(transformedPos.x, transformedPos.y, transformedPos.z);
 
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
 
-        JetLagClientPlayerEntity jetLagPlayer = (JetLagClientPlayerEntity) player;
-        renderAirStreak(matrixStack, buffer, jetLagPlayer);
-
-//        renderAirStreak(matrixStack, buffer, originPos, targetPos);
+        buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR_TEXTURE);
+        renderAirStreak(matrixStack, buffer, player, true);
+//        renderAirStreak(matrixStack, buffer, player, false);
 
         RenderSystem.setShader(GameRenderer::getPositionColorTexProgram);
         RenderSystem.setShaderTexture(0, BEAM_TEXTURE);
@@ -48,16 +39,17 @@ public class AirStreakRenderer {
         matrixStack.pop();
     }
 
-    private static void renderAirStreak(MatrixStack matrixStack, BufferBuilder buffer, JetLagClientPlayerEntity player) {
+    private static void renderAirStreak(MatrixStack matrixStack, BufferBuilder buffer, ClientPlayerEntity player, boolean right) {
         Vec3d origin;
         Vec3d target;
-        buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR_TEXTURE);
+        JetLagClientPlayerEntity jetLagPlayer = (JetLagClientPlayerEntity) player;
+        AirStreak playerAirStreaks = jetLagPlayer.jetLag$getPlayerAirStreaks();
         matrixStack.push();
-        AirStreak playerAirStreaks = player.jetLag$getPlayerAirStreaks();
         if(playerAirStreaks != null) {
-            for (int i = 0; i < playerAirStreaks.points.size() - 1; i++) {
-                origin = playerAirStreaks.points.get(i);
-                target = playerAirStreaks.points.get(i + 1);
+            //renders all left wing points
+            for (int i = 0; i < playerAirStreaks.leftPoints.size() - 1; i++) {
+                origin = playerAirStreaks.leftPoints.get(i);
+                target = playerAirStreaks.leftPoints.get(i + 1);
 
                 Camera camera = MinecraftClient.getInstance().gameRenderer.getCamera();
                 Vec3d transformedPos = origin.subtract(camera.getPos());
@@ -69,6 +61,22 @@ public class AirStreakRenderer {
                 drawCube(matrixStack, buffer, origin, target);
                 matrixStack.pop();
             }
+//
+            //renders all right wing points
+//            for (int i = 0; i < playerAirStreaks.rightPoints.size() - 1; i++) {
+//                origin = playerAirStreaks.rightPoints.get(i);
+//                target = playerAirStreaks.rightPoints.get(i + 1);
+//
+//                Camera camera = MinecraftClient.getInstance().gameRenderer.getCamera();
+//                Vec3d transformedPos = origin.subtract(camera.getPos());
+//                matrixStack.push();
+//                matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
+//                matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(camera.getYaw() + 180f));
+//                matrixStack.translate(transformedPos.x, transformedPos.y, transformedPos.z);
+//
+//                drawCube(matrixStack, buffer, origin, target);
+//                matrixStack.pop();
+//            }
         }
         matrixStack.pop();
     }
