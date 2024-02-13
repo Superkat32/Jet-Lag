@@ -4,6 +4,8 @@ import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.minecraft.client.model.ModelPart;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.item.Items;
 import net.superkat.jetlag.rendering.AirStreakRenderer;
 
 import java.util.List;
@@ -16,7 +18,7 @@ public class AirStreakHandler {
         for(AbstractClientPlayerEntity abstractPlayer : players) {
             if(abstractPlayer instanceof ClientPlayerEntity player) {
                 JetLagClientPlayerEntity jetLagPlayer = (JetLagClientPlayerEntity) player;
-                if(player.isFallFlying()) {
+                if(player.isFallFlying() || player.getEquippedStack(EquipmentSlot.MAINHAND).getItem() == Items.SPYGLASS) {
                     if(jetLagPlayer.jetLag$getPlayerAirStreaks() == null) {
                         jetLagPlayer.jetLag$setAirStreak(new AirStreak(player));
                     }
@@ -35,8 +37,9 @@ public class AirStreakHandler {
 
     public static void changeElytraRotation(ModelPart leftWing, ModelPart rightWing) {
         //this was used for testing purposes
-//        System.out.println(leftWing.roll);
+//        System.out.println(rightWing.roll);
         //-1.5707958 is the absolute max roll the left wing can have
+//        leftWing.roll = -1.5707958f;
 //        rightWing.roll = 1.5f;
     }
 }

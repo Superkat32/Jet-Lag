@@ -1,6 +1,7 @@
 package net.superkat.jetlag.mixin;
 
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.util.math.MatrixStack;
 import net.superkat.jetlag.airstreak.AirStreak;
 import net.superkat.jetlag.airstreak.AirStreakHandler;
 import net.superkat.jetlag.airstreak.JetLagClientPlayerEntity;
@@ -25,6 +26,13 @@ public class ClientPlayerEntityMixin implements JetLagClientPlayerEntity {
     @Override
     public void jetLag$updateAirStreakPoint() {
         playerAirStreaks.addPoint();
+    }
+
+    @Override
+    public void addPoint(MatrixStack matrixStack, ClientPlayerEntity entity) {
+        if(playerAirStreaks != null) {
+            playerAirStreaks.addPoint(matrixStack, entity);
+        }
     }
 
     @Inject(method = "tick", at = @At("TAIL"))
