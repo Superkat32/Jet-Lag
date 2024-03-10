@@ -12,6 +12,7 @@ import net.minecraft.item.Items;
 import net.minecraft.util.math.Vec3d;
 import net.superkat.jetlag.airstreak.AirStreakHandler;
 import net.superkat.jetlag.airstreak.JetLagClientPlayerEntity;
+import net.superkat.jetlag.rendering.AirStreakRenderer;
 import org.apache.commons.compress.utils.Lists;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -51,8 +52,8 @@ public class ElytraEntityModelMixin extends AnimalModelMixin{
     @Inject(method = "getTexturedModelData", at = @At("RETURN"))
     private static void injectTrailEmitters(CallbackInfoReturnable<TexturedModelData> cir, @Local ModelPartData modelPartData, @Local Dilation dilation) {
         modelPartData.addChild("trail_emitter_one",
-                ModelPartBuilder.create().uv(22, 0).cuboid(-15.0F, 0.0F, 0.0F, 10.0F, 20.0F, 2.0F, dilation),
-                ModelTransform.of(5.0F, 0.0F, 0.0F, (float) (Math.PI / 12), 0.0F, (float) (-Math.PI / 12))
+                ModelPartBuilder.create().uv(34, 0).cuboid(-2.0F, 20.0F, 0.0F, 2f, 2.0F, 2.0F, dilation),
+                ModelTransform.of(0.0F, 0.0F, 0.0F, (float) (Math.PI / 12), 0.0F, (float) (-Math.PI / 12))
         );
     }
 
@@ -60,24 +61,23 @@ public class ElytraEntityModelMixin extends AnimalModelMixin{
     public void injectTrailerEmitters2(CallbackInfoReturnable<Iterable<ModelPart>> cir) {
         ArrayList<ModelPart> parts = new ArrayList<>();
 
-//        Iterator<ModelPart> returnValues = (Iterator<ModelPart>) cir.getReturnValue();
         Iterable<ModelPart> returnValues = cir.getReturnValue();
         for (ModelPart returnValue : returnValues) {
             parts.add(returnValue);
         }
-//        parts.add(testEmitter);
+        parts.add(testEmitter); //adds the part to the model
         cir.setReturnValue(parts);
     }
 
     @Override
     protected void test(MatrixStack matrices, VertexConsumer vertices, int light, int overlay, float red, float green, float blue, float alpha, CallbackInfo ci) {
-//        super.test(matrices, vertices, light, overlay, red, green, blue, alpha, ci);
-
         if(entity != null) {
             if(entity.getEquippedStack(EquipmentSlot.MAINHAND).getItem() == Items.SPYGLASS) {
                 if(entity instanceof ClientPlayerEntity clientPlayer) {
                     if(clientPlayer instanceof JetLagClientPlayerEntity jetLagPlayer) {
                         jetLagPlayer.addPoint(matrices, clientPlayer);
+//                        jetLagPlayer.addPoint(clientPlayer.getPos());
+                        AirStreakRenderer.renderAirStreaks(matrices, clientPlayer);
                     }
                 }
             }

@@ -6,7 +6,7 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.Items;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import org.joml.Vector3f;
+import org.joml.Quaternionf;
 import org.spongepowered.include.com.google.common.collect.Lists;
 
 import java.util.List;
@@ -15,6 +15,7 @@ public class AirStreak {
     public final ClientPlayerEntity player;
     public List<Vec3d> leftPoints = Lists.newArrayList();
     public List<Vec3d> rightPoints = Lists.newArrayList();
+    public List<Quaternionf> elytraRotationLeft = Lists.newArrayList();
     public int maxPoints = 30;
     public int ticksUntilNextPoint = 2;
     public int ticksUntilRemovePoint = 10;
@@ -22,9 +23,27 @@ public class AirStreak {
         this.player = player;
         addPoint();
     }
+
+    public void addPoint(Vec3d pointLoc) {
+        leftPoints.add(pointLoc);
+    }
+
     public void addPoint(MatrixStack matrixStack, ClientPlayerEntity player) {
-        Vector3f vector3f = new Vector3f(0, 0, 0);
-        Vector3f translated = matrixStack.peek().getPositionMatrix().getTranslation(vector3f);
+        leftPoints.add(player.getPos());
+
+//        matrixStack.push();
+
+//        matrixStack.translate(0, 0, 0);
+
+//        Vector4f vec = matrixStack.peek().getPositionMatrix().transform(new Vector4f(0, 0, 0, 1));
+//        Matrix4f pos = matrixStack.peek().getPositionMatrix();
+//        Matrix4f test = pos.add(new Matrix4f().m30((float) player.getX()).m31((float) player.getY()).m32((float) player.getZ()));
+//        Vector4f vec = test.transform(new Vector4f(0, 0, 0, 1));
+
+//        Vec3d wingOffset = new Vec3d(vec.x, vec.y, vec.z);
+//        System.out.println(vec.x); //roll
+//        Vec3d wingPos = player.getPos().add(Math.cos(player.getBodyYaw() * 0.017453292F) * (vec.x + vec.z), vec.y, Math.sin(player.getBodyYaw() * 0.017453292F) * (vec.x + vec.z));
+
 
 //        PlayerEntityRenderer playerRenderer = (PlayerEntityRenderer) MinecraftClient.getInstance().getEntityRenderDispatcher().getRenderer(player);
 //        Matrix4f test = matrixStack.peek().getPositionMatrix();
@@ -45,7 +64,10 @@ public class AirStreak {
 //        double zoffset = Math.sin(player.getYaw() / 180f) * test.m20;
 //        leftPoints.add(player.getPos().add(xoffset, yoffset, zoffset));
 
-        leftPoints.add(new Vec3d(translated.x, translated.y, translated.z));
+//        leftPoints.add(wingPos);
+//        elytraRotationLeft.add(new Quaternionf(player.elytraYaw, player.elytraPitch, player.elytraRoll, 1f));
+
+//        matrixStack.pop();
     }
     public void addPoint() {
 
@@ -101,6 +123,7 @@ public class AirStreak {
     public void removeOldestPoint() {
         leftPoints.remove(0);
         rightPoints.remove(0);
+        elytraRotationLeft.remove(0);
     }
     public void setMaxPoints(int maxPoints) {
         this.maxPoints = maxPoints;

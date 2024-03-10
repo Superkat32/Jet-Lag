@@ -3,7 +3,8 @@
   "package": "net.superkat.jetlag.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "FireworkRocketEntityMixin"
+    "FireworkRocketEntityMixin",
+    "MooshroomMushroomFeatureRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1
@@ -12,6 +13,7 @@
     "AnimalModelMixin",
     "ClientPlayerEntityMixin",
     "ElytraEntityModelMixin",
+    "LivingEntityRendererMixin",
     "PlayerEntityRendererMixin",
     "TestMixin"
   ]

@@ -17,6 +17,10 @@ import org.joml.Matrix4f;
 public class AirStreakRenderer {
     public static final Identifier BEAM_TEXTURE = new Identifier("textures/entity/beacon_beam.png");
 
+    public static void renderAirStreaks(MatrixStack matrixStack, ClientPlayerEntity player) {
+
+    }
+
     public static void renderAirStreaks(WorldRenderContext context, ClientPlayerEntity player) {
         MatrixStack matrixStack = new MatrixStack();
         matrixStack.push();
@@ -57,6 +61,7 @@ public class AirStreakRenderer {
                 matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
                 matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(camera.getYaw() + 180f));
                 matrixStack.translate(transformedPos.x, transformedPos.y, transformedPos.z);
+//                matrixStack.translate(1, 0, 0);
 
                 drawCube(matrixStack, buffer, origin, target);
                 matrixStack.pop();
