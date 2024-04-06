@@ -65,7 +65,7 @@ public class ElytraEntityModelMixin extends AnimalModelMixin{
         for (ModelPart returnValue : returnValues) {
             parts.add(returnValue);
         }
-        parts.add(testEmitter); //adds the part to the model
+//        parts.add(testEmitter); //adds the part to the model
         cir.setReturnValue(parts);
     }
 

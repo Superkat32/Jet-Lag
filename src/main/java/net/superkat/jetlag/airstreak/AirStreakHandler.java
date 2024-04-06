@@ -10,7 +10,6 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.passive.MooshroomEntity;
 import net.minecraft.item.Items;
 import net.minecraft.particle.ParticleTypes;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
 import net.superkat.jetlag.rendering.AirStreakRenderer;
@@ -25,47 +24,126 @@ public class AirStreakHandler {
         float yaw = player.getYaw(MinecraftClient.getInstance().getTickDelta());
         float pitch = player.getPitch(MinecraftClient.getInstance().getTickDelta());
         float roll = (float) getPlayerRoll(player, MinecraftClient.getInstance().getTickDelta());
+        float yawRadians = (float) Math.toRadians(yaw);
+        //start of attempt 3
+        //configurable variables to change the particle pos
+        float initHorizontalOffset = 1.385f;
+        float initYOffset = 0.7f;
 
-        //adjustment variables and cached variables
-        float defaultY = 0.65f; //Move up to the elytra wing's level
-        float yawRadians = yaw * 0.017453292F;
-        float pitchRadians = pitch * 0.017453292F;
+        //elytra wing offset
+        //the player.elytra<Pitch,Yaw,Roll> is all for the left wing
+        //Offsets the position towards the default resting position of the elytra
+        float elytraWingOffset = Math.abs(player.elytraRoll + 0.2617994f);
 
-        //Variables used to determine the position
-        float horizontalOffset = 1.45f - (Math.abs(roll) / 2f) * (1 + Math.abs(pitch / 70f)); //the offset left/right from the wings
-        float forwardsOffset = pitch / 90f * 0.75f; //the offset to in front of OR behind the elytra
+        //begin by offsetting player pos to default elytra edge
+        //could also be considered yaw offset
+        //Offsets the position to the edge of the elytra if the player's pitch was 0
+        float initXOffset = (float) Math.cos(yawRadians) * initHorizontalOffset;
+        float initZOffset = (float) Math.sin(yawRadians) * initHorizontalOffset;
 
-        //Variables that determine the position
-        float xYawOffset = MathHelper.cos(yawRadians) * horizontalOffset;
-        float zYawOffset = MathHelper.sin(yawRadians) * horizontalOffset;
-        float xPitchOffset = MathHelper.sin(-yawRadians) * forwardsOffset;
-        float zPitchOffset = MathHelper.cos(-yawRadians) * forwardsOffset;
+        //pitch offset
+        //Offsets the position to either behind or in front of the player
+        //depending on if they are looking upwards or downwards respectively
+        float pitchXOffset = (float) (Math.sin(-yawRadians) * Math.atan(pitch) / 3f) / elytraWingOffset;
+        float pitchZOffset = (float) (Math.cos(-yawRadians) * Math.atan(pitch) / 3f) / elytraWingOffset;
 
-        float yOffset = roll * 1.35f * (1 + Math.abs(pitch / 90f));
+        //roll offset
+        //Offsets the position up or down and to some degree left or right
+        //depending on how far the player has turned
+        float rollHeightOffset = (float) (Math.atan(roll) * (Math.toRadians(Math.abs(pitch)) + 0.5f)); //adjust for pitch as well
+        float rollXOffset = (float) (Math.atan(initXOffset) * Math.abs(roll));
+        float rollZOffset = (float) (Math.atan(initZOffset) * Math.abs(roll));
 
-        //Positions for each wing
-        double xLeft = xYawOffset + xPitchOffset;
-        double yLeft = defaultY + yOffset;
-        double zLeft = zYawOffset + zPitchOffset;
 
-        double xRight = xYawOffset - xPitchOffset;
-        double yRight = defaultY - yOffset;
-        double zRight = zYawOffset - zPitchOffset;
+        //final variables
+        float leftX = (initXOffset + pitchXOffset - rollXOffset) * elytraWingOffset;
+        float leftY = initYOffset + rollHeightOffset;
+        float leftZ = (initZOffset + pitchZOffset - rollZOffset) * elytraWingOffset;
+        float rightX = (-initXOffset + pitchXOffset + rollXOffset) * elytraWingOffset;
+        float rightY = initYOffset - rollHeightOffset;
+        float rightZ = (-initZOffset + pitchZOffset + rollZOffset) * elytraWingOffset;
+
+        //elytra offset
+//        float leftX = initXOffset * elytraWingOffset;
+//        float leftY = initYOffset;
+//        float leftZ = initZOffset * elytraWingOffset;
+//        float rightX = -initXOffset * elytraWingOffset;
+//        float rightY = initYOffset;
+//        float rightZ = -initZOffset * elytraWingOffset;
+
+        //pitch adjustment
+//        float leftX = initXOffset + pitchXOffset;
+//        float leftY = initYOffset;
+//        float leftZ = initZOffset + pitchZOffset;
+//        float rightX = -initXOffset + pitchXOffset;
+//        float rightY = initYOffset;
+//        float rightZ = -initZOffset + pitchZOffset;
+
+        //roll adjustment
+//        float leftX = initXOffset - rollXOffset;
+//        float leftY = initYOffset + rollHeightOffset;
+//        float leftZ = initZOffset - rollZOffset;
+//        float rightX = -initXOffset + rollXOffset;
+//        float rightY = initYOffset - rollHeightOffset;
+//        float rightZ = -initZOffset + rollZOffset;
 
         //left particle of player
         player.clientWorld.addParticle(ParticleTypes.END_ROD,
-                player.getX() + xLeft,
-                player.getY() + yLeft,
-                player.getZ() + zLeft,
-                0.001, 0.001, 0.001);
+                player.getX() + leftX,
+                player.getY() + leftY,
+                player.getZ() + leftZ,
+                0, 0, 0);
 
         //right particle of player
         player.clientWorld.addParticle(ParticleTypes.END_ROD,
-                player.getX() - xRight,
-                player.getY() + yRight,
-                player.getZ() - zRight,
-                0.001, 0.001, 0.001);
+                player.getX() + rightX,
+                player.getY() + rightY,
+                player.getZ() + rightZ,
+                0, 0, 0);
 
+        //end of attempt 3
+
+        //start of attempt 2
+//        //adjustment variables and cached variables
+//        float defaultY = 0.65f; //Move up to the elytra wing's level
+//        float yawRadians = yaw * 0.017453292F;
+//        float pitchRadians = pitch * 0.017453292F;
+//
+//        //Variables used to determine the position
+//        float horizontalOffset = 1.45f - (Math.abs(roll) / 2f) * (1 + Math.abs(pitch / 70f)); //the offset left/right from the wings
+//        float forwardsOffset = pitch / 90f * 0.75f; //the offset to in front of OR behind the elytra
+//
+//        //Variables that determine the position
+//        float xYawOffset = MathHelper.cos(yawRadians) * horizontalOffset;
+//        float zYawOffset = MathHelper.sin(yawRadians) * horizontalOffset;
+//        float xPitchOffset = MathHelper.sin(-yawRadians) * forwardsOffset;
+//        float zPitchOffset = MathHelper.cos(-yawRadians) * forwardsOffset;
+//
+//        float yOffset = roll * 1.35f * (1 + Math.abs(pitch / 90f));
+//
+//        //Positions for each wing
+//        double xLeft = xYawOffset + xPitchOffset;
+//        double yLeft = defaultY + yOffset;
+//        double zLeft = zYawOffset + zPitchOffset;
+//
+//        double xRight = xYawOffset - xPitchOffset;
+//        double yRight = defaultY - yOffset;
+//        double zRight = zYawOffset - zPitchOffset;
+//
+//        //left particle of player
+//        player.clientWorld.addParticle(ParticleTypes.END_ROD,
+//                player.getX() + xLeft,
+//                player.getY() + yLeft,
+//                player.getZ() + zLeft,
+//                0.001, 0.001, 0.001);
+//
+//        //right particle of player
+//        player.clientWorld.addParticle(ParticleTypes.END_ROD,
+//                player.getX() - xRight,
+//                player.getY() + yRight,
+//                player.getZ() - zRight,
+//                0.001, 0.001, 0.001);
+//
         //end of attempt 2
 
 //        float horizontalOffset = 1.35f; //the offset left/right from the wings
