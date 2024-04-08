@@ -4,7 +4,6 @@ import com.mojang.authlib.GameProfile;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
-import net.superkat.jetlag.airstreak.AirStreakHandler;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -25,7 +24,7 @@ public abstract class TestMixin extends AbstractClientPlayerEntity {
     @Inject(method = "tickMovement", at = @At("RETURN"))
     public void jetLag$test(CallbackInfo ci) {
         if(this.isFallFlying()) {
-            AirStreakHandler.spawnInParticlesAtElytraTips((AbstractClientPlayerEntity) (Object) this);
+//            AirStreakHandler.spawnInParticlesAtElytraTips((AbstractClientPlayerEntity) (Object) this);
         }
     }
 }

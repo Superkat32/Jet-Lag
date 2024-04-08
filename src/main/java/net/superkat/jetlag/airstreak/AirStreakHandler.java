@@ -2,23 +2,64 @@ package net.superkat.jetlag.airstreak;
 
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.model.ModelPart;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.passive.MooshroomEntity;
-import net.minecraft.item.Items;
 import net.minecraft.particle.ParticleTypes;
-import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
-import net.superkat.jetlag.rendering.AirStreakRenderer;
-import org.joml.Vector4f;
+import net.superkat.jetlag.airstreak.AirStreak.AirStreakPos;
 
 import java.util.List;
 
 public class AirStreakHandler {
     //This is really just a utils class which can be hot swapped
+
+    public static AirStreakPos getAirStreakPos(ClientPlayerEntity player) {
+        float yaw = player.getYaw(MinecraftClient.getInstance().getTickDelta());
+        float pitch = player.getPitch(MinecraftClient.getInstance().getTickDelta());
+        float roll = (float) getPlayerRoll(player, MinecraftClient.getInstance().getTickDelta());
+        float yawRadians = (float) Math.toRadians(yaw);
+        //start of attempt 3
+        //configurable variables to change the particle pos
+        float initHorizontalOffset = 1.385f;
+        float initYOffset = 0.7f;
+
+        //elytra wing offset
+        //the player.elytra<Pitch,Yaw,Roll> is all for the left wing
+        //Offsets the position towards the default resting position of the elytra
+        float elytraWingOffset = Math.abs(player.elytraRoll + 0.2617994f);
+
+        //begin by offsetting player pos to default elytra edge
+        //could also be considered yaw offset
+        //Offsets the position to the edge of the elytra if the player's pitch was 0
+        float initXOffset = (float) Math.cos(yawRadians) * initHorizontalOffset;
+        float initZOffset = (float) Math.sin(yawRadians) * initHorizontalOffset;
+
+        //pitch offset
+        //Offsets the position to either behind or in front of the player
+        //depending on if they are looking upwards or downwards respectively
+        float pitchXOffset = (float) (Math.sin(-yawRadians) * Math.atan(pitch) / 3f) / elytraWingOffset;
+        float pitchZOffset = (float) (Math.cos(-yawRadians) * Math.atan(pitch) / 3f) / elytraWingOffset;
+
+        //roll offset
+        //Offsets the position up or down and to some degree left or right
+        //depending on how far the player has turned
+        float rollHeightOffset = (float) (Math.atan(roll) * (Math.toRadians(Math.abs(pitch)) + 0.5f)); //adjust for pitch as well
+        float rollXOffset = (float) (Math.atan(initXOffset) * Math.abs(roll));
+        float rollZOffset = (float) (Math.atan(initZOffset) * Math.abs(roll));
+
+
+        //final variables
+        float leftX = (initXOffset + pitchXOffset - rollXOffset) * elytraWingOffset;
+        float leftY = initYOffset + rollHeightOffset;
+        float leftZ = (initZOffset + pitchZOffset - rollZOffset) * elytraWingOffset;
+        float rightX = (-initXOffset + pitchXOffset + rollXOffset) * elytraWingOffset;
+        float rightY = initYOffset - rollHeightOffset;
+        float rightZ = (-initZOffset + pitchZOffset + rollZOffset) * elytraWingOffset;
+
+        Vec3d left = new Vec3d(player.getX() + leftX, player.getY() + leftY, player.getZ() + leftZ);
+        Vec3d right = new Vec3d(player.getX() + rightX, player.getY() + rightY, player.getZ() + rightZ);
+        return new AirStreakPos(left, right);
+    }
 
     public static void spawnInParticlesAtElytraTips(AbstractClientPlayerEntity player) {
         float yaw = player.getYaw(MinecraftClient.getInstance().getTickDelta());
@@ -214,46 +255,42 @@ public class AirStreakHandler {
         return roll;
     }
 
-    public static void test(MatrixStack stack, MooshroomEntity mooshroom) {
-//        stack.push();
-        stack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(mooshroom.age));
-//        stack.pop();
-    }
+//    public static Vec3d getWorldPos(MatrixStack matrixStack, ClientPlayerEntity player) {
+//        Vector4f vec = matrixStack.peek().getPositionMatrix().transform(new Vector4f(0, 0, 0, 1));
+////
+//        Vec3d pos = player.getPos().subtract(Math.cos(player.getBodyYaw() * 0.017453292F) * (vec.z + vec.x), vec.y, Math.sin(player.getBodyYaw() * 0.017453292F) * (vec.z + vec.x));
+//        return pos;
+//    }
 
-    public static Vec3d getWorldPos(MatrixStack matrixStack, ClientPlayerEntity player) {
-        Vector4f vec = matrixStack.peek().getPositionMatrix().transform(new Vector4f(0, 0, 0, 1));
-//
-        Vec3d pos = player.getPos().subtract(Math.cos(player.getBodyYaw() * 0.017453292F) * (vec.z + vec.x), vec.y, Math.sin(player.getBodyYaw() * 0.017453292F) * (vec.z + vec.x));
-        return pos;
-    }
-
-    public static void determineAirStreakRendering(WorldRenderContext context) {
+    public static void airStreakWorldRendering(WorldRenderContext context) {
         List<AbstractClientPlayerEntity> players = context.world().getPlayers();
         for(AbstractClientPlayerEntity abstractPlayer : players) {
             if(abstractPlayer instanceof ClientPlayerEntity player) {
-                JetLagClientPlayerEntity jetLagPlayer = (JetLagClientPlayerEntity) player;
-                if(player.isFallFlying() || player.getEquippedStack(EquipmentSlot.MAINHAND).getItem() == Items.SPYGLASS) {
-                    if(jetLagPlayer.jetLag$getPlayerAirStreaks() == null) {
-                        jetLagPlayer.jetLag$setAirStreak(new AirStreak(player));
-                    }
-                } if (jetLagPlayer.jetLag$getPlayerAirStreaks() != null) {
-                    AirStreakRenderer.renderAirStreaks(context, player);
-                }
+                JetLagPlayer jetLagPlayer = (JetLagPlayer) player;
+                jetLagPlayer.jetlag$tick();
+//                JetLagClientPlayerEntity jetLagPlayer = (JetLagClientPlayerEntity) player;
+//                if(player.isFallFlying() || player.getEquippedStack(EquipmentSlot.MAINHAND).getItem() == Items.SPYGLASS) {
+//                    if(jetLagPlayer.jetLag$getPlayerAirStreaks() == null) {
+//                        jetLagPlayer.jetLag$setAirStreak(new AirStreak(player));
+//                    }
+//                } if (jetLagPlayer.jetLag$getPlayerAirStreaks() != null) {
+//                    AirStreakRenderer.renderAirStreaks(context, player);
+//                }
             }
         }
     }
 
-    public static void updatePlayerAirStreaks(ClientPlayerEntity player) {
-        JetLagClientPlayerEntity jetLagPlayer = (JetLagClientPlayerEntity) player;
-        AirStreak playerAirStreak = jetLagPlayer.jetLag$getPlayerAirStreaks();
-        playerAirStreak.tick();
-    }
+//    public static void updatePlayerAirStreaks(ClientPlayerEntity player) {
+//        JetLagClientPlayerEntity jetLagPlayer = (JetLagClientPlayerEntity) player;
+//        AirStreak playerAirStreak = jetLagPlayer.jetLag$getPlayerAirStreaks();
+//        playerAirStreak.tick();
+//    }
 
-    public static void changeElytraRotation(ModelPart leftWing, ModelPart rightWing) {
+//    public static void changeElytraRotation(ModelPart leftWing, ModelPart rightWing) {
         //this was used for testing purposes
 //        System.out.println(rightWing.roll);
         //-1.5707958 is the absolute max roll the left wing can have
 //        leftWing.roll = -1.5707958f;
 //        rightWing.roll = 1.5f;
-    }
+//    }
 }
