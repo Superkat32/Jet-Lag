@@ -61,9 +61,9 @@ public class JetLagConfig {
                     .tooltip(Text.translatable("jetlag.category.default.tooltip"));
 
             var airStreakGroup = OptionGroup.createBuilder()
-                    .name(Text.translatable("jetlag.airstreak.group"))
+                    .name(Text.translatable("jetlag.contrail.group"))
                     .description(OptionDescription.createBuilder()
-                            .text(Text.translatable("jetlag.airstreak.group.tooltip"))
+                            .text(Text.translatable("jetlag.contrail.group.tooltip"))
                             .build());
 
             var maxPoints = Option.<Integer>createBuilder()

@@ -19,7 +19,7 @@ public class PlayerEntityRendererMixin {
 
     @Inject(method = "setupTransforms(Lnet/minecraft/client/network/AbstractClientPlayerEntity;Lnet/minecraft/client/util/math/MatrixStack;FFF)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/RotationAxis;rotation(F)Lorg/joml/Quaternionf;"), cancellable = true)
     public void reomveRoll(AbstractClientPlayerEntity abstractClientPlayerEntity, MatrixStack matrixStack, float f, float g, float h, CallbackInfo ci) {
-//        AirStreakHandler.getPlayerRoll(abstractClientPlayerEntity, h);
+//        ContrailHandler.getPlayerRoll(abstractClientPlayerEntity, h);
 //        ci.cancel();
     }
 
@@ -31,7 +31,7 @@ public class PlayerEntityRendererMixin {
 //    @Inject(method = "render(Lnet/minecraft/entity/LivingEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V", at = @At("TAIL"))
 //    public void captureWingAngle(LivingEntity livingEntity, float f, float g, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, CallbackInfo ci) {
 //        if(livingEntity instanceof ClientPlayerEntity) {
-////            AirStreakRenderer.renderAirStreak(matrixStack, vertexConsumerProvider, f, g, livingEntity);
+////            ContrailRenderer.renderAirStreak(matrixStack, vertexConsumerProvider, f, g, livingEntity);
 ////        }
 //    }
 

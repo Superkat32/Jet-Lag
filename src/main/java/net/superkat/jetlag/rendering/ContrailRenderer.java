@@ -12,18 +12,18 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
 import net.superkat.jetlag.JetLagMain;
-import net.superkat.jetlag.airstreak.AirStreak;
-import net.superkat.jetlag.airstreak.JetLagClientPlayerEntity;
-import net.superkat.jetlag.airstreak.JetLagPlayer;
 import net.superkat.jetlag.config.JetLagConfig;
+import net.superkat.jetlag.contrail.Contrail;
+import net.superkat.jetlag.contrail.JetLagClientPlayerEntity;
+import net.superkat.jetlag.contrail.JetLagPlayer;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 import org.spongepowered.include.com.google.common.collect.Lists;
 
 import java.util.List;
 
-public class AirStreakRenderer {
-    public static final Identifier AIRSTREAK_TEXTURE = new Identifier(JetLagMain.MOD_ID, "textures/airstreak.png");
+public class ContrailRenderer {
+    public static final Identifier CONTRAIL_TEXTURE = new Identifier(JetLagMain.MOD_ID, "textures/contrail.png");
 
     public static void airStreakWorldRendering(WorldRenderContext context) {
         List<AbstractClientPlayerEntity> players = context.world().getPlayers();
@@ -34,10 +34,10 @@ public class AirStreakRenderer {
 //                JetLagClientPlayerEntity jetLagPlayer = (JetLagClientPlayerEntity) player;
 //                if(player.isFallFlying() || player.getEquippedStack(EquipmentSlot.MAINHAND).getItem() == Items.SPYGLASS) {
 //                    if(jetLagPlayer.jetLag$getPlayerAirStreaks() == null) {
-//                        jetLagPlayer.jetLag$setAirStreak(new AirStreak(player));
+//                        jetLagPlayer.jetLag$setAirStreak(new Contrail(player));
 //                    }
 //                } if (jetLagPlayer.jetLag$getPlayerAirStreaks() != null) {
-//                    AirStreakRenderer.renderAirStreaks(context, player);
+//                    ContrailRenderer.renderAirStreaks(context, player);
 //                }
             }
         }
@@ -45,11 +45,11 @@ public class AirStreakRenderer {
 
     public static void renderAirStreaks(ClientPlayerEntity player) {
         JetLagClientPlayerEntity jetLagPlayer = (JetLagClientPlayerEntity) player;
-        AirStreak playerAirStreaks = jetLagPlayer.jetLag$getPlayerAirStreaks();
+        Contrail playerAirStreaks = jetLagPlayer.jetLag$getPlayerAirStreaks();
         renderAirStreaks(playerAirStreaks);
     }
 
-    public static void renderAirStreaks(AirStreak airStreak) {
+    public static void renderAirStreaks(Contrail contrail) {
         MatrixStack matrixStack = new MatrixStack();
         matrixStack.push();
 
@@ -57,10 +57,10 @@ public class AirStreakRenderer {
         BufferBuilder buffer = tessellator.getBuffer();
 
         buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR_TEXTURE);
-        renderAirStreak(matrixStack, buffer, airStreak);
+        renderAirStreak(matrixStack, buffer, contrail);
 
         RenderSystem.setShader(GameRenderer::getPositionColorTexProgram);
-        RenderSystem.setShaderTexture(0, AIRSTREAK_TEXTURE);
+        RenderSystem.setShaderTexture(0, CONTRAIL_TEXTURE);
         RenderSystem.depthFunc(GL11.GL_LEQUAL);
 
         RenderSystem.disableCull();
@@ -149,18 +149,18 @@ public class AirStreakRenderer {
         }
     }
 
-    private static void renderAirStreak(MatrixStack matrixStack, BufferBuilder buffer, AirStreak airStreak) {
+    private static void renderAirStreak(MatrixStack matrixStack, BufferBuilder buffer, Contrail contrail) {
         Vec3d origin;
         Vec3d target;
         matrixStack.push();
         renderTest(matrixStack, buffer);
-        if(airStreak != null) {
+        if(contrail != null) {
             //renders all left wing points
-            List<Vec3d> leftPoints = airStreak.getLeftPoints();
+            List<Vec3d> leftPoints = contrail.getLeftPoints();
             renderList(matrixStack, buffer, leftPoints);
 
             //renders all right wing points
-            List<Vec3d> rightPoints = airStreak.getRightPoints();
+            List<Vec3d> rightPoints = contrail.getRightPoints();
             renderList(matrixStack, buffer, rightPoints);
         }
         matrixStack.pop();

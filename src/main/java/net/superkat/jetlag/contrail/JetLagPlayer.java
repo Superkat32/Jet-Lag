@@ -1,9 +1,9 @@
-package net.superkat.jetlag.airstreak;
+package net.superkat.jetlag.contrail;
 
 import java.util.List;
 
 public interface JetLagPlayer {
-    List<AirStreak> jetlag$getAirStreaks();
+    List<Contrail> jetlag$getAirStreaks();
     void jetlag$createAirStreak();
     void jetlag$removeAllAirStreaks();
     void jetlag$onElytraEnd();

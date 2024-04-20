@@ -24,7 +24,7 @@ public abstract class TestMixin extends AbstractClientPlayerEntity {
     @Inject(method = "tickMovement", at = @At("RETURN"))
     public void jetLag$test(CallbackInfo ci) {
         if(this.isFallFlying()) {
-//            AirStreakHandler.spawnInParticlesAtElytraTips((AbstractClientPlayerEntity) (Object) this);
+//            ContrailHandler.spawnInParticlesAtElytraTips((AbstractClientPlayerEntity) (Object) this);
         }
     }
 }

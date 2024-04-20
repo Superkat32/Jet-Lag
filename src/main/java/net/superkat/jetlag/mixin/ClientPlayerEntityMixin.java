@@ -2,8 +2,8 @@ package net.superkat.jetlag.mixin;
 
 import com.google.common.collect.Lists;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.superkat.jetlag.airstreak.AirStreak;
-import net.superkat.jetlag.airstreak.JetLagPlayer;
+import net.superkat.jetlag.contrail.Contrail;
+import net.superkat.jetlag.contrail.JetLagPlayer;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 
@@ -11,23 +11,23 @@ import java.util.List;
 
 @Mixin(ClientPlayerEntity.class)
 public class ClientPlayerEntityMixin implements JetLagPlayer {
-    List<AirStreak> airStreaks = Lists.newArrayList();
+    List<Contrail> contrails = Lists.newArrayList();
     @Nullable
-    AirStreak currentAirStreak = null;
+    Contrail currentContrail = null;
     @Override
-    public List<AirStreak> jetlag$getAirStreaks() {
-        return airStreaks;
+    public List<Contrail> jetlag$getAirStreaks() {
+        return contrails;
     }
 
     @Override
     public void jetlag$createAirStreak() {
-        currentAirStreak = new AirStreak((ClientPlayerEntity) (Object) this);
-        airStreaks.add(currentAirStreak);
+        currentContrail = new Contrail((ClientPlayerEntity) (Object) this);
+        contrails.add(currentContrail);
     }
 
     @Override
     public void jetlag$removeAllAirStreaks() {
-        airStreaks = Lists.newArrayList();
+        contrails = Lists.newArrayList();
     }
 
     @Override
@@ -45,9 +45,9 @@ public class ClientPlayerEntityMixin implements JetLagPlayer {
         //checks if the player is flying with an elytra
         ClientPlayerEntity player = (ClientPlayerEntity) (Object) this;
         if(player.isFallFlying()) {
-            if(currentAirStreak != null) {
+            if(currentContrail != null) {
                 //adds new points to the newest air streak
-                currentAirStreak.addPoint();
+                currentContrail.addPoint();
             } else {
                 //creates and sets the current air streak
                 jetlag$createAirStreak();
@@ -57,25 +57,25 @@ public class ClientPlayerEntityMixin implements JetLagPlayer {
 
     @Override
     public void jetlag$renderAirStreakSets() {
-        for(AirStreak airStreak : airStreaks) {
-            airStreak.render();
+        for(Contrail contrail : contrails) {
+            contrail.render();
         }
     }
 
     @Override
     public boolean jetlag$hasAirStreaks() {
-        return !airStreaks.isEmpty();
+        return !contrails.isEmpty();
     }
 
 
-//    public AirStreak playerAirStreaks = null;
+//    public Contrail playerAirStreaks = null;
 //    @Override
-//    public AirStreak jetLag$getPlayerAirStreaks() {
+//    public Contrail jetLag$getPlayerAirStreaks() {
 //        return playerAirStreaks;
 //    }
 //
 //    @Override
-//    public void jetLag$setAirStreak(AirStreak airStreak) {
+//    public void jetLag$setAirStreak(Contrail airStreak) {
 //        this.playerAirStreaks = airStreak;
 //    }
 //
@@ -101,7 +101,7 @@ public class ClientPlayerEntityMixin implements JetLagPlayer {
 //    @Inject(method = "tick", at = @At("TAIL"))
 //    public void jetLag$updateAirStreaks(CallbackInfo ci) {
 //        if(playerAirStreaks != null) {
-//            AirStreakHandler.updatePlayerAirStreaks((ClientPlayerEntity) (Object) this);
+//            ContrailHandler.updatePlayerAirStreaks((ClientPlayerEntity) (Object) this);
 //        }
 //    }
 }

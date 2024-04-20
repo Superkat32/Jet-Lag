@@ -1,4 +1,4 @@
-package net.superkat.jetlag.airstreak;
+package net.superkat.jetlag.contrail;
 
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.minecraft.client.MinecraftClient;
@@ -7,14 +7,14 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.superkat.jetlag.airstreak.AirStreak.AirStreakPos;
+import net.superkat.jetlag.contrail.Contrail.ContrailPos;
 
 import java.util.List;
 
-public class AirStreakHandler {
+public class ContrailHandler {
     //This is really just a utils class which can be hot swapped
 
-    public static AirStreakPos getAirStreakPos(ClientPlayerEntity player) {
+    public static ContrailPos getAirStreakPos(ClientPlayerEntity player) {
         float yaw = player.getYaw(MinecraftClient.getInstance().getTickDelta());
         float pitch = player.getPitch(MinecraftClient.getInstance().getTickDelta());
         float roll = (float) getPlayerRoll(player, MinecraftClient.getInstance().getTickDelta());
@@ -65,7 +65,7 @@ public class AirStreakHandler {
 
         Vec3d left = new Vec3d(lerpedPlayerX + leftX, lerpedPlayerY + leftY, lerpedPlayerZ + leftZ);
         Vec3d right = new Vec3d(lerpedPlayerX + rightX, lerpedPlayerY + rightY, lerpedPlayerZ + rightZ);
-        return new AirStreakPos(left, right);
+        return new ContrailPos(left, right);
     }
 
     public static void spawnInParticlesAtElytraTips(AbstractClientPlayerEntity player) {
@@ -278,10 +278,10 @@ public class AirStreakHandler {
 //                JetLagClientPlayerEntity jetLagPlayer = (JetLagClientPlayerEntity) player;
 //                if(player.isFallFlying() || player.getEquippedStack(EquipmentSlot.MAINHAND).getItem() == Items.SPYGLASS) {
 //                    if(jetLagPlayer.jetLag$getPlayerAirStreaks() == null) {
-//                        jetLagPlayer.jetLag$setAirStreak(new AirStreak(player));
+//                        jetLagPlayer.jetLag$setAirStreak(new Contrail(player));
 //                    }
 //                } if (jetLagPlayer.jetLag$getPlayerAirStreaks() != null) {
-//                    AirStreakRenderer.renderAirStreaks(context, player);
+//                    ContrailRenderer.renderAirStreaks(context, player);
 //                }
             }
         }
@@ -289,7 +289,7 @@ public class AirStreakHandler {
 
 //    public static void updatePlayerAirStreaks(ClientPlayerEntity player) {
 //        JetLagClientPlayerEntity jetLagPlayer = (JetLagClientPlayerEntity) player;
-//        AirStreak playerAirStreak = jetLagPlayer.jetLag$getPlayerAirStreaks();
+//        Contrail playerAirStreak = jetLagPlayer.jetLag$getPlayerAirStreaks();
 //        playerAirStreak.tick();
 //    }
 

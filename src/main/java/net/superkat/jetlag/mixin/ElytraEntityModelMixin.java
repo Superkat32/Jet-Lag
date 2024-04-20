@@ -10,7 +10,7 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Items;
 import net.minecraft.util.math.Vec3d;
-import net.superkat.jetlag.airstreak.JetLagClientPlayerEntity;
+import net.superkat.jetlag.contrail.JetLagClientPlayerEntity;
 import org.apache.commons.compress.utils.Lists;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -39,7 +39,7 @@ public class ElytraEntityModelMixin extends AnimalModelMixin{
 
     @Inject(method = "setAngles(Lnet/minecraft/entity/LivingEntity;FFFFF)V", at = @At("TAIL"))
     public void changeElytraRotation(LivingEntity livingEntity, float f, float g, float h, float i, float j, CallbackInfo ci) {
-//        AirStreakHandler.changeElytraRotation(leftWing, rightWing);
+//        ContrailHandler.changeElytraRotation(leftWing, rightWing);
         if(testEmitter != null) {
             if(entity == null) {
                 this.entity = livingEntity;
@@ -75,7 +75,7 @@ public class ElytraEntityModelMixin extends AnimalModelMixin{
                     if(clientPlayer instanceof JetLagClientPlayerEntity jetLagPlayer) {
 //                        jetLagPlayer.addPoint(matrices, clientPlayer);
 //                        jetLagPlayer.addPoint(clientPlayer.getPos());
-//                        AirStreakRenderer.renderAirStreaks(matrices, clientPlayer);
+//                        ContrailRenderer.renderAirStreaks(matrices, clientPlayer);
                     }
                 }
             }
