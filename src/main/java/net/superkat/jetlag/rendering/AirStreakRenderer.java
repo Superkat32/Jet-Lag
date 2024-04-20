@@ -7,7 +7,6 @@ import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.particle.ParticleTypes;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
@@ -16,6 +15,7 @@ import net.superkat.jetlag.JetLagMain;
 import net.superkat.jetlag.airstreak.AirStreak;
 import net.superkat.jetlag.airstreak.JetLagClientPlayerEntity;
 import net.superkat.jetlag.airstreak.JetLagPlayer;
+import net.superkat.jetlag.config.JetLagConfig;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 import org.spongepowered.include.com.google.common.collect.Lists;
@@ -82,6 +82,8 @@ public class AirStreakRenderer {
         Vec3d point3 = new Vec3d(5, -58, -10);
         Vec3d point4 = new Vec3d(10, -58, -10);
         Vec3d point5 = new Vec3d(10, -58, -15);
+        Vec3d point6 = new Vec3d(0, -58, -13);
+        Vec3d point7 = new Vec3d(5, -56, -16);
         List<Vec3d> points = Lists.newArrayList();
         points.add(point1);
         points.add(point2);
@@ -91,11 +93,12 @@ public class AirStreakRenderer {
         points.add(new Vec3d(5, -58, -20));
         points.add(new Vec3d(0, -58, -20));
         points.add(new Vec3d(-3, -58, -10));
-        points.add(new Vec3d(0, -58, -13));
-        points.add(new Vec3d(5, -56, -15));
+        points.add(point6);
+        points.add(point7);
         points.add(new Vec3d(5, -58, -25));
 
         JetLagPlayer jetLagPlayer = (JetLagPlayer) MinecraftClient.getInstance().player;
+//        points = jetLagPlayer.jetlag$getAirStreaks().get(0).getRightPoints();
 
         Vec3d origin = new Vec3d(0, -58, 0);
         Vec3d target = new Vec3d(0, -58, -5);
@@ -106,8 +109,11 @@ public class AirStreakRenderer {
         matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(camera.getYaw() + 180f));
         matrixStack.translate(transformedPos.x, transformedPos.y, transformedPos.z);
 
-        drawCube(matrixStack, buffer, origin, target);
+//        drawCube(matrixStack, buffer, origin, target);
         matrixStack.pop();
+
+//        drawSegment(matrixStack, buffer, origin, target);
+
         origin = new Vec3d(0, -58, -5);
         target = new Vec3d(5, -58, -10);
 //        target = new Vec3d(10, -58, -10);
@@ -117,23 +123,30 @@ public class AirStreakRenderer {
         matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(camera.getYaw() + 180f));
         matrixStack.translate(transformedPos.x, transformedPos.y, transformedPos.z);
 
-        drawCube(matrixStack, buffer, origin, target);
+//        drawCube(matrixStack, buffer, origin, target);
 
+        matrixStack.pop();
+        int curvePoints = JetLagConfig.getInstance().airStreakCurvePoints;
         for (int i = 0; i < points.size() - 1; i++) {
             Vec3d prevPoint = points.get(i != 0 ? i - 1 : 0);
             Vec3d originPoint = points.get(i);
             Vec3d targetPoint = points.get(i + 1);
             Vec3d nextPoint = points.get(i + 2 <= points.size() - 1 ? i + 2 : i + 1);
-            float testX = MathHelper.catmullRom(MinecraftClient.getInstance().getTickDelta(), (float) prevPoint.getX(), (float) originPoint.getX(), (float) targetPoint.getX(), (float) nextPoint.getX());
-            float testY = MathHelper.catmullRom(MinecraftClient.getInstance().getTickDelta(), (float) prevPoint.getY(), (float) originPoint.getY(), (float) targetPoint.getY(), (float) nextPoint.getY());
-            float testZ = MathHelper.catmullRom(MinecraftClient.getInstance().getTickDelta(), (float) prevPoint.getZ(), (float) originPoint.getZ(), (float) targetPoint.getZ(), (float) nextPoint.getZ());
-            MinecraftClient.getInstance().world.addParticle(ParticleTypes.WAX_ON, testX, testY, testZ, 0, 0, 0);
+
+            Vec3d prevCurvePoint = prevPoint;
+            for (int j = 0; j <= curvePoints; j++) {
+                float delta = 1f / curvePoints * j;
+
+                float curveX = MathHelper.catmullRom(delta, (float) prevPoint.getX(), (float) originPoint.getX(), (float) targetPoint.getX(), (float) nextPoint.getX());
+                float curveY = MathHelper.catmullRom(delta, (float) prevPoint.getY(), (float) originPoint.getY(), (float) targetPoint.getY(), (float) nextPoint.getY());
+                float curveZ = MathHelper.catmullRom(delta, (float) prevPoint.getZ(), (float) originPoint.getZ(), (float) targetPoint.getZ(), (float) nextPoint.getZ());
+                Vec3d curvePoint = new Vec3d(curveX, curveY, curveZ);
+                if(delta > 0f) {
+                    renderSegment(matrixStack, buffer, curvePoint, prevCurvePoint, 1f);
+                }
+                prevCurvePoint = curvePoint;
+            }
         }
-//        float testX = MathHelper.catmullRom(MinecraftClient.getInstance().getTickDelta(), (float) point1.getX(), (float) point2.getX(), (float) point3.getX(), (float) point4.getX());
-//        float testY = MathHelper.catmullRom(MinecraftClient.getInstance().getTickDelta(), (float) point1.getY(), (float) point2.getY(), (float) point3.getY(), (float) point4.getY());
-//        float testZ = MathHelper.catmullRom(MinecraftClient.getInstance().getTickDelta(), (float) point1.getZ(), (float) point2.getZ(), (float) point3.getZ(), (float) point4.getZ());
-//        MinecraftClient.getInstance().world.addParticle(ParticleTypes.END_ROD, testX, testY, testZ, 0, 0, 0);
-        matrixStack.pop();
     }
 
     private static void renderAirStreak(MatrixStack matrixStack, BufferBuilder buffer, AirStreak airStreak) {
@@ -144,55 +157,98 @@ public class AirStreakRenderer {
         if(airStreak != null) {
             //renders all left wing points
             List<Vec3d> leftPoints = airStreak.getLeftPoints();
-            for (int i = 0; i < leftPoints.size() - 1; i++) {
-                origin = leftPoints.get(i);
-                target = leftPoints.get(i + 1);
-                Camera camera = MinecraftClient.getInstance().gameRenderer.getCamera();
-                Vec3d transformedPos = origin.subtract(camera.getPos());
-                matrixStack.push();
-                matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
-                matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(camera.getYaw() + 180f));
-                matrixStack.translate(transformedPos.x, transformedPos.y, transformedPos.z);
-
-//                drawCube(matrixStack, buffer, origin, target);
-
-                Vec3d prevPoint = leftPoints.get(i != 0 ? i - 1 : 0);
-                Vec3d originPoint = leftPoints.get(i);
-                Vec3d targetPoint = leftPoints.get(i + 1);
-                Vec3d nextPoint = leftPoints.get(i + 2 <= leftPoints.size() - 1 ? i + 2 : i + 1);
-                float testX = MathHelper.catmullRom(MinecraftClient.getInstance().getTickDelta(), (float) prevPoint.getX(), (float) originPoint.getX(), (float) targetPoint.getX(), (float) nextPoint.getX());
-                float testY = MathHelper.catmullRom(MinecraftClient.getInstance().getTickDelta(), (float) prevPoint.getY(), (float) originPoint.getY(), (float) targetPoint.getY(), (float) nextPoint.getY());
-                float testZ = MathHelper.catmullRom(MinecraftClient.getInstance().getTickDelta(), (float) prevPoint.getZ(), (float) originPoint.getZ(), (float) targetPoint.getZ(), (float) nextPoint.getZ());
-                MinecraftClient.getInstance().world.addParticle(ParticleTypes.BUBBLE_COLUMN_UP, testX, testY, testZ, 0, 0, 0);
-                matrixStack.pop();
-            }
+            renderList(matrixStack, buffer, leftPoints);
 
             //renders all right wing points
             List<Vec3d> rightPoints = airStreak.getRightPoints();
-            for (int i = 0; i < rightPoints.size() - 1; i++) {
-                origin = rightPoints.get(i);
-                target = rightPoints.get(i + 1);
-                Camera camera = MinecraftClient.getInstance().gameRenderer.getCamera();
-                Vec3d transformedPos = origin.subtract(camera.getPos());
-                matrixStack.push();
-                matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
-                matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(camera.getYaw() + 180f));
-                matrixStack.translate(transformedPos.x, transformedPos.y, transformedPos.z);
+            renderList(matrixStack, buffer, rightPoints);
+        }
+        matrixStack.pop();
+    }
 
-//                drawCube(matrixStack, buffer, origin, target);
+    /**
+     * Renders a connected line of Vec3d's given in a list. The list is rendering in order starting from 0. Called by each set of player air streaks.
+     * @param matrixStack The MatrixStack used in rendering.
+     * @param buffer The BufferBuilder used in rendering
+     * @param points The list of Vec3d points to be rendered.
+     */
+    private static void renderList(MatrixStack matrixStack, BufferBuilder buffer, List<Vec3d> points) {
+        matrixStack.push();
+        int curvePoints = JetLagConfig.getInstance().airStreakCurvePoints;
+        for (int i = 0; i < points.size() - 1; i++) {
+            Vec3d prevPoint = points.get(i != 0 ? i - 1 : 0);
+            Vec3d originPoint = points.get(i);
+            Vec3d targetPoint = points.get(i + 1);
+            Vec3d nextPoint = points.get(i + 2 <= points.size() - 1 ? i + 2 : i + 1);
 
+            Vec3d prevCurvePoint = prevPoint;
+            for (int j = 0; j <= curvePoints; j++) {
+                float delta = 1f / curvePoints * j;
 
-                Vec3d prevPoint = rightPoints.get(i != 0 ? i - 1 : 0);
-                Vec3d originPoint = rightPoints.get(i);
-                Vec3d targetPoint = rightPoints.get(i + 1);
-                Vec3d nextPoint = rightPoints.get(i + 2 <= rightPoints.size() - 1 ? i + 2 : i + 1);
-                float testX = MathHelper.catmullRom(MinecraftClient.getInstance().getTickDelta(), (float) prevPoint.getX(), (float) originPoint.getX(), (float) targetPoint.getX(), (float) nextPoint.getX());
-                float testY = MathHelper.catmullRom(MinecraftClient.getInstance().getTickDelta(), (float) prevPoint.getY(), (float) originPoint.getY(), (float) targetPoint.getY(), (float) nextPoint.getY());
-                float testZ = MathHelper.catmullRom(MinecraftClient.getInstance().getTickDelta(), (float) prevPoint.getZ(), (float) originPoint.getZ(), (float) targetPoint.getZ(), (float) nextPoint.getZ());
-                MinecraftClient.getInstance().world.addParticle(ParticleTypes.BUBBLE_COLUMN_UP, testX, testY, testZ, 0, 0, 0);matrixStack.pop();
+                float curveX = MathHelper.catmullRom(delta, (float) prevPoint.getX(), (float) originPoint.getX(), (float) targetPoint.getX(), (float) nextPoint.getX());
+                float curveY = MathHelper.catmullRom(delta, (float) prevPoint.getY(), (float) originPoint.getY(), (float) targetPoint.getY(), (float) nextPoint.getY());
+                float curveZ = MathHelper.catmullRom(delta, (float) prevPoint.getZ(), (float) originPoint.getZ(), (float) targetPoint.getZ(), (float) nextPoint.getZ());
+                Vec3d curvePoint = new Vec3d(curveX, curveY, curveZ);
+                if(delta > 0f) {
+                    renderSegment(matrixStack, buffer, curvePoint, prevCurvePoint, 1f);
+                }
+                prevCurvePoint = curvePoint;
             }
         }
         matrixStack.pop();
+    }
+
+    /**
+     * Translates and rotates the MatrixStack. Also calculates the to-be rendered line's width and length.
+     *
+     * @param matrixStack The MatrixStack used for rendering.
+     * @param buffer The BufferBuilder used for rendering.
+     * @param origin The starting point to render from.
+     * @param target The ending point to render to.
+     * @param opacity The rendered segment's opacity/alpha value.
+     */
+    private static void renderSegment(MatrixStack matrixStack, BufferBuilder buffer, Vec3d origin, Vec3d target, float opacity) {
+        //FIXME - Gap between each segment. Perhaps translate entire matrixStack only from the first or last point, and draw from there?
+        Camera camera = MinecraftClient.getInstance().gameRenderer.getCamera();
+        Vec3d transformedMatrixPos = origin.subtract(camera.getPos());
+        matrixStack.push();
+
+        //offsets to the origin's pos
+        matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
+        matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(camera.getYaw() + 180f));
+        matrixStack.translate(transformedMatrixPos.x, transformedMatrixPos.y, transformedMatrixPos.z);
+
+        //calculates length
+        float length = (float) origin.distanceTo(target);
+
+        //rotates towards target from origin
+        Vec3d transformedPos = target.subtract(origin);
+        transformedPos = transformedPos.normalize();
+        float rightAngle = (float) Math.toRadians(90);
+        float n = (float)Math.acos(transformedPos.y);
+        float o = (float)Math.atan2(transformedPos.z, transformedPos.x);
+        matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees((float) Math.toDegrees(rightAngle - o))); //rotates left/right
+        matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees((float) Math.toDegrees(rightAngle + n))); //rotates up/down
+
+        drawRectangle(matrixStack.peek().getPositionMatrix(), buffer, 0.1f, -length, opacity);
+
+        matrixStack.pop();
+    }
+
+    /**
+     * Renders a rectangle with a specific width and length. For Air Streak rendering, this is called after the MatrixStack has been translated/rotated.
+     *
+     * @param matrix The MatrixStack's Position Matrix used for rendering.
+     * @param buffer The BufferBuilder used for rendering
+     * @param width The rendered rectangle's width. Should be determined by a config option.
+     * @param length The rendered rectangle's length. Should be determined by the length from the origin point to the target point in {@link #renderSegment(MatrixStack, BufferBuilder, Vec3d, Vec3d, float)}.
+     * @param opacity The rendered rectangle's opacity/alpha value.
+     */
+    private static void drawRectangle(Matrix4f matrix, BufferBuilder buffer, float width, float length, float opacity) {
+        buffer.vertex(matrix, 0, 0, length).color(1f, 1f, 1f, opacity).texture(1f, 1f).next();
+        buffer.vertex(matrix, 0, 0, 0).color(1f, 1f, 1f, opacity).texture(1f, 1f).next();
+        buffer.vertex(matrix, width, 0, 0).color(1f, 1f, 1f, opacity).texture(1f, 1f).next();
+        buffer.vertex(matrix, width, 0, length).color(1f, 1f, 1f, opacity).texture(1f, 1f).next();
     }
 
     private static void drawCube(MatrixStack matrixStack, BufferBuilder buffer, Vec3d origin, Vec3d target) {

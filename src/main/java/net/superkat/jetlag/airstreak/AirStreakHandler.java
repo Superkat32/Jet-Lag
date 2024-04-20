@@ -5,6 +5,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.superkat.jetlag.airstreak.AirStreak.AirStreakPos;
 
@@ -56,8 +57,14 @@ public class AirStreakHandler {
         float rightY = initYOffset - rollHeightOffset;
         float rightZ = (-initZOffset + pitchZOffset + rollZOffset) * elytraWingOffset;
 
-        Vec3d left = new Vec3d(player.getX() + leftX, player.getY() + leftY, player.getZ() + leftZ);
-        Vec3d right = new Vec3d(player.getX() + rightX, player.getY() + rightY, player.getZ() + rightZ);
+        //values must be lerped to heavily reduce rendering artifacts
+        //FIXME - weird rendering artifacts when flying straight up
+        double lerpedPlayerX = MathHelper.lerp(MinecraftClient.getInstance().getTickDelta(), player.prevX, player.getX());
+        double lerpedPlayerY = MathHelper.lerp(MinecraftClient.getInstance().getTickDelta(), player.prevY, player.getY());
+        double lerpedPlayerZ = MathHelper.lerp(MinecraftClient.getInstance().getTickDelta(), player.prevZ, player.getZ());
+
+        Vec3d left = new Vec3d(lerpedPlayerX + leftX, lerpedPlayerY + leftY, lerpedPlayerZ + leftZ);
+        Vec3d right = new Vec3d(lerpedPlayerX + rightX, lerpedPlayerY + rightY, lerpedPlayerZ + rightZ);
         return new AirStreakPos(left, right);
     }
 

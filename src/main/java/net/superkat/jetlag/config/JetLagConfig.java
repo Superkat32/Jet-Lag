@@ -43,6 +43,7 @@ public class JetLagConfig {
     @SerialEntry public int fadeOutPoints = 30;
     @SerialEntry public float airStreakWidth = 0.5f;
     @SerialEntry public float airStreakHeight = 0.1f;
+    @SerialEntry public int airStreakCurvePoints = 3;
 
 //    @SerialEntry
 //    public boolean showSpeedlines = true;
@@ -104,9 +105,23 @@ public class JetLagConfig {
                     .customController(opt -> new IntegerSliderController(opt, 1, maxPoints.pendingValue(), 1))
                     .build();
 
+            var curvePoints = Option.<Integer>createBuilder()
+                    .name(Text.translatable("jetlag.curvepoints"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("jetlag.curvepoints.tooltip"))
+                            .build())
+                    .binding(
+                            defaults.airStreakCurvePoints,
+                            () -> config.airStreakCurvePoints,
+                            val -> config.airStreakCurvePoints = val
+                    )
+                    .customController(opt -> new IntegerSliderController(opt, 1, 48, 1))
+                    .build();
+
             airStreakGroup.option(maxPoints);
             airStreakGroup.option(fadeInPoints);
             airStreakGroup.option(fadeOutPoints);
+            airStreakGroup.option(curvePoints);
             defaultCategoryBuilder.group(airStreakGroup.build());
 
             return builder
