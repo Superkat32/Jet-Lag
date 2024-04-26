@@ -41,9 +41,9 @@ public class JetLagConfig {
     @SerialEntry public int maxPoints = 100;
     @SerialEntry public int fadeInPoints = 10;
     @SerialEntry public int fadeOutPoints = 30;
-    @SerialEntry public float airStreakWidth = 0.5f;
-    @SerialEntry public float airStreakHeight = 0.1f;
-    @SerialEntry public int airStreakCurvePoints = 3;
+    @SerialEntry public float contrailWidth = 0.5f;
+    @SerialEntry public float contrailHeight = 0.1f;
+    @SerialEntry public int contrailCurvePoints = 3;
 
 //    @SerialEntry
 //    public boolean showSpeedlines = true;
@@ -89,7 +89,7 @@ public class JetLagConfig {
                             () -> config.fadeInPoints,
                             val -> config.fadeInPoints = val
                     )
-                    .customController(opt -> new IntegerSliderController(opt, 1, maxPoints.pendingValue(), 1))
+                    .customController(opt -> new IntegerSliderController(opt, 0, maxPoints.pendingValue(), 1))
                     .build();
 
             var fadeOutPoints = Option.<Integer>createBuilder()
@@ -102,7 +102,7 @@ public class JetLagConfig {
                             () -> config.fadeOutPoints,
                             val -> config.fadeOutPoints = val
                     )
-                    .customController(opt -> new IntegerSliderController(opt, 1, maxPoints.pendingValue(), 1))
+                    .customController(opt -> new IntegerSliderController(opt, 0, maxPoints.pendingValue(), 1))
                     .build();
 
             var curvePoints = Option.<Integer>createBuilder()
@@ -111,9 +111,9 @@ public class JetLagConfig {
                             .text(Text.translatable("jetlag.curvepoints.tooltip"))
                             .build())
                     .binding(
-                            defaults.airStreakCurvePoints,
-                            () -> config.airStreakCurvePoints,
-                            val -> config.airStreakCurvePoints = val
+                            defaults.contrailCurvePoints,
+                            () -> config.contrailCurvePoints,
+                            val -> config.contrailCurvePoints = val
                     )
                     .customController(opt -> new IntegerSliderController(opt, 1, 48, 1))
                     .build();

@@ -31,28 +31,29 @@ public class ContrailRenderer {
             if(abstractPlayer instanceof ClientPlayerEntity player) {
                 JetLagPlayer jetLagPlayer = (JetLagPlayer) player;
                 jetLagPlayer.jetlag$tick();
-//                JetLagClientPlayerEntity jetLagPlayer = (JetLagClientPlayerEntity) player;
-//                if(player.isFallFlying() || player.getEquippedStack(EquipmentSlot.MAINHAND).getItem() == Items.SPYGLASS) {
-//                    if(jetLagPlayer.jetLag$getPlayerAirStreaks() == null) {
-//                        jetLagPlayer.jetLag$setAirStreak(new Contrail(player));
-//                    }
-//                } if (jetLagPlayer.jetLag$getPlayerAirStreaks() != null) {
-//                    ContrailRenderer.renderAirStreaks(context, player);
-//                }
             }
         }
     }
 
-    public static void renderAirStreaks(ClientPlayerEntity player) {
+    /**
+     * Render a player's contrail's points.
+     *
+     * @param player Renders this player's existing contrails
+     */
+    public static void renderContrails(ClientPlayerEntity player) {
         JetLagClientPlayerEntity jetLagPlayer = (JetLagClientPlayerEntity) player;
         Contrail playerAirStreaks = jetLagPlayer.jetLag$getPlayerAirStreaks();
-        renderAirStreaks(playerAirStreaks);
+        renderContrails(playerAirStreaks);
     }
 
-    public static void renderAirStreaks(Contrail contrail) {
+    /**
+     * Render a contrail's points. The main method to be called.
+     *
+     * @param contrail The contrail to be rendered
+     */
+    public static void renderContrails(Contrail contrail) {
         MatrixStack matrixStack = new MatrixStack();
         matrixStack.push();
-
 
         RenderSystem.setShader(GameRenderer::getPositionColorTexProgram);
         RenderSystem.setShaderTexture(0, CONTRAIL_TEXTURE);
@@ -60,16 +61,14 @@ public class ContrailRenderer {
 
         RenderSystem.disableCull();
         RenderSystem.enableBlend();
-//        RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
         RenderSystem.setShaderColor(1f, 1f, 1f, 0.3f);
 
         Tessellator tessellator = Tessellator.getInstance();
-        renderAirStreak(matrixStack, tessellator, contrail);
+        renderContrail(matrixStack, tessellator, contrail);
         renderTest(matrixStack, tessellator);
 
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
         RenderSystem.disableBlend();
-//        RenderSystem.defaultBlendFunc();
         RenderSystem.enableCull();
 
         matrixStack.pop();
@@ -155,156 +154,11 @@ public class ContrailRenderer {
 //        }
 
         renderList(matrixStack, buffer, points);
-        matrixStack.push();
-
-        //offsets to the origin's pos
-
-//        float rightAngle = (float) Math.toRadians(90);
-//
-//        Vec3d originPoint = point1; //vec3d2 - entity
-//        Vec3d targetPoint = point2; //vec3d - holding entity
-//
-//        //Offsets to the origin's pos?
-//        Vec3d transformedMatrixPos = originPoint.subtract(camera.getPos());
-//        matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
-//        matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(camera.getYaw() + 180f));
-//        matrixStack.translate(transformedMatrixPos.x, transformedMatrixPos.y, transformedMatrixPos.z);
-//
-//        double e = Math.cos(rightAngle) * originPoint.getZ() + Math.sin(rightAngle) * originPoint.getX();
-//        double f = Math.sin(rightAngle) * originPoint.getZ() - Math.cos(rightAngle) * originPoint.getX();
-//        matrixStack.translate(e, 0, f);
-//
-//        //these seemingly aren't needed except the yOffset?
-//        float xOffset = (float) (originPoint.getX());
-//        float yOffset = (float) (originPoint.getY());
-//        float zOffset = (float) (originPoint.getZ());
-//
-//        float j = (float) (targetPoint.getX() - xOffset);
-//        float k = (float) (targetPoint.getY() - yOffset);
-//        float l = (float) (targetPoint.getZ() - zOffset);
-//
-//        float m = 0.25f; //width
-//
-//        float n = MathHelper.inverseSqrt(j * j + l * l) * m / 2f;
-//        float o = l * n;
-//        float p = j * n;
-//
-//        Matrix4f posMatrix = matrixStack.peek().getPositionMatrix();
-//        VertexConsumer vertexConsumer = MinecraftClient.getInstance().getBufferBuilders().getEntityVertexConsumers().getBuffer(RenderLayer.getLeash());
-//
-//        for (int u = 0; u <= 24; u++) {
-//            renderLeashPiece(posMatrix, vertexConsumer, j, k, l, 0, 0, 15, 15, m, m, o, p, u, false);
-//        }
-//
-////        for (int u = 24; u >= 0; u--) {
-////            renderLeashPiece(posMatrix, vertexConsumer, j, k, l, 0, 0, 15, 15, m, m, o, p, u, false);
-////        }
-//
-//
-//
-//        originPoint = targetPoint; //vec3d2 - entity
-//        targetPoint = point3; //vec3d - holding entity
-//
-//        //Offsets to the origin's pos?
-////        transformedMatrixPos = originPoint.subtract(camera.getPos());
-////        matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
-////        matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(camera.getYaw() + 180f));
-////        matrixStack.translate(transformedMatrixPos.x, transformedMatrixPos.y, transformedMatrixPos.z);
-//
-//        e = Math.cos(rightAngle) * originPoint.getZ() + Math.sin(rightAngle) * originPoint.getX();
-//        f = Math.sin(rightAngle) * originPoint.getZ() - Math.cos(rightAngle) * originPoint.getX();
-//        matrixStack.translate(e, 0, f);
-//
-//        //these seemingly aren't needed except the yOffset?
-//        xOffset = (float) (originPoint.getX());
-//        yOffset = (float) (originPoint.getY());
-//        zOffset = (float) (originPoint.getZ());
-//
-//        j = (float) (targetPoint.getX() - xOffset);
-//        k = (float) (targetPoint.getY() - yOffset);
-//        l = (float) (targetPoint.getZ() - zOffset);
-//
-//        n = MathHelper.inverseSqrt(j * j + l * l) * m / 2f;
-//        o = l * n;
-//        p = j * n;
-//
-//        posMatrix = matrixStack.peek().getPositionMatrix();
-//
-//        for (int u = 0; u <= 24; u++) {
-//            renderLeashPiece(posMatrix, vertexConsumer, j, k, l, 0, 0, 15, 15, m, m, o, p, u, false);
-//        }
-//
-//        originPoint = targetPoint; //vec3d2 - entity
-//        targetPoint = point4; //vec3d - holding entity
-//
-//        //Offsets to the origin's pos?
-////        transformedMatrixPos = originPoint.subtract(camera.getPos());
-////        matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
-////        matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(camera.getYaw() + 180f));
-////        matrixStack.translate(transformedMatrixPos.x, transformedMatrixPos.y, transformedMatrixPos.z);
-//
-//        e = Math.cos(rightAngle) * originPoint.getZ() + Math.sin(rightAngle) * originPoint.getX();
-//        f = Math.sin(rightAngle) * originPoint.getZ() - Math.cos(rightAngle) * originPoint.getX();
-//        matrixStack.translate(e, 0, 0);
-//
-//        //these seemingly aren't needed except the yOffset?
-//        xOffset = (float) (originPoint.getX());
-//        yOffset = (float) (originPoint.getY());
-//        zOffset = (float) (originPoint.getZ());
-//
-//        j = (float) (targetPoint.getX() - xOffset);
-//        k = (float) (targetPoint.getY() - yOffset);
-//        l = (float) (targetPoint.getZ() - zOffset);
-//
-//        n = MathHelper.inverseSqrt(j * j + l * l) * m / 2f;
-//        o = l * n;
-//        p = j * n;
-//
-//        posMatrix = matrixStack.peek().getPositionMatrix();
-//
-//        for (int u = 0; u <= 24; u++) {
-//            renderLeashPiece(posMatrix, vertexConsumer, j, k, l, 0, 0, 15, 15, m, m, o, p, u, false);
-//        }
-//
-//        originPoint = targetPoint; //vec3d2 - entity
-//        targetPoint = new Vec3d(10, -58, -10); //vec3d - holding entity
-//
-//        //Offsets to the origin's pos?
-////        transformedMatrixPos = originPoint.subtract(camera.getPos());
-////        matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
-////        matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(camera.getYaw() + 180f));
-////        matrixStack.translate(transformedMatrixPos.x, transformedMatrixPos.y, transformedMatrixPos.z);
-//
-//        e = Math.cos(rightAngle) * originPoint.getZ() + Math.sin(rightAngle) * originPoint.getX();
-//        f = Math.sin(rightAngle) * originPoint.getZ() - Math.cos(rightAngle) * originPoint.getX();
-//        matrixStack.translate(e, 0, f);
-//
-//        //these seemingly aren't needed except the yOffset?
-//        xOffset = (float) (originPoint.getX());
-//        yOffset = (float) (originPoint.getY());
-//        zOffset = (float) (originPoint.getZ());
-//
-//        j = (float) (targetPoint.getX() - xOffset);
-//        k = (float) (targetPoint.getY() - yOffset);
-//        l = (float) (targetPoint.getZ() - zOffset);
-//
-//        n = MathHelper.inverseSqrt(j * j + l * l) * m / 2f;
-//        o = l * n;
-//        p = j * n;
-//
-//        posMatrix = matrixStack.peek().getPositionMatrix();
-//
-//        for (int u = 0; u <= 24; u++) {
-//            renderLeashPiece(posMatrix, vertexConsumer, j, k, l, 0, 0, 15, 15, m, m, o, p, u, false);
-//        }
-
-
-        matrixStack.pop();
 
         tessellator.draw();
     }
 
-    private static void renderAirStreak(MatrixStack matrixStack, Tessellator tessellator, Contrail contrail) {
+    private static void renderContrail(MatrixStack matrixStack, Tessellator tessellator, Contrail contrail) {
         matrixStack.push();
         if(contrail != null) {
             BufferBuilder buffer = tessellator.getBuffer();
@@ -332,43 +186,7 @@ public class ContrailRenderer {
      */
     private static void renderList(MatrixStack matrixStack, BufferBuilder buffer, List<Vec3d> points) {
         matrixStack.push();
-//        Camera camera = MinecraftClient.getInstance().gameRenderer.getCamera();
-//        Vec3d origin = points.get(0);
-//        Vec3d transformedMatrixPos = origin.subtract(camera.getPos());
-//
-//        //offsets to the origin's pos
-//        matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
-//        matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(camera.getYaw() + 180f));
-//        matrixStack.translate(transformedMatrixPos.x, transformedMatrixPos.y, transformedMatrixPos.z);
-
-//        Matrix4f positionMatrix = matrixStack.peek().getPositionMatrix();
-//        buffer.vertex(positionMatrix, 1, 0, 1).color(1f, 1f, 1f, 1f).texture(1f, 1f).next();
-//        buffer.vertex(positionMatrix, 0, 0, 1).color(1f, 1f, 1f, 1f).texture(1f, 1f).next();
-//        buffer.vertex(positionMatrix, 0, 0, -5).color(1f, 1f, 1f, 1f).texture(1f, 1f).next();
-//        buffer.vertex(positionMatrix, 1, 0, -5).color(1f, 1f, 1f, 1f).texture(1f, 1f).next();
-//
-//        buffer.vertex(positionMatrix, 0, 0, -5).color(1f, 1f, 1f, 1f).texture(1f, 1f).next();
-//        buffer.vertex(positionMatrix, 1, 0, -5).color(1f, 1f, 1f, 1f).texture(1f, 1f).next();
-//        buffer.vertex(positionMatrix, 6, 0, -11).color(1f, 1f, 1f, 1f).texture(1f, 1f).next();
-//        buffer.vertex(positionMatrix, 5, 0, -11).color(1f, 1f, 1f, 1f).texture(1f, 1f).next();
-//
-//        buffer.vertex(positionMatrix, 6, 0, -11).color(1f, 1f, 1f, 1f).texture(1f, 1f).next();
-//        buffer.vertex(positionMatrix, 5, 0, -11).color(1f, 1f, 1f, 1f).texture(1f, 1f).next();
-//        buffer.vertex(positionMatrix, 0, 0, -14).color(1f, 1f, 1f, 1f).texture(1f, 1f).next();
-//        buffer.vertex(positionMatrix, 1, 0, -14).color(1f, 1f, 1f, 1f).texture(1f, 1f).next();
-//
-//        buffer.vertex(positionMatrix, 0, 0, -14).color(1f, 1f, 1f, 1f).texture(1f, 1f).next();
-//        buffer.vertex(positionMatrix, 1, 0, -14).color(1f, 1f, 1f, 1f).texture(1f, 1f).next();
-//        buffer.vertex(positionMatrix, -3, 0, -10).color(1f, 1f, 1f, 1f).texture(1f, 1f).next();
-//        buffer.vertex(positionMatrix, -4, 0, -10).color(1f, 1f, 1f, 1f).texture(1f, 1f).next();
-//        drawRectangle(positionMatrix, buffer, 0f, 1f, 0f, 0f, 1f, -5f, 1f, 1f);
-//        drawRectangle(positionMatrix, buffer, 1f, -5f, 0f, 0f, 6f, -11f, 1f, 1f);
-//        drawRectangle(positionMatrix, buffer, 1f, -5f, 0f, 0f, 5f, -4f, 1f, 1f);
-//        drawRectangle(positionMatrix, buffer, 1f, 1f, 1f);
-//        drawRectangle(positionMatrix, buffer, 1f, 1f, 0f, 0f, 0f, -5f, 1f);
-//        drawRectangle(positionMatrix, buffer, 1f, -4f, 0f, 0f, 6f, -5f, 1f);
-//        drawRectangle(positionMatrix, buffer, 5f, -5f, 0f, 0f, 5f, -10f, 1f);
-        int curvePoints = JetLagConfig.getInstance().airStreakCurvePoints;
+        int curvePoints = JetLagConfig.getInstance().contrailCurvePoints;
         for (int i = 0; i < points.size() - 1; i++) {
             Vec3d prevPoint = points.get(i != 0 ? i - 1 : 0);
             Vec3d originPoint = points.get(i);
@@ -427,13 +245,6 @@ public class ContrailRenderer {
 
         matrixStack.pop();
     }
-
-//    private static void drawRectangle(Matrix4f matrix, BufferBuilder buffer, float x1, float z1, float y1, float y2, float x2, float z2, float width, float opacity) {
-//        buffer.vertex(matrix, x1, y1, z1).color(1f, 1f, 1f, opacity).texture(1f, 1f).next();
-//        buffer.vertex(matrix, x1, y2, z2).color(1f, 1f, 1f, opacity).texture(1f, 1f).next();
-//        buffer.vertex(matrix, x2, y2, z2).color(1f, 1f, 1f, opacity).texture(1f, 1f).next();
-//        buffer.vertex(matrix, x2, y1, z1).color(1f, 1f, 1f, opacity).texture(1f, 1f).next();
-//    }
 
     /**
      * Renders a triangle with a specific width and length. For Contrail rendering, this is called after the MatrixStack has been translated/rotated.

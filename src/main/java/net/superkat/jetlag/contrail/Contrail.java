@@ -2,6 +2,7 @@ package net.superkat.jetlag.contrail;
 
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.util.math.Vec3d;
+import net.superkat.jetlag.config.JetLagConfig;
 import net.superkat.jetlag.rendering.ContrailRenderer;
 import org.spongepowered.include.com.google.common.collect.Lists;
 
@@ -10,12 +11,13 @@ import java.util.List;
 public class Contrail {
     public final ClientPlayerEntity player;
     public List<ContrailPos> airStreakPoints = Lists.newArrayList();
-    public int maxPoints = 100; //TODO - config here
+    public int maxPoints;
     public boolean startDeletingPoints = false;
     public int ticksUntilNextDelete = 10;
 
     public Contrail(ClientPlayerEntity player) {
         this.player = player;
+        this.maxPoints = JetLagConfig.getInstance().maxPoints;
     }
 
     public void addPoint() {
@@ -26,15 +28,18 @@ public class Contrail {
     }
 
     public void render() {
+
+        maxPoints = JetLagConfig.getInstance().maxPoints;
+
         if(startDeletingPoints && !noPointsLeft()) {
             ticksUntilNextDelete--;
             if(ticksUntilNextDelete <= 0) {
                 removeOldestPoint();
-                ticksUntilNextDelete = 10;
+                ticksUntilNextDelete = 3;
             }
         }
 
-        ContrailRenderer.renderAirStreaks(this);
+        ContrailRenderer.renderContrails(this);
     }
 
     public boolean shouldRemoveOldestPoint() {
