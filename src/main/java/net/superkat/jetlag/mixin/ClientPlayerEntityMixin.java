@@ -15,18 +15,18 @@ public class ClientPlayerEntityMixin implements JetLagPlayer {
     @Nullable
     Contrail currentContrail = null;
     @Override
-    public List<Contrail> jetlag$getAirStreaks() {
+    public List<Contrail> jetlag$getContrails() {
         return contrails;
     }
 
     @Override
-    public void jetlag$createAirStreak() {
+    public void jetlag$createContrail() {
         currentContrail = new Contrail((ClientPlayerEntity) (Object) this);
         contrails.add(currentContrail);
     }
 
     @Override
-    public void jetlag$removeAllAirStreaks() {
+    public void jetlag$removeAllContrails() {
         contrails = Lists.newArrayList();
     }
 
@@ -38,8 +38,8 @@ public class ClientPlayerEntityMixin implements JetLagPlayer {
     @Override
     public void jetlag$tick() {
         //renders air streaks if any exists
-        if(jetlag$hasAirStreaks()) {
-            jetlag$renderAirStreakSets();
+        if(jetlag$hasContrails()) {
+            jetlag$renderContrailSets();
         }
 
         //checks if the player is flying with an elytra
@@ -50,20 +50,20 @@ public class ClientPlayerEntityMixin implements JetLagPlayer {
                 currentContrail.addPoint();
             } else {
                 //creates and sets the current air streak
-                jetlag$createAirStreak();
+                jetlag$createContrail();
             }
         }
     }
 
     @Override
-    public void jetlag$renderAirStreakSets() {
+    public void jetlag$renderContrailSets() {
         for(Contrail contrail : contrails) {
             contrail.render();
         }
     }
 
     @Override
-    public boolean jetlag$hasAirStreaks() {
+    public boolean jetlag$hasContrails() {
         return !contrails.isEmpty();
     }
 
