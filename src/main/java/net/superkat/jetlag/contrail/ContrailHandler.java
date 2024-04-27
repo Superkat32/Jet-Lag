@@ -136,4 +136,8 @@ public class ContrailHandler {
 
         return roll;
     }
+
+//    public static float getPlayerElytraOffset(AbstractClientPlayerEntity player) {
+//
+//    }
 }

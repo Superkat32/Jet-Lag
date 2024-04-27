@@ -1,6 +1,7 @@
 package net.superkat.jetlag.mixin;
 
 import com.google.common.collect.Lists;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.superkat.jetlag.contrail.Contrail;
 import net.superkat.jetlag.contrail.JetLagPlayer;
@@ -32,26 +33,32 @@ public class ClientPlayerEntityMixin implements JetLagPlayer {
 
     @Override
     public void jetlag$onElytraEnd() {
-
+        //DELETEME - perhaps easier without this?
     }
 
     @Override
     public void jetlag$tick() {
         //renders air streaks if any exists
-        if(jetlag$hasContrails()) {
-            jetlag$renderContrailSets();
-        }
+        jetlag$renderContrailSets();
 
         //checks if the player is flying with an elytra
         ClientPlayerEntity player = (ClientPlayerEntity) (Object) this;
         if(player.isFallFlying()) {
             if(currentContrail != null) {
                 //adds new points to the newest air streak
-                currentContrail.addPoint();
+                MinecraftClient client = MinecraftClient.getInstance();
+                if(!client.isPaused() && (client.world == null || client.world.getTickManager().shouldTick())) {
+                    if(jetlag$hasContrails()) {
+                        currentContrail.addPoint();
+                    }
+                }
             } else {
                 //creates and sets the current air streak
                 jetlag$createContrail();
             }
+        } else if (currentContrail != null) {
+            currentContrail.startDeletingPoints();
+            currentContrail = null;
         }
     }
 

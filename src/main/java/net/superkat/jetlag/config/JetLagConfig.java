@@ -5,6 +5,7 @@ import dev.isxander.yacl3.api.*;
 import dev.isxander.yacl3.config.v2.api.ConfigClassHandler;
 import dev.isxander.yacl3.config.v2.api.SerialEntry;
 import dev.isxander.yacl3.config.v2.api.serializer.GsonConfigSerializerBuilder;
+import dev.isxander.yacl3.gui.controllers.slider.DoubleSliderController;
 import dev.isxander.yacl3.gui.controllers.slider.IntegerSliderController;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.gui.screen.Screen;
@@ -39,11 +40,13 @@ public class JetLagConfig {
 
 
     @SerialEntry public int maxPoints = 100;
-    @SerialEntry public int fadeInPoints = 10;
+    @SerialEntry public int fadeInPoints = 20;
     @SerialEntry public int fadeOutPoints = 30;
-    @SerialEntry public float contrailWidth = 0.5f;
+    @SerialEntry public double contrailWidth = 0.1;
     @SerialEntry public float contrailHeight = 0.1f;
     @SerialEntry public int contrailCurvePoints = 3;
+    @SerialEntry public int contrailDeletionDelay = 1;
+    @SerialEntry public int pointsDeletedPerDelay = 1;
 
 //    @SerialEntry
 //    public boolean showSpeedlines = true;
@@ -60,7 +63,7 @@ public class JetLagConfig {
                     .name(Text.translatable("jetlag.category.default"))
                     .tooltip(Text.translatable("jetlag.category.default.tooltip"));
 
-            var airStreakGroup = OptionGroup.createBuilder()
+            var contrailGroup = OptionGroup.createBuilder()
                     .name(Text.translatable("jetlag.contrail.group"))
                     .description(OptionDescription.createBuilder()
                             .text(Text.translatable("jetlag.contrail.group.tooltip"))
@@ -76,7 +79,7 @@ public class JetLagConfig {
                             () -> config.maxPoints,
                             val -> config.maxPoints = val
                     )
-                    .customController(opt -> new IntegerSliderController(opt, 1, 200, 1))
+                    .customController(opt -> new IntegerSliderController(opt, 0, 200, 1))
                     .build();
 
             var fadeInPoints = Option.<Integer>createBuilder()
@@ -89,7 +92,7 @@ public class JetLagConfig {
                             () -> config.fadeInPoints,
                             val -> config.fadeInPoints = val
                     )
-                    .customController(opt -> new IntegerSliderController(opt, 0, maxPoints.pendingValue(), 1))
+                    .customController(opt -> new IntegerSliderController(opt, 0, 50, 1))
                     .build();
 
             var fadeOutPoints = Option.<Integer>createBuilder()
@@ -102,7 +105,7 @@ public class JetLagConfig {
                             () -> config.fadeOutPoints,
                             val -> config.fadeOutPoints = val
                     )
-                    .customController(opt -> new IntegerSliderController(opt, 0, maxPoints.pendingValue(), 1))
+                    .customController(opt -> new IntegerSliderController(opt, 0, 50, 1))
                     .build();
 
             var curvePoints = Option.<Integer>createBuilder()
@@ -118,11 +121,53 @@ public class JetLagConfig {
                     .customController(opt -> new IntegerSliderController(opt, 1, 48, 1))
                     .build();
 
-            airStreakGroup.option(maxPoints);
-            airStreakGroup.option(fadeInPoints);
-            airStreakGroup.option(fadeOutPoints);
-            airStreakGroup.option(curvePoints);
-            defaultCategoryBuilder.group(airStreakGroup.build());
+            var contrailWidth = Option.<Double>createBuilder()
+                    .name(Text.translatable("jetlag.contrailwidth"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("jetlag.contrailwidth.tooltip"))
+                            .build())
+                    .binding(
+                            defaults.contrailWidth,
+                            () -> config.contrailWidth,
+                            val -> config.contrailWidth = val
+                    )
+                    .customController(opt -> new DoubleSliderController(opt, 0.05, 0.5, 0.05))
+                    .build();
+
+            var deleteDelay = Option.<Integer>createBuilder()
+                    .name(Text.translatable("jetlag.deletedelay"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("jetlag.deletedelay.tooltip"))
+                            .build())
+                    .binding(
+                            defaults.contrailDeletionDelay,
+                            () -> config.contrailDeletionDelay,
+                            val -> config.contrailDeletionDelay = val
+                    )
+                    .customController(opt -> new IntegerSliderController(opt, 1, 10, 1))
+                    .build();
+
+            var pointsPerDelete = Option.<Integer>createBuilder()
+                    .name(Text.translatable("jetlag.pointsperdelete"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("jetlag.pointsperdelete.tooltip"))
+                            .build())
+                    .binding(
+                            defaults.pointsDeletedPerDelay,
+                            () -> config.pointsDeletedPerDelay,
+                            val -> config.pointsDeletedPerDelay = val
+                    )
+                    .customController(opt -> new IntegerSliderController(opt, 1, 10, 1))
+                    .build();
+
+            contrailGroup.option(maxPoints);
+            contrailGroup.option(fadeInPoints);
+            contrailGroup.option(fadeOutPoints);
+            contrailGroup.option(curvePoints);
+            contrailGroup.option(contrailWidth);
+            contrailGroup.option(deleteDelay);
+            contrailGroup.option(pointsPerDelete);
+            defaultCategoryBuilder.group(contrailGroup.build());
 
             return builder
                 .title(Text.translatable("jetlag.title"))

@@ -10,7 +10,7 @@ import java.util.List;
 
 public class Contrail {
     public final ClientPlayerEntity player;
-    public List<ContrailPos> airStreakPoints = Lists.newArrayList();
+    public List<ContrailPos> contrailPoints = Lists.newArrayList();
     public int maxPoints;
     public boolean startDeletingPoints = false;
     public int ticksUntilNextDelete = 10;
@@ -21,21 +21,25 @@ public class Contrail {
     }
 
     public void addPoint() {
-        airStreakPoints.add(ContrailHandler.getAirStreakPos(player));
+        contrailPoints.add(ContrailHandler.getAirStreakPos(player));
         if(shouldRemoveOldestPoint()) {
             removeOldestPoint();
         }
     }
 
     public void render() {
-
         maxPoints = JetLagConfig.getInstance().maxPoints;
 
         if(startDeletingPoints && !noPointsLeft()) {
             ticksUntilNextDelete--;
             if(ticksUntilNextDelete <= 0) {
-                removeOldestPoint();
-                ticksUntilNextDelete = 3;
+                for (int i = 0; i < JetLagConfig.getInstance().pointsDeletedPerDelay; i++) {
+                    if(contrailPoints.isEmpty()) {
+                        break;
+                    }
+                    removeOldestPoint();
+                }
+                ticksUntilNextDelete = JetLagConfig.getInstance().contrailDeletionDelay;
             }
         }
 
@@ -43,11 +47,11 @@ public class Contrail {
     }
 
     public boolean shouldRemoveOldestPoint() {
-        return airStreakPoints.size() >= maxPoints;
+        return contrailPoints.size() >= maxPoints;
     }
 
     public void removeOldestPoint() {
-        airStreakPoints.remove(0);
+        contrailPoints.remove(0);
     }
 
     public void startDeletingPoints() {
@@ -55,18 +59,18 @@ public class Contrail {
     }
 
     public boolean noPointsLeft() {
-        return airStreakPoints.isEmpty();
+        return contrailPoints.isEmpty();
     }
 
     public List<Vec3d> getLeftPoints() {
         List<Vec3d> points = Lists.newArrayList();
-        airStreakPoints.stream().map(ContrailPos::getLeftPoint).forEach(points::add);
+        contrailPoints.stream().map(ContrailPos::getLeftPoint).forEach(points::add);
         return points;
     }
 
     public List<Vec3d> getRightPoints() {
         List<Vec3d> points = Lists.newArrayList();
-        airStreakPoints.stream().map(ContrailPos::getRightPoint).forEach(points::add);
+        contrailPoints.stream().map(ContrailPos::getRightPoint).forEach(points::add);
         return points;
     }
 

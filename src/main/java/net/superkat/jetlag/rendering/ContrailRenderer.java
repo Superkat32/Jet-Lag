@@ -12,15 +12,15 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
 import net.superkat.jetlag.JetLagMain;
-import net.superkat.jetlag.config.JetLagConfig;
 import net.superkat.jetlag.contrail.Contrail;
-import net.superkat.jetlag.contrail.JetLagClientPlayerEntity;
 import net.superkat.jetlag.contrail.JetLagPlayer;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 import org.spongepowered.include.com.google.common.collect.Lists;
 
 import java.util.List;
+
+import static net.superkat.jetlag.config.JetLagConfig.getInstance;
 
 public class ContrailRenderer {
     public static final Identifier CONTRAIL_TEXTURE = new Identifier(JetLagMain.MOD_ID, "textures/contrail.png");
@@ -41,9 +41,9 @@ public class ContrailRenderer {
      * @param player Renders this player's existing contrails
      */
     public static void renderContrails(ClientPlayerEntity player) {
-        JetLagClientPlayerEntity jetLagPlayer = (JetLagClientPlayerEntity) player;
-        Contrail playerAirStreaks = jetLagPlayer.jetLag$getPlayerAirStreaks();
-        renderContrails(playerAirStreaks);
+        JetLagPlayer jetLagPlayer = (JetLagPlayer) player;
+        List<Contrail> playerContrails = jetLagPlayer.jetlag$getContrails();
+        playerContrails.forEach(ContrailRenderer::renderContrails);
     }
 
     /**
@@ -179,14 +179,22 @@ public class ContrailRenderer {
     }
 
     /**
-     * Renders a connected line of Vec3d's given in a list. The list is rendering in order starting from 0. Called by each set of player air streaks.
+     * Renders a connected line of Vec3d's given in a list. The list is rendering in order starting from 0(oldest point). Called by each set of player contrails.
      * @param matrixStack The MatrixStack used in rendering.
      * @param buffer The BufferBuilder used in rendering
      * @param points The list of Vec3d points to be rendered.
      */
     private static void renderList(MatrixStack matrixStack, BufferBuilder buffer, List<Vec3d> points) {
         matrixStack.push();
-        int curvePoints = JetLagConfig.getInstance().contrailCurvePoints;
+        int curvePoints = getInstance().contrailCurvePoints;
+
+        int fadeoutPoints = getInstance().fadeOutPoints;
+        int fadeinPoints = getInstance().fadeInPoints;
+
+        float opacity = 0f;
+        if(fadeoutPoints <= 0) {
+            opacity = 1f;
+        }
         for (int i = 0; i < points.size() - 1; i++) {
             Vec3d prevPoint = points.get(i != 0 ? i - 1 : 0);
             Vec3d originPoint = points.get(i);
@@ -202,9 +210,23 @@ public class ContrailRenderer {
                 float curveZ = MathHelper.catmullRom(delta, (float) prevPoint.getZ(), (float) originPoint.getZ(), (float) targetPoint.getZ(), (float) nextPoint.getZ());
                 Vec3d curvePoint = new Vec3d(curveX, curveY, curveZ);
                 if(delta > 0f) {
-                    renderSegment(matrixStack, buffer, curvePoint, prevCurvePoint, 1f);
+                    renderSegment(matrixStack, buffer, curvePoint, prevCurvePoint, opacity);
                 }
                 prevCurvePoint = curvePoint;
+            }
+
+            //fading stuff
+            //fading out takes priority over fading in
+            if(i <= fadeoutPoints && fadeoutPoints != 0) { //fade out
+                opacity = (float) i / fadeoutPoints;
+            } else if(i >= points.size() - fadeinPoints) { //fade in
+                opacity = (float) (points.size() - i) / fadeinPoints;
+            }
+
+            //lower opacity values get discarded by Minecraft,
+            //so this ensures that all points still get rendered to some degree
+            if(opacity <= 0.1f) {
+                opacity = 0.11f;
             }
         }
         matrixStack.pop();
@@ -241,7 +263,9 @@ public class ContrailRenderer {
         matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees((float) Math.toDegrees(rightAngle - o))); //rotates left/right
         matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees((float) Math.toDegrees(rightAngle + n))); //rotates up/down
 
-        drawTriangle(matrixStack.peek().getPositionMatrix(), buffer, 0.1f, -length, opacity);
+        float width = (float) getInstance().contrailWidth;
+
+        drawTriangle(matrixStack.peek().getPositionMatrix(), buffer, width, -length, opacity);
 
         matrixStack.pop();
     }
