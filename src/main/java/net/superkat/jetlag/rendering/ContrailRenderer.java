@@ -17,6 +17,7 @@ import net.superkat.jetlag.JetLagMain;
 import net.superkat.jetlag.contrail.Contrail;
 import net.superkat.jetlag.contrail.JetLagPlayer;
 import org.joml.Matrix4f;
+import org.lwjgl.opengl.GL11;
 import org.spongepowered.include.com.google.common.collect.Lists;
 
 import java.util.List;
@@ -56,15 +57,14 @@ public class ContrailRenderer {
         MatrixStack matrixStack = new MatrixStack();
         matrixStack.push();
 
-        RenderSystem.setShader(GameRenderer::getPositionColorTexLightmapProgram);
+        RenderSystem.setShader(GameRenderer::getRenderTypeTripwireProgram);
         RenderSystem.setShaderTexture(0, CONTRAIL_TEXTURE);
-//        RenderSystem.enableDepthTest(); //I have no clue what these 2 commented out things here do
-//        RenderSystem.depthFunc(GL11.GL_LEQUAL);
+        RenderSystem.enableDepthTest(); //I have no clue what these 2 commented out things here do
+        RenderSystem.depthFunc(GL11.GL_LEQUAL);
 
         RenderSystem.disableCull();
         RenderSystem.enableBlend();
-        RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
-//        RenderSystem.setShaderColor(1f, 1f, 1f, 0.3f);
+        RenderSystem.setShaderColor(1f, 1f, 1f, 0.3f);
         MinecraftClient.getInstance().gameRenderer.getLightmapTextureManager().enable();
 
         Tessellator tessellator = Tessellator.getInstance();
@@ -228,14 +228,9 @@ public class ContrailRenderer {
                 Vec3d curvePoint = new Vec3d(curveX, curveY, curveZ);
 
                 //light adjustment per segment
-//                int blockLight = MathHelper.lerp(delta, originBlockLight, targetBlockLight);
-//                int skyLight = MathHelper.lerp(delta, originSkyLight, targetSkyLight);
-//                int light = LightmapTextureManager.pack(blockLight, skyLight);
-
-                //at midnight with no block light around, this equals 15728640 (blockLight = 0, skyLight = 15)
-                int skyLight = originSkyLight;
-                int blockLight = originBlockLight;
-                int light = skyLight << 20 | blockLight << 4;
+                int blockLight = MathHelper.lerp(delta, originBlockLight, targetBlockLight);
+                int skyLight = MathHelper.lerp(delta, originSkyLight, targetSkyLight);
+                int light = LightmapTextureManager.pack(blockLight, skyLight);
 
                 if(delta > 0f) {
                     renderSegment(matrixStack, buffer, curvePoint, prevCurvePoint, opacity, light);
@@ -308,8 +303,8 @@ public class ContrailRenderer {
      * @param opacity The rendered rectangle's opacity/alpha value.
      */
     private static void drawTriangle(Matrix4f matrix, BufferBuilder buffer, float width, float length, float opacity, int light) {
-        buffer.vertex(matrix, width, 0, length).color(1f, 1f, 1f, opacity).texture(0f, 0f).light(light).next();
-        buffer.vertex(matrix, 0, 0, length).color(1f, 1f, 1f, opacity).texture(0f, 0f).light(light).next();
+        buffer.vertex(matrix, width, 0, length).color(1f, 1f, 1f, opacity).texture(1f, 1f).light(light).next();
+        buffer.vertex(matrix, 0, 0, length).color(1f, 1f, 1f, opacity).texture(1f, 1f).light(light).next();
     }
 
     private static int getLightLevel(LightType lightType, Vec3d pos) {
