@@ -8,14 +8,15 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.LightType;
 import net.superkat.jetlag.JetLagMain;
 import net.superkat.jetlag.contrail.Contrail;
 import net.superkat.jetlag.contrail.JetLagPlayer;
 import org.joml.Matrix4f;
-import org.lwjgl.opengl.GL11;
 import org.spongepowered.include.com.google.common.collect.Lists;
 
 import java.util.List;
@@ -55,13 +56,16 @@ public class ContrailRenderer {
         MatrixStack matrixStack = new MatrixStack();
         matrixStack.push();
 
-        RenderSystem.setShader(GameRenderer::getPositionColorTexProgram);
+        RenderSystem.setShader(GameRenderer::getPositionColorTexLightmapProgram);
         RenderSystem.setShaderTexture(0, CONTRAIL_TEXTURE);
-        RenderSystem.depthFunc(GL11.GL_LEQUAL);
+//        RenderSystem.enableDepthTest(); //I have no clue what these 2 commented out things here do
+//        RenderSystem.depthFunc(GL11.GL_LEQUAL);
 
         RenderSystem.disableCull();
         RenderSystem.enableBlend();
-        RenderSystem.setShaderColor(1f, 1f, 1f, 0.3f);
+        RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
+//        RenderSystem.setShaderColor(1f, 1f, 1f, 0.3f);
+        MinecraftClient.getInstance().gameRenderer.getLightmapTextureManager().enable();
 
         Tessellator tessellator = Tessellator.getInstance();
         renderContrail(matrixStack, tessellator, contrail);
@@ -70,6 +74,7 @@ public class ContrailRenderer {
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
         RenderSystem.disableBlend();
         RenderSystem.enableCull();
+        MinecraftClient.getInstance().gameRenderer.getLightmapTextureManager().disable();
 
         matrixStack.pop();
     }
@@ -77,7 +82,7 @@ public class ContrailRenderer {
     private static void renderTest(MatrixStack matrixStack, Tessellator tessellator) {
 
         BufferBuilder buffer = tessellator.getBuffer();
-        buffer.begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR_TEXTURE);
+        buffer.begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR_TEXTURE_LIGHT);
 
         Vec3d point1 = new Vec3d(0, -58, 0);
         Vec3d point2 = new Vec3d(0, -58, -5);
@@ -161,15 +166,19 @@ public class ContrailRenderer {
     private static void renderContrail(MatrixStack matrixStack, Tessellator tessellator, Contrail contrail) {
         matrixStack.push();
         if(contrail != null) {
+            //It is EXTREMELY important that TRIANGLES_STRIP is used, as it has "shareVertices" option enabled,
+            //allowing the drawn line here to be connected seamlessly.
+            //It is also important the teh tessellator gets drawn individually for each list,
+            //as not doing so would connect the two drawn lists together, forming an "N" shape
             BufferBuilder buffer = tessellator.getBuffer();
 
-            buffer.begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR_TEXTURE);
+            buffer.begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR_TEXTURE_LIGHT);
             //renders all left wing points
             List<Vec3d> leftPoints = contrail.getLeftPoints();
             renderList(matrixStack, buffer, leftPoints);
             tessellator.draw();
 
-            buffer.begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR_TEXTURE);
+            buffer.begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR_TEXTURE_LIGHT);
             //renders all right wing points
             List<Vec3d> rightPoints = contrail.getRightPoints();
             renderList(matrixStack, buffer, rightPoints);
@@ -202,15 +211,34 @@ public class ContrailRenderer {
             Vec3d nextPoint = points.get(i + 2 <= points.size() - 1 ? i + 2 : i + 1);
 
             Vec3d prevCurvePoint = prevPoint;
-            for (int j = 0; j <= curvePoints; j++) {
-                float delta = 1f / curvePoints * j;
 
+            //light adjustment
+            int originBlockLight = getLightLevel(LightType.BLOCK, originPoint);
+            int targetBlockLight = getLightLevel(LightType.BLOCK, targetPoint);
+            int originSkyLight = getLightLevel(LightType.SKY, originPoint);
+            int targetSkyLight = getLightLevel(LightType.SKY, targetPoint);
+
+            for (int j = 0; j <= curvePoints; j++) {
+                float delta = (float) j / curvePoints;
+
+                //easing/interpolation
                 float curveX = MathHelper.catmullRom(delta, (float) prevPoint.getX(), (float) originPoint.getX(), (float) targetPoint.getX(), (float) nextPoint.getX());
                 float curveY = MathHelper.catmullRom(delta, (float) prevPoint.getY(), (float) originPoint.getY(), (float) targetPoint.getY(), (float) nextPoint.getY());
                 float curveZ = MathHelper.catmullRom(delta, (float) prevPoint.getZ(), (float) originPoint.getZ(), (float) targetPoint.getZ(), (float) nextPoint.getZ());
                 Vec3d curvePoint = new Vec3d(curveX, curveY, curveZ);
+
+                //light adjustment per segment
+//                int blockLight = MathHelper.lerp(delta, originBlockLight, targetBlockLight);
+//                int skyLight = MathHelper.lerp(delta, originSkyLight, targetSkyLight);
+//                int light = LightmapTextureManager.pack(blockLight, skyLight);
+
+                //at midnight with no block light around, this equals 15728640 (blockLight = 0, skyLight = 15)
+                int skyLight = originSkyLight;
+                int blockLight = originBlockLight;
+                int light = skyLight << 20 | blockLight << 4;
+
                 if(delta > 0f) {
-                    renderSegment(matrixStack, buffer, curvePoint, prevCurvePoint, opacity);
+                    renderSegment(matrixStack, buffer, curvePoint, prevCurvePoint, opacity, light);
                 }
                 prevCurvePoint = curvePoint;
             }
@@ -241,7 +269,7 @@ public class ContrailRenderer {
      * @param target The ending point to render to.
      * @param opacity The rendered segment's opacity/alpha value.
      */
-    private static void renderSegment(MatrixStack matrixStack, BufferBuilder buffer, Vec3d origin, Vec3d target, float opacity) {
+    private static void renderSegment(MatrixStack matrixStack, BufferBuilder buffer, Vec3d origin, Vec3d target, float opacity, int light) {
         Camera camera = MinecraftClient.getInstance().gameRenderer.getCamera();
         Vec3d transformedMatrixPos = origin.subtract(camera.getPos());
         matrixStack.push();
@@ -265,7 +293,7 @@ public class ContrailRenderer {
 
         float width = (float) getInstance().contrailWidth;
 
-        drawTriangle(matrixStack.peek().getPositionMatrix(), buffer, width, -length, opacity);
+        drawTriangle(matrixStack.peek().getPositionMatrix(), buffer, width, -length, opacity, light);
 
         matrixStack.pop();
     }
@@ -276,12 +304,17 @@ public class ContrailRenderer {
      * @param matrix The MatrixStack's Position Matrix used for rendering.
      * @param buffer The BufferBuilder used for rendering
      * @param width The rendered rectangle's width. Should be determined by a config option.
-     * @param length The rendered rectangle's length. Should be determined by the length from the origin point to the target point in {@link #renderSegment(MatrixStack, BufferBuilder, Vec3d, Vec3d, float)}.
+     * @param length The rendered rectangle's length. Should be determined by the length from the origin point to the target point in {@link #renderSegment(MatrixStack, BufferBuilder, Vec3d, Vec3d, float, int)}.
      * @param opacity The rendered rectangle's opacity/alpha value.
      */
-    private static void drawTriangle(Matrix4f matrix, BufferBuilder buffer, float width, float length, float opacity) {
-        buffer.vertex(matrix, width, 0, length).color(1f, 1f, 1f, opacity).texture(1f, 1f).next();
-        buffer.vertex(matrix, 0, 0, length).color(1f, 1f, 1f, opacity).texture(1f, 1f).next();
+    private static void drawTriangle(Matrix4f matrix, BufferBuilder buffer, float width, float length, float opacity, int light) {
+        buffer.vertex(matrix, width, 0, length).color(1f, 1f, 1f, opacity).texture(0f, 0f).light(light).next();
+        buffer.vertex(matrix, 0, 0, length).color(1f, 1f, 1f, opacity).texture(0f, 0f).light(light).next();
+    }
+
+    private static int getLightLevel(LightType lightType, Vec3d pos) {
+        BlockPos blockPos = new BlockPos((int) pos.getX(), (int) pos.getY(), (int) pos.getZ());
+        return MinecraftClient.getInstance().world.getLightLevel(lightType, blockPos);
     }
 
     private static void drawCube(MatrixStack matrixStack, BufferBuilder buffer, Vec3d origin, Vec3d target) {
