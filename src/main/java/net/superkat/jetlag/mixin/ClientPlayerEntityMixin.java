@@ -1,7 +1,6 @@
 package net.superkat.jetlag.mixin;
 
 import com.google.common.collect.Lists;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.superkat.jetlag.contrail.Contrail;
 import net.superkat.jetlag.contrail.JetLagPlayer;
@@ -46,12 +45,14 @@ public class ClientPlayerEntityMixin implements JetLagPlayer {
         if(player.isFallFlying()) {
             if(currentContrail != null) {
                 //adds new points to the newest air streak
-                MinecraftClient client = MinecraftClient.getInstance();
-                if(!client.isPaused() && (client.world == null || client.world.getTickManager().shouldTick())) {
+//                MinecraftClient client = MinecraftClient.getInstance();
+//                if(!client.isPaused() && (client.world == null || client.world.getTickManager().shouldTick())) {
+                if(Contrail.tickPoints()) {
                     if(jetlag$hasContrails()) {
                         currentContrail.addPoint();
                     }
                 }
+//                }
             } else {
                 //creates and sets the current air streak
                 jetlag$createContrail();

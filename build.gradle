@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '1.5-SNAPSHOT'
+	id 'fabric-loom' version '1.6-SNAPSHOT'
 	id 'maven-publish'
 }
 
@@ -47,12 +47,7 @@ dependencies {
 	modApi "com.terraformersmc:modmenu:${modmenu_version}"
 
 	//YACL
-	modImplementation("dev.isxander.yacl:yet-another-config-lib-fabric:${yacl_version}") {
-		exclude(group: "com.twelvemonkeys.common")
-		exclude(group: "com.twelvemonkeys.imageio")
-	}
-
-//	include modImplementation("com.github.0x3C50:Renderer:master-SNAPSHOT")
+	modImplementation "dev.isxander:yet-another-config-lib:${yacl_version}"
 
 	// Uncomment the following line to enable the deprecated Fabric API modules. 
 	// These are included in the Fabric API production distribution and allow you to update your mod to the latest modules at a later more convenient time.

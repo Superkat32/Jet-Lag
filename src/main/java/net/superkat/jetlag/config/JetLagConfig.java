@@ -5,7 +5,9 @@ import dev.isxander.yacl3.api.*;
 import dev.isxander.yacl3.config.v2.api.ConfigClassHandler;
 import dev.isxander.yacl3.config.v2.api.SerialEntry;
 import dev.isxander.yacl3.config.v2.api.serializer.GsonConfigSerializerBuilder;
+import dev.isxander.yacl3.gui.controllers.ColorController;
 import dev.isxander.yacl3.gui.controllers.slider.DoubleSliderController;
+import dev.isxander.yacl3.gui.controllers.slider.FloatSliderController;
 import dev.isxander.yacl3.gui.controllers.slider.IntegerSliderController;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.gui.screen.Screen;
@@ -13,6 +15,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.superkat.jetlag.JetLagMain;
 
+import java.awt.*;
 import java.nio.file.Path;
 
 public class JetLagConfig {
@@ -43,10 +46,12 @@ public class JetLagConfig {
     @SerialEntry public int fadeInPoints = 20;
     @SerialEntry public int fadeOutPoints = 30;
     @SerialEntry public double contrailWidth = 0.1;
-    @SerialEntry public float contrailHeight = 0.1f;
+    @SerialEntry public double contrailWidthAddition = 0.75;
+    @SerialEntry public float contrailFluffiness = 1f;
     @SerialEntry public int contrailCurvePoints = 3;
     @SerialEntry public int contrailDeletionDelay = 1;
     @SerialEntry public int pointsDeletedPerDelay = 1;
+    @SerialEntry public Color contrailColor = new Color(220, 255, 255, 118);
 
 //    @SerialEntry
 //    public boolean showSpeedlines = true;
@@ -131,7 +136,33 @@ public class JetLagConfig {
                             () -> config.contrailWidth,
                             val -> config.contrailWidth = val
                     )
-                    .customController(opt -> new DoubleSliderController(opt, 0.05, 0.5, 0.05))
+                    .customController(opt -> new DoubleSliderController(opt, 0.05, 0.5, 0.01))
+                    .build();
+
+            var contrailWidthAddition = Option.<Double>createBuilder()
+                    .name(Text.translatable("jetlag.contrailwidthadd"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("jetlag.contrailwidthadd.tooltip"))
+                            .build())
+                    .binding(
+                            defaults.contrailWidthAddition,
+                            () -> config.contrailWidthAddition,
+                            val -> config.contrailWidthAddition = val
+                    )
+                    .customController(opt -> new DoubleSliderController(opt, 0, 0.1, 0.01))
+                    .build();
+
+            var contrailFluffiness = Option.<Float>createBuilder()
+                    .name(Text.translatable("jetlag.contrailfluffiness"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("jetlag.contrailfluffiness.tooltip"))
+                            .build())
+                    .binding(
+                            defaults.contrailFluffiness,
+                            () -> config.contrailFluffiness,
+                            val -> config.contrailFluffiness = val
+                    )
+                    .customController(opt -> new FloatSliderController(opt, 0, 2f, 0.05f))
                     .build();
 
             var deleteDelay = Option.<Integer>createBuilder()
@@ -160,18 +191,40 @@ public class JetLagConfig {
                     .customController(opt -> new IntegerSliderController(opt, 1, 10, 1))
                     .build();
 
+            var contrailColor = Option.<Color>createBuilder()
+                    .name(Text.translatable("jetlag.contrailcolor"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("jetlag.contrailcolor.tooltip"))
+                            .build())
+                    .binding(
+                            defaults.contrailColor,
+                            () -> config.contrailColor,
+                            val -> config.contrailColor = val
+                    )
+                    .customController(opt -> new ColorController(opt, true))
+                    .build();
+
+            var testCategory = TestCategory.createBuilder()
+                    .name(Text.of("name"))
+                    .tooltip(Text.of("tooltip"));
+
             contrailGroup.option(maxPoints);
             contrailGroup.option(fadeInPoints);
             contrailGroup.option(fadeOutPoints);
             contrailGroup.option(curvePoints);
             contrailGroup.option(contrailWidth);
+            contrailGroup.option(contrailWidthAddition);
+            contrailGroup.option(contrailFluffiness);
             contrailGroup.option(deleteDelay);
             contrailGroup.option(pointsPerDelete);
+            contrailGroup.option(contrailColor);
             defaultCategoryBuilder.group(contrailGroup.build());
+
 
             return builder
                 .title(Text.translatable("jetlag.title"))
-                .category(defaultCategoryBuilder.build());
+                .category(defaultCategoryBuilder.build())
+                    .category(testCategory.build());
 //
 //            var screenEffectsGroup = OptionGroup.createBuilder()
 //                    .name(Text.translatable("jetlag.screeneffects.group"))

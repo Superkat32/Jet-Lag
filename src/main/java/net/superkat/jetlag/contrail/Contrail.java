@@ -1,5 +1,6 @@
 package net.superkat.jetlag.contrail;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.util.math.Vec3d;
 import net.superkat.jetlag.config.JetLagConfig;
@@ -21,8 +22,8 @@ public class Contrail {
     }
 
     public void addPoint() {
-        contrailPoints.add(ContrailHandler.getAirStreakPos(player));
-        if(shouldRemoveOldestPoint()) {
+        contrailPoints.add(0, ContrailHandler.getAirStreakPos(player));
+        if(shouldRemoveOldestPoint() && tickPoints()) {
             removeOldestPoint();
         }
     }
@@ -51,7 +52,7 @@ public class Contrail {
     }
 
     public void removeOldestPoint() {
-        contrailPoints.remove(0);
+        contrailPoints.remove(contrailPoints.size() - 1);
     }
 
     public void startDeletingPoints() {
@@ -73,7 +74,10 @@ public class Contrail {
         contrailPoints.stream().map(ContrailPos::getRightPoint).forEach(points::add);
         return points;
     }
-
+    public static boolean tickPoints() {
+        MinecraftClient client = MinecraftClient.getInstance();
+        return !client.isPaused() && (client.world == null || client.world.getTickManager().shouldTick());
+    }
     public static class ContrailPos {
         public Vec3d left;
         public Vec3d right;
@@ -88,6 +92,37 @@ public class Contrail {
 
         public Vec3d getRightPoint() {
             return right;
+        }
+    }
+
+    public static class ContrailPoint {
+        public Vec3d vec3d;
+        public float width;
+        public float opacity;
+        public ContrailPoint(Vec3d vec3d, float width, float opacity) {
+            this.vec3d = vec3d;
+            this.width = width;
+            this.opacity = opacity;
+        }
+        public ContrailPoint(Vec3d vec3d) {
+            this.vec3d = vec3d;
+            this.width = (float) JetLagConfig.getInstance().contrailWidth;
+            this.opacity = (float) JetLagConfig.getInstance().contrailColor.getAlpha() / 255f;
+        }
+        public Vec3d getVec3d() {
+            return this.vec3d;
+        }
+        public float getWidth() {
+            return this.width;
+        }
+        public float getOpacity() {
+            return this.opacity;
+        }
+        public void setWidth(float width) {
+            this.width = width;
+        }
+        public void setOpacity(float opacity) {
+            this.opacity = opacity;
         }
     }
 }

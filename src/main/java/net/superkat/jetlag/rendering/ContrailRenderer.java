@@ -20,6 +20,7 @@ import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 import org.spongepowered.include.com.google.common.collect.Lists;
 
+import java.awt.*;
 import java.util.List;
 
 import static net.superkat.jetlag.config.JetLagConfig.getInstance;
@@ -64,7 +65,8 @@ public class ContrailRenderer {
 
         RenderSystem.disableCull();
         RenderSystem.enableBlend();
-        RenderSystem.setShaderColor(1f, 1f, 1f, 0.3f);
+        Color contrailColor = getInstance().contrailColor;
+        RenderSystem.setShaderColor(contrailColor.getRed() / 255f, contrailColor.getGreen() / 255f, contrailColor.getBlue() / 255f, contrailColor.getAlpha() / 255f);
         MinecraftClient.getInstance().gameRenderer.getLightmapTextureManager().enable();
 
         Tessellator tessellator = Tessellator.getInstance();
@@ -204,6 +206,9 @@ public class ContrailRenderer {
         if(fadeoutPoints <= 0) {
             opacity = 1f;
         }
+
+        float width = (float) getInstance().contrailWidth;
+
         for (int i = 0; i < points.size() - 1; i++) {
             Vec3d prevPoint = points.get(i != 0 ? i - 1 : 0);
             Vec3d originPoint = points.get(i);
@@ -233,7 +238,7 @@ public class ContrailRenderer {
                 int light = LightmapTextureManager.pack(blockLight, skyLight);
 
                 if(delta > 0f) {
-                    renderSegment(matrixStack, buffer, curvePoint, prevCurvePoint, opacity, light);
+                    renderSegment(matrixStack, buffer, curvePoint, prevCurvePoint, opacity, light, width);
                 }
                 prevCurvePoint = curvePoint;
             }
@@ -251,6 +256,8 @@ public class ContrailRenderer {
             if(opacity <= 0.1f) {
                 opacity = 0.11f;
             }
+
+            width += (float) (getInstance().contrailWidthAddition / 10f);
         }
         matrixStack.pop();
     }
@@ -264,7 +271,7 @@ public class ContrailRenderer {
      * @param target The ending point to render to.
      * @param opacity The rendered segment's opacity/alpha value.
      */
-    private static void renderSegment(MatrixStack matrixStack, BufferBuilder buffer, Vec3d origin, Vec3d target, float opacity, int light) {
+    private static void renderSegment(MatrixStack matrixStack, BufferBuilder buffer, Vec3d origin, Vec3d target, float opacity, int light, float width) {
         Camera camera = MinecraftClient.getInstance().gameRenderer.getCamera();
         Vec3d transformedMatrixPos = origin.subtract(camera.getPos());
         matrixStack.push();
@@ -286,8 +293,6 @@ public class ContrailRenderer {
         matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees((float) Math.toDegrees(rightAngle - o))); //rotates left/right
         matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees((float) Math.toDegrees(rightAngle + n))); //rotates up/down
 
-        float width = (float) getInstance().contrailWidth;
-
         drawTriangle(matrixStack.peek().getPositionMatrix(), buffer, width, -length, opacity, light);
 
         matrixStack.pop();
@@ -299,12 +304,13 @@ public class ContrailRenderer {
      * @param matrix The MatrixStack's Position Matrix used for rendering.
      * @param buffer The BufferBuilder used for rendering
      * @param width The rendered rectangle's width. Should be determined by a config option.
-     * @param length The rendered rectangle's length. Should be determined by the length from the origin point to the target point in {@link #renderSegment(MatrixStack, BufferBuilder, Vec3d, Vec3d, float, int)}.
+     * @param length The rendered rectangle's length. Should be determined by the length from the origin point to the target point in {@link #renderSegment(MatrixStack, BufferBuilder, Vec3d, Vec3d, float, int, float)}.
      * @param opacity The rendered rectangle's opacity/alpha value.
      */
     private static void drawTriangle(Matrix4f matrix, BufferBuilder buffer, float width, float length, float opacity, int light) {
-        buffer.vertex(matrix, width, 0, length).color(1f, 1f, 1f, opacity).texture(1f, 1f).light(light).next();
-        buffer.vertex(matrix, 0, 0, length).color(1f, 1f, 1f, opacity).texture(1f, 1f).light(light).next();
+        //dividing the width by 2 to ensure that the width given is accurately rendered
+        buffer.vertex(matrix, width / 2f, 0, length).color(1f, 1f, 1f, opacity).texture(0f, 0f).light(light).next();
+        buffer.vertex(matrix, -width / 2f, 0, length).color(1f, 1f, 1f, opacity).texture(1f, 1f).light(light).next();
     }
 
     private static int getLightLevel(LightType lightType, Vec3d pos) {

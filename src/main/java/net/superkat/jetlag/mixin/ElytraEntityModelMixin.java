@@ -10,7 +10,6 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Items;
 import net.minecraft.util.math.Vec3d;
-import net.superkat.jetlag.contrail.JetLagClientPlayerEntity;
 import org.apache.commons.compress.utils.Lists;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -72,11 +71,11 @@ public class ElytraEntityModelMixin extends AnimalModelMixin{
         if(entity != null) {
             if(entity.getEquippedStack(EquipmentSlot.MAINHAND).getItem() == Items.SPYGLASS) {
                 if(entity instanceof ClientPlayerEntity clientPlayer) {
-                    if(clientPlayer instanceof JetLagClientPlayerEntity jetLagPlayer) {
+//                    if(clientPlayer instanceof JetLagClientPlayerEntity jetLagPlayer) {
 //                        jetLagPlayer.addPoint(matrices, clientPlayer);
 //                        jetLagPlayer.addPoint(clientPlayer.getPos());
 //                        ContrailRenderer.renderAirStreaks(matrices, clientPlayer);
-                    }
+//                    }
                 }
             }
         }
