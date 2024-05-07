@@ -2,7 +2,9 @@ package net.superkat.jetlag.contrail;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.random.Random;
 import net.superkat.jetlag.config.JetLagConfig;
 import net.superkat.jetlag.rendering.ContrailRenderer;
 import org.spongepowered.include.com.google.common.collect.Lists;
@@ -12,9 +14,12 @@ import java.util.List;
 public class Contrail {
     public final ClientPlayerEntity player;
     public List<ContrailPos> contrailPoints = Lists.newArrayList();
+//    public List<Float> contrailWidthAdjustments = Lists.newArrayList();
+    public List<Float> contrailOpacityAdjustments = Lists.newArrayList();
     public int maxPoints;
     public boolean startDeletingPoints = false;
     public int ticksUntilNextDelete = 10;
+    public final Random random = Random.create();
 
     public Contrail(ClientPlayerEntity player) {
         this.player = player;
@@ -23,6 +28,16 @@ public class Contrail {
 
     public void addPoint() {
         contrailPoints.add(0, ContrailHandler.getAirStreakPos(player));
+
+//        float maxWidthAdjustment = JetLagConfig.getInstance().contrailFluffiness / 20f;
+//        contrailWidthAdjustments.add(0, MathHelper.nextBetween(this.random, -maxWidthAdjustment, maxWidthAdjustment));
+
+        float maxOpacityAdjustment = JetLagConfig.getInstance().contrailOpacityAdjustment;
+        boolean velocityOpacity = JetLagConfig.getInstance().velocityBasedOpacityAdjust;
+        if(velocityOpacity) {
+            maxOpacityAdjustment *= (float) this.player.getVelocity().lengthSquared();
+        }
+        contrailOpacityAdjustments.add(0, MathHelper.nextBetween(this.random, -maxOpacityAdjustment, maxOpacityAdjustment));
         if(shouldRemoveOldestPoint() && tickPoints()) {
             removeOldestPoint();
         }
@@ -31,7 +46,7 @@ public class Contrail {
     public void render() {
         maxPoints = JetLagConfig.getInstance().maxPoints;
 
-        if(startDeletingPoints && !noPointsLeft()) {
+        if(startDeletingPoints && !noPointsLeft() && Contrail.tickPoints()) {
             ticksUntilNextDelete--;
             if(ticksUntilNextDelete <= 0) {
                 for (int i = 0; i < JetLagConfig.getInstance().pointsDeletedPerDelay; i++) {
@@ -53,6 +68,8 @@ public class Contrail {
 
     public void removeOldestPoint() {
         contrailPoints.remove(contrailPoints.size() - 1);
+//        contrailWidthAdjustments.remove(contrailWidthAdjustments.size() - 1);
+        contrailOpacityAdjustments.remove(contrailOpacityAdjustments.size() - 1);
     }
 
     public void startDeletingPoints() {
@@ -61,6 +78,14 @@ public class Contrail {
 
     public boolean noPointsLeft() {
         return contrailPoints.isEmpty();
+    }
+
+//    public List<Float> getWidthAdjustments() {
+//        return contrailWidthAdjustments;
+//    }
+
+    public List<Float> getOpacityAdjustments() {
+        return contrailOpacityAdjustments;
     }
 
     public List<Vec3d> getLeftPoints() {

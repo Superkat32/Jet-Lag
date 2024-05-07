@@ -5,6 +5,7 @@ import dev.isxander.yacl3.api.*;
 import dev.isxander.yacl3.config.v2.api.ConfigClassHandler;
 import dev.isxander.yacl3.config.v2.api.SerialEntry;
 import dev.isxander.yacl3.config.v2.api.serializer.GsonConfigSerializerBuilder;
+import dev.isxander.yacl3.gui.controllers.BooleanController;
 import dev.isxander.yacl3.gui.controllers.ColorController;
 import dev.isxander.yacl3.gui.controllers.slider.DoubleSliderController;
 import dev.isxander.yacl3.gui.controllers.slider.FloatSliderController;
@@ -46,9 +47,11 @@ public class JetLagConfig {
     @SerialEntry public int fadeInPoints = 20;
     @SerialEntry public int fadeOutPoints = 30;
     @SerialEntry public double contrailWidth = 0.1;
-    @SerialEntry public double contrailWidthAddition = 0.75;
-    @SerialEntry public float contrailFluffiness = 1f;
+    @SerialEntry public double contrailWidthAddition = 0.04;
+    @SerialEntry public float contrailOpacityAdjustment = 0.25f;
+    @SerialEntry public boolean velocityBasedOpacityAdjust = true;
     @SerialEntry public int contrailCurvePoints = 3;
+    @SerialEntry public int ticksPerPoint = 1;
     @SerialEntry public int contrailDeletionDelay = 1;
     @SerialEntry public int pointsDeletedPerDelay = 1;
     @SerialEntry public Color contrailColor = new Color(220, 255, 255, 118);
@@ -123,7 +126,7 @@ public class JetLagConfig {
                             () -> config.contrailCurvePoints,
                             val -> config.contrailCurvePoints = val
                     )
-                    .customController(opt -> new IntegerSliderController(opt, 1, 48, 1))
+                    .customController(opt -> new IntegerSliderController(opt, 1, 36, 1))
                     .build();
 
             var contrailWidth = Option.<Double>createBuilder()
@@ -152,17 +155,43 @@ public class JetLagConfig {
                     .customController(opt -> new DoubleSliderController(opt, 0, 0.1, 0.01))
                     .build();
 
-            var contrailFluffiness = Option.<Float>createBuilder()
-                    .name(Text.translatable("jetlag.contrailfluffiness"))
+            var contrailOpacityAdjustment = Option.<Float>createBuilder()
+                    .name(Text.translatable("jetlag.contrailopacityadjustment"))
                     .description(OptionDescription.createBuilder()
-                            .text(Text.translatable("jetlag.contrailfluffiness.tooltip"))
+                            .text(Text.translatable("jetlag.contrailopacityadjustment.tooltip"))
                             .build())
                     .binding(
-                            defaults.contrailFluffiness,
-                            () -> config.contrailFluffiness,
-                            val -> config.contrailFluffiness = val
+                            defaults.contrailOpacityAdjustment,
+                            () -> config.contrailOpacityAdjustment,
+                            val -> config.contrailOpacityAdjustment = val
                     )
-                    .customController(opt -> new FloatSliderController(opt, 0, 2f, 0.05f))
+                    .customController(opt -> new FloatSliderController(opt, 0, 1f, 0.05f))
+                    .build();
+
+            var velocityBasedOpacityAdjust = Option.<Boolean>createBuilder()
+                    .name(Text.translatable("jetlag.velocityopacityadjust"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("jetlag.velocityopacityadjust.tooltip"))
+                            .build())
+                    .binding(
+                            defaults.velocityBasedOpacityAdjust,
+                            () -> config.velocityBasedOpacityAdjust,
+                            val -> config.velocityBasedOpacityAdjust = val
+                    )
+                    .customController(opt -> new BooleanController(opt, BooleanController.YES_NO_FORMATTER, true))
+                    .build();
+
+            var ticksPerPoint = Option.<Integer>createBuilder()
+                    .name(Text.translatable("jetlag.ticksperpoint"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("jetlag.ticksperpoint.tooltip"))
+                            .build())
+                    .binding(
+                            defaults.ticksPerPoint,
+                            () -> config.ticksPerPoint,
+                            val -> config.ticksPerPoint = val
+                    )
+                    .customController(opt -> new IntegerSliderController(opt, 1, 20, 1))
                     .build();
 
             var deleteDelay = Option.<Integer>createBuilder()
@@ -214,7 +243,9 @@ public class JetLagConfig {
             contrailGroup.option(curvePoints);
             contrailGroup.option(contrailWidth);
             contrailGroup.option(contrailWidthAddition);
-            contrailGroup.option(contrailFluffiness);
+            contrailGroup.option(contrailOpacityAdjustment);
+            contrailGroup.option(velocityBasedOpacityAdjust);
+            contrailGroup.option(ticksPerPoint);
             contrailGroup.option(deleteDelay);
             contrailGroup.option(pointsPerDelete);
             contrailGroup.option(contrailColor);

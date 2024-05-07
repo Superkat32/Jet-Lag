@@ -16,8 +16,8 @@ import net.minecraft.world.LightType;
 import net.superkat.jetlag.JetLagMain;
 import net.superkat.jetlag.contrail.Contrail;
 import net.superkat.jetlag.contrail.JetLagPlayer;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
-import org.lwjgl.opengl.GL11;
 import org.spongepowered.include.com.google.common.collect.Lists;
 
 import java.awt.*;
@@ -60,8 +60,8 @@ public class ContrailRenderer {
 
         RenderSystem.setShader(GameRenderer::getRenderTypeTripwireProgram);
         RenderSystem.setShaderTexture(0, CONTRAIL_TEXTURE);
-        RenderSystem.enableDepthTest(); //I have no clue what these 2 commented out things here do
-        RenderSystem.depthFunc(GL11.GL_LEQUAL);
+//        RenderSystem.enableDepthTest(); //I have no clue what these 2 commented out things here do
+//        RenderSystem.depthFunc(GL11.GL_LEQUAL);
 
         RenderSystem.disableCull();
         RenderSystem.enableBlend();
@@ -71,7 +71,7 @@ public class ContrailRenderer {
 
         Tessellator tessellator = Tessellator.getInstance();
         renderContrail(matrixStack, tessellator, contrail);
-        renderTest(matrixStack, tessellator);
+//        renderTest(matrixStack, tessellator);
 
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
         RenderSystem.disableBlend();
@@ -168,6 +168,10 @@ public class ContrailRenderer {
     private static void renderContrail(MatrixStack matrixStack, Tessellator tessellator, Contrail contrail) {
         matrixStack.push();
         if(contrail != null) {
+
+//            List<Float> widthAdjustments = contrail.getWidthAdjustments();
+            List<Float> opacityAdjustments = contrail.getOpacityAdjustments();
+
             //It is EXTREMELY important that TRIANGLES_STRIP is used, as it has "shareVertices" option enabled,
             //allowing the drawn line here to be connected seamlessly.
             //It is also important the teh tessellator gets drawn individually for each list,
@@ -177,13 +181,13 @@ public class ContrailRenderer {
             buffer.begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR_TEXTURE_LIGHT);
             //renders all left wing points
             List<Vec3d> leftPoints = contrail.getLeftPoints();
-            renderList(matrixStack, buffer, leftPoints);
+            renderList(matrixStack, buffer, leftPoints, opacityAdjustments);
             tessellator.draw();
 
             buffer.begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR_TEXTURE_LIGHT);
             //renders all right wing points
             List<Vec3d> rightPoints = contrail.getRightPoints();
-            renderList(matrixStack, buffer, rightPoints);
+            renderList(matrixStack, buffer, rightPoints, opacityAdjustments);
             tessellator.draw();
         }
         matrixStack.pop();
@@ -196,6 +200,17 @@ public class ContrailRenderer {
      * @param points The list of Vec3d points to be rendered.
      */
     private static void renderList(MatrixStack matrixStack, BufferBuilder buffer, List<Vec3d> points) {
+        renderList(matrixStack, buffer, points, null);
+    }
+
+    /**
+     * Renders a connected line of Vec3d's given in a list. The list is rendering in order starting from 0(oldest point). Called by each set of player contrails.
+     * @param matrixStack The MatrixStack used in rendering.
+     * @param buffer The BufferBuilder used in rendering
+     * @param points The list of Vec3d points to be rendered.
+     * @param opacityAdjustment A list matching the size of the points, used for adjusting the opacity per point
+     */
+    private static void renderList(MatrixStack matrixStack, BufferBuilder buffer, List<Vec3d> points, @Nullable List<Float> opacityAdjustment) {
         matrixStack.push();
         int curvePoints = getInstance().contrailCurvePoints;
 
@@ -203,11 +218,22 @@ public class ContrailRenderer {
         int fadeinPoints = getInstance().fadeInPoints;
 
         float opacity = 0f;
-        if(fadeoutPoints <= 0) {
+        if(fadeinPoints <= 0) {
             opacity = 1f;
         }
 
+        float contrailAlpha = getInstance().contrailColor.getAlpha() / 255f;
+        float minOpacity = 0.11f + (1f - contrailAlpha);
+
+        boolean shouldAdjustOpacity = opacityAdjustment != null;
+
         float width = (float) getInstance().contrailWidth;
+//        boolean shouldAdjustWidth = widthAdjustment != null;
+//        float originWidthAdjustment = 0f;
+//        float targetWidthAdjustment = 0f;
+//        float extraWidthAdjustment = 0f;
+
+//        int pointsPerFluff = 7;
 
         for (int i = 0; i < points.size() - 1; i++) {
             Vec3d prevPoint = points.get(i != 0 ? i - 1 : 0);
@@ -223,6 +249,26 @@ public class ContrailRenderer {
             int originSkyLight = getLightLevel(LightType.SKY, originPoint);
             int targetSkyLight = getLightLevel(LightType.SKY, targetPoint);
 
+            float originOpacityAdjustment = 0f;
+            float targetOpacityAdjustment = 0f;
+
+            if(shouldAdjustOpacity) {
+                originOpacityAdjustment = opacityAdjustment.get(i);
+                targetOpacityAdjustment = opacityAdjustment.get(i + 1);
+            }
+
+//            float originWidthAdjustment = 0f;
+//            float targetWidthAdjustment = 0f;
+//            float extraWidthAdjustment = 0f;
+
+//            if(shouldAdjustWidth && i % pointsPerFluff == 1) {
+//                extraWidthAdjustment = i / 30f;
+//                originWidthAdjustment = widthAdjustment.get(i);
+//                targetWidthAdjustment = widthAdjustment.get(i + 1);
+//            }
+
+//            float widthDelta = (float) (i % pointsPerFluff) / pointsPerFluff;
+
             for (int j = 0; j <= curvePoints; j++) {
                 float delta = (float) j / curvePoints;
 
@@ -237,24 +283,30 @@ public class ContrailRenderer {
                 int skyLight = MathHelper.lerp(delta, originSkyLight, targetSkyLight);
                 int light = LightmapTextureManager.pack(blockLight, skyLight);
 
+                float opacityAdjust = MathHelper.lerp(delta, originOpacityAdjustment, targetOpacityAdjustment);
+                float usedOpacity = MathHelper.clamp(opacity + opacityAdjust, minOpacity, 1f);
+
+//                float widthAdjust = MathHelper.lerp(delta, originWidthAdjustment, targetWidthAdjustment) * extraWidthAdjustment;
+//                float widthAdjust = MathHelper.lerp(widthDelta * delta, originWidthAdjustment, targetWidthAdjustment) * extraWidthAdjustment;
+
                 if(delta > 0f) {
-                    renderSegment(matrixStack, buffer, curvePoint, prevCurvePoint, opacity, light, width);
+                    renderSegment(matrixStack, buffer, curvePoint, prevCurvePoint, usedOpacity, light, width);
                 }
                 prevCurvePoint = curvePoint;
             }
 
             //fading stuff
             //fading out takes priority over fading in
-            if(i <= fadeoutPoints && fadeoutPoints != 0) { //fade out
-                opacity = (float) i / fadeoutPoints;
-            } else if(i >= points.size() - fadeinPoints) { //fade in
-                opacity = (float) (points.size() - i) / fadeinPoints;
+            if(i >= points.size() - fadeoutPoints) { //fade out
+                opacity = (float) (points.size() - i) / fadeoutPoints;
+            } else if(i <= fadeinPoints && fadeinPoints != 0) { //fade in
+                opacity = (float) i / fadeinPoints;
             }
 
             //lower opacity values get discarded by Minecraft,
             //so this ensures that all points still get rendered to some degree
-            if(opacity <= 0.1f) {
-                opacity = 0.11f;
+            if(opacity <= minOpacity) {
+                opacity = minOpacity + 0.01f;
             }
 
             width += (float) (getInstance().contrailWidthAddition / 10f);

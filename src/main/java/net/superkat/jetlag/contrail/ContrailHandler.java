@@ -18,25 +18,25 @@ public class ContrailHandler {
         float elytraWingOffset = Math.abs(player.elytraRoll + 0.2617994f);
 
         //circle
-        int sides = 20;
-        float radius = 1.3f;
-        for (int i = 0; i < sides; i++) {
-
-            double angle = i * Math.PI * 2 / sides;
-            double xOffset = Math.cos(angle) * radius;
-            double yOffset = Math.sin(i * Math.PI * 2 / sides) * radius;
-            double zOffset = Math.sin(angle) * radius;
-
-            double x = player.getX() + xOffset * Math.cos(yawRadians) - zOffset * Math.sin(yawRadians);
-            double y = player.getY() + Math.sin(i * Math.PI * 2 / sides) * radius;
-            double z = player.getZ() + xOffset * Math.sin(yawRadians) + zOffset * Math.cos(yawRadians);
-
-//            MinecraftClient.getInstance().world.addParticle(ParticleTypes.BUBBLE_POP,
-//                    x,
-//                    y,
-//                    z,
-//                    0, 0, 0);
-        }
+//        int sides = 20;
+//        float radius = 1.3f;
+//        for (int i = 0; i < sides; i++) {
+//
+//            double angle = i * Math.PI * 2 / sides;
+//            double xOffset = Math.cos(angle) * radius;
+//            double yOffset = Math.sin(i * Math.PI * 2 / sides) * radius;
+//            double zOffset = Math.sin(angle) * radius;
+//
+//            double x = player.getX() + xOffset * Math.cos(yawRadians) - zOffset * Math.sin(yawRadians);
+//            double y = player.getY() + Math.sin(i * Math.PI * 2 / sides) * radius;
+//            double z = player.getZ() + xOffset * Math.sin(yawRadians) + zOffset * Math.cos(yawRadians);
+//
+////            MinecraftClient.getInstance().world.addParticle(ParticleTypes.BUBBLE_POP,
+////                    x,
+////                    y,
+////                    z,
+////                    0, 0, 0);
+//        }
         //fixes flickering after glider while not turning camera for a while
         if(Float.isNaN(roll)) {
             roll = 0f;
