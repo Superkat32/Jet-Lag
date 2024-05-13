@@ -3,10 +3,12 @@ package net.superkat.jetlag.rendering;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -78,6 +80,29 @@ public class ContrailRenderer {
         RenderSystem.enableCull();
         MinecraftClient.getInstance().gameRenderer.getLightmapTextureManager().disable();
 
+        matrixStack.pop();
+    }
+
+    public static void renderGuiContrail(DrawContext context, Contrail contrail) {
+        context.drawTextWithShadow(MinecraftClient.getInstance().textRenderer, Text.of("Hey little guy"), 50, 30, Color.white.getRGB());
+        MatrixStack matrixStack = context.getMatrices();
+        matrixStack.push();
+        matrixStack.translate(100, 0, 0);
+//        matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180f));
+        matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees((System.currentTimeMillis() % 5000) / 5000f * 360f));
+//        context.drawHorizontalLine(50, 100, 30, Color.YELLOW.getRGB());
+        Color contrailColor = getInstance().contrailColor;
+        Vec3d firstPoint = contrail.getLeftPoints().get(0);
+        Vec3d secondPoint = contrail.getLeftPoints().get(1);
+        float opacityAdjustOne = contrail.getOpacityAdjustments().get(0);
+        float opacityAdjustTwo = contrail.getOpacityAdjustments().get(1);
+        int opacityAdjust = (int) (MathHelper.lerp(MinecraftClient.getInstance().getTickDelta(), opacityAdjustOne, opacityAdjustTwo) * 255f);
+        Color color = new Color(contrailColor.getRed(), contrailColor.getGreen(), contrailColor.getBlue(), MathHelper.clamp(contrailColor.getAlpha() + opacityAdjust, 0, 255));
+        RenderSystem.disableCull();
+        context.fill((int) firstPoint.getX(), (int) firstPoint.getY(), (int) secondPoint.getX(), (int) secondPoint.getY(), color.getRGB());
+        RenderSystem.enableCull();
+
+//        context.fill(50, 50, 70, 70, contrailColor.getRGB());
         matrixStack.pop();
     }
 
@@ -169,7 +194,6 @@ public class ContrailRenderer {
         matrixStack.push();
         if(contrail != null) {
 
-//            List<Float> widthAdjustments = contrail.getWidthAdjustments();
             List<Float> opacityAdjustments = contrail.getOpacityAdjustments();
 
             //It is EXTREMELY important that TRIANGLES_STRIP is used, as it has "shareVertices" option enabled,
@@ -228,12 +252,7 @@ public class ContrailRenderer {
         boolean shouldAdjustOpacity = opacityAdjustment != null;
 
         float width = (float) getInstance().contrailWidth;
-//        boolean shouldAdjustWidth = widthAdjustment != null;
-//        float originWidthAdjustment = 0f;
-//        float targetWidthAdjustment = 0f;
-//        float extraWidthAdjustment = 0f;
-
-//        int pointsPerFluff = 7;
+        float widthAdd = (float) (getInstance().contrailWidthAddition / 10f);
 
         for (int i = 0; i < points.size() - 1; i++) {
             Vec3d prevPoint = points.get(i != 0 ? i - 1 : 0);
@@ -257,18 +276,6 @@ public class ContrailRenderer {
                 targetOpacityAdjustment = opacityAdjustment.get(i + 1);
             }
 
-//            float originWidthAdjustment = 0f;
-//            float targetWidthAdjustment = 0f;
-//            float extraWidthAdjustment = 0f;
-
-//            if(shouldAdjustWidth && i % pointsPerFluff == 1) {
-//                extraWidthAdjustment = i / 30f;
-//                originWidthAdjustment = widthAdjustment.get(i);
-//                targetWidthAdjustment = widthAdjustment.get(i + 1);
-//            }
-
-//            float widthDelta = (float) (i % pointsPerFluff) / pointsPerFluff;
-
             for (int j = 0; j <= curvePoints; j++) {
                 float delta = (float) j / curvePoints;
 
@@ -283,11 +290,9 @@ public class ContrailRenderer {
                 int skyLight = MathHelper.lerp(delta, originSkyLight, targetSkyLight);
                 int light = LightmapTextureManager.pack(blockLight, skyLight);
 
+                //opacity randomness per point
                 float opacityAdjust = MathHelper.lerp(delta, originOpacityAdjustment, targetOpacityAdjustment);
                 float usedOpacity = MathHelper.clamp(opacity + opacityAdjust, minOpacity, 1f);
-
-//                float widthAdjust = MathHelper.lerp(delta, originWidthAdjustment, targetWidthAdjustment) * extraWidthAdjustment;
-//                float widthAdjust = MathHelper.lerp(widthDelta * delta, originWidthAdjustment, targetWidthAdjustment) * extraWidthAdjustment;
 
                 if(delta > 0f) {
                     renderSegment(matrixStack, buffer, curvePoint, prevCurvePoint, usedOpacity, light, width);
@@ -309,7 +314,7 @@ public class ContrailRenderer {
                 opacity = minOpacity + 0.01f;
             }
 
-            width += (float) (getInstance().contrailWidthAddition / 10f);
+            width += widthAdd;
         }
         matrixStack.pop();
     }
@@ -367,7 +372,10 @@ public class ContrailRenderer {
 
     private static int getLightLevel(LightType lightType, Vec3d pos) {
         BlockPos blockPos = new BlockPos((int) pos.getX(), (int) pos.getY(), (int) pos.getZ());
-        return MinecraftClient.getInstance().world.getLightLevel(lightType, blockPos);
+        if(MinecraftClient.getInstance().world != null) {
+            return MinecraftClient.getInstance().world.getLightLevel(lightType, blockPos);
+        }
+        return LightmapTextureManager.pack(7, 15);
     }
 
     private static void drawCube(MatrixStack matrixStack, BufferBuilder buffer, Vec3d origin, Vec3d target) {

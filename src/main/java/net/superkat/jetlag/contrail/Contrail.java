@@ -14,7 +14,6 @@ import java.util.List;
 public class Contrail {
     public final ClientPlayerEntity player;
     public List<ContrailPos> contrailPoints = Lists.newArrayList();
-//    public List<Float> contrailWidthAdjustments = Lists.newArrayList();
     public List<Float> contrailOpacityAdjustments = Lists.newArrayList();
     public int maxPoints;
     public boolean startDeletingPoints = false;
@@ -29,18 +28,21 @@ public class Contrail {
     public void addPoint() {
         contrailPoints.add(0, ContrailHandler.getAirStreakPos(player));
 
-//        float maxWidthAdjustment = JetLagConfig.getInstance().contrailFluffiness / 20f;
-//        contrailWidthAdjustments.add(0, MathHelper.nextBetween(this.random, -maxWidthAdjustment, maxWidthAdjustment));
-
         float maxOpacityAdjustment = JetLagConfig.getInstance().contrailOpacityAdjustment;
         boolean velocityOpacity = JetLagConfig.getInstance().velocityBasedOpacityAdjust;
         if(velocityOpacity) {
             maxOpacityAdjustment *= (float) this.player.getVelocity().lengthSquared();
         }
         contrailOpacityAdjustments.add(0, MathHelper.nextBetween(this.random, -maxOpacityAdjustment, maxOpacityAdjustment));
-        if(shouldRemoveOldestPoint() && tickPoints()) {
+        if(shouldRemoveOldestPoint() && Contrail.tickPoints()) {
             removeOldestPoint();
         }
+    }
+
+    public void addPoint(ContrailPos contrailPos) {
+        contrailPoints.add(0, contrailPos);
+        float maxOpacityAdjustment = JetLagConfig.getInstance().contrailOpacityAdjustment;
+        contrailOpacityAdjustments.add(0, MathHelper.nextBetween(this.random, -maxOpacityAdjustment, maxOpacityAdjustment));
     }
 
     public void render() {
@@ -68,7 +70,6 @@ public class Contrail {
 
     public void removeOldestPoint() {
         contrailPoints.remove(contrailPoints.size() - 1);
-//        contrailWidthAdjustments.remove(contrailWidthAdjustments.size() - 1);
         contrailOpacityAdjustments.remove(contrailOpacityAdjustments.size() - 1);
     }
 
@@ -79,10 +80,6 @@ public class Contrail {
     public boolean noPointsLeft() {
         return contrailPoints.isEmpty();
     }
-
-//    public List<Float> getWidthAdjustments() {
-//        return contrailWidthAdjustments;
-//    }
 
     public List<Float> getOpacityAdjustments() {
         return contrailOpacityAdjustments;
@@ -104,6 +101,7 @@ public class Contrail {
         return !client.isPaused() && (client.world == null || client.world.getTickManager().shouldTick());
     }
     public static class ContrailPos {
+        //opacity adjustment here instead?
         public Vec3d left;
         public Vec3d right;
         public ContrailPos(Vec3d left, Vec3d right) {
@@ -117,37 +115,6 @@ public class Contrail {
 
         public Vec3d getRightPoint() {
             return right;
-        }
-    }
-
-    public static class ContrailPoint {
-        public Vec3d vec3d;
-        public float width;
-        public float opacity;
-        public ContrailPoint(Vec3d vec3d, float width, float opacity) {
-            this.vec3d = vec3d;
-            this.width = width;
-            this.opacity = opacity;
-        }
-        public ContrailPoint(Vec3d vec3d) {
-            this.vec3d = vec3d;
-            this.width = (float) JetLagConfig.getInstance().contrailWidth;
-            this.opacity = (float) JetLagConfig.getInstance().contrailColor.getAlpha() / 255f;
-        }
-        public Vec3d getVec3d() {
-            return this.vec3d;
-        }
-        public float getWidth() {
-            return this.width;
-        }
-        public float getOpacity() {
-            return this.opacity;
-        }
-        public void setWidth(float width) {
-            this.width = width;
-        }
-        public void setOpacity(float opacity) {
-            this.opacity = opacity;
         }
     }
 }
