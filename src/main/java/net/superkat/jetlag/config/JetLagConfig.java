@@ -46,41 +46,42 @@ public class JetLagConfig {
     @SerialEntry public int maxPoints = 100;
     @SerialEntry public int fadeInPoints = 20;
     @SerialEntry public int fadeOutPoints = 30;
+    @SerialEntry public int contrailCurvePoints = 3;
+    @SerialEntry public Color contrailColor = new Color(220, 255, 255, 118);
     @SerialEntry public double contrailWidth = 0.1;
     @SerialEntry public double contrailWidthAddition = 0.04;
     @SerialEntry public float contrailOpacityAdjustment = 0.25f;
     @SerialEntry public boolean velocityBasedOpacityAdjust = true;
-    @SerialEntry public int contrailCurvePoints = 3;
     @SerialEntry public int ticksPerPoint = 1;
     @SerialEntry public int contrailDeletionDelay = 1;
     @SerialEntry public int pointsDeletedPerDelay = 1;
-    @SerialEntry public Color contrailColor = new Color(220, 255, 255, 118);
 
 //    @SerialEntry
 //    public boolean showSpeedlines = true;
 //    @SerialEntry public boolean altSpeedlineTextures = false;
-//    @SerialEntry public boolean windGusts = true;
-//    @SerialEntry
-//    public boolean altFireworkParticles = true;
-//    @SerialEntry public boolean alwaysUseAltFireworkParticles = false;
+    @SerialEntry public boolean windGusts = true;
+    @SerialEntry public boolean useMinecraftWindGusts = false;
+    @SerialEntry public boolean altFireworkParticles = true;
+    @SerialEntry public boolean alwaysUseAltFireworkParticles = false;
 
     public static Screen makeScreen(Screen parent) {
         return YetAnotherConfigLib.create(INSTANCE, (defaults, config, builder) -> {
 
-            var defaultCategoryBuilder = ConfigCategory.createBuilder()
-                    .name(Text.translatable("jetlag.category.default"))
-                    .tooltip(Text.translatable("jetlag.category.default.tooltip"));
+            var contrailCategoryBuilder = ConfigCategory.createBuilder()
+                    .name(Text.translatable("jetlag.category.contrail"))
+                    .tooltip(Text.translatable("jetlag.category.contrail.tooltip"));
 
-            var contrailGroup = OptionGroup.createBuilder()
-                    .name(Text.translatable("jetlag.contrail.group"))
+            var pointsGroup = OptionGroup.createBuilder()
+                    .name(Text.translatable("jetlag.points.group"))
                     .description(OptionDescription.createBuilder()
-                            .text(Text.translatable("jetlag.contrail.group.tooltip"))
+                            .text(Text.translatable("jetlag.points.group.tooltip"))
                             .build());
 
             var maxPoints = Option.<Integer>createBuilder()
                     .name(Text.translatable("jetlag.maxpoints"))
                     .description(OptionDescription.createBuilder()
                             .text(Text.translatable("jetlag.maxpoint.tooltip"))
+                            .text(Text.translatable("jetlag.lagwarning"))
                             .build())
                     .binding(
                             defaults.maxPoints,
@@ -120,6 +121,7 @@ public class JetLagConfig {
                     .name(Text.translatable("jetlag.curvepoints"))
                     .description(OptionDescription.createBuilder()
                             .text(Text.translatable("jetlag.curvepoints.tooltip"))
+                            .text(Text.translatable("jetlag.superlagwarning"))
                             .build())
                     .binding(
                             defaults.contrailCurvePoints,
@@ -128,6 +130,25 @@ public class JetLagConfig {
                     )
                     .customController(opt -> new IntegerSliderController(opt, 1, 36, 1))
                     .build();
+
+            var contrailColor = Option.<Color>createBuilder()
+                    .name(Text.translatable("jetlag.contrailcolor"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("jetlag.contrailcolor.tooltip"))
+                            .build())
+                    .binding(
+                            defaults.contrailColor,
+                            () -> config.contrailColor,
+                            val -> config.contrailColor = val
+                    )
+                    .customController(opt -> new ColorController(opt, true))
+                    .build();
+
+            var widthAndOpacityGroup = OptionGroup.createBuilder()
+                    .name(Text.translatable("jetlag.widthopacity.group"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("jetlag.widthopacity.group.tooltip"))
+                            .build());
 
             var contrailWidth = Option.<Double>createBuilder()
                     .name(Text.translatable("jetlag.contrailwidth"))
@@ -146,6 +167,7 @@ public class JetLagConfig {
                     .name(Text.translatable("jetlag.contrailwidthadd"))
                     .description(OptionDescription.createBuilder()
                             .text(Text.translatable("jetlag.contrailwidthadd.tooltip"))
+                            .text(Text.translatable("jetlag.artifactwarning"))
                             .build())
                     .binding(
                             defaults.contrailWidthAddition,
@@ -178,8 +200,14 @@ public class JetLagConfig {
                             () -> config.velocityBasedOpacityAdjust,
                             val -> config.velocityBasedOpacityAdjust = val
                     )
-                    .customController(opt -> new BooleanController(opt, BooleanController.YES_NO_FORMATTER, true))
+                    .customController(opt -> new BooleanController(opt, BooleanController.ON_OFF_FORMATTER, true))
                     .build();
+
+            var spawningAndDeletingGroup = OptionGroup.createBuilder()
+                    .name(Text.translatable("jetlag.spawndelete.group"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("jetlag.spawndelete.group.tooltip"))
+                            .build());
 
             var ticksPerPoint = Option.<Integer>createBuilder()
                     .name(Text.translatable("jetlag.ticksperpoint"))
@@ -220,42 +248,103 @@ public class JetLagConfig {
                     .customController(opt -> new IntegerSliderController(opt, 1, 10, 1))
                     .build();
 
-            var contrailColor = Option.<Color>createBuilder()
-                    .name(Text.translatable("jetlag.contrailcolor"))
+            pointsGroup.option(maxPoints);
+            pointsGroup.option(fadeInPoints);
+            pointsGroup.option(fadeOutPoints);
+            pointsGroup.option(curvePoints);
+            pointsGroup.option(contrailColor);
+            widthAndOpacityGroup.option(contrailWidth);
+            widthAndOpacityGroup.option(contrailWidthAddition);
+            widthAndOpacityGroup.option(contrailOpacityAdjustment);
+            widthAndOpacityGroup.option(velocityBasedOpacityAdjust);
+            spawningAndDeletingGroup.option(ticksPerPoint);
+            spawningAndDeletingGroup.option(deleteDelay);
+            spawningAndDeletingGroup.option(pointsPerDelete);
+
+            contrailCategoryBuilder.group(pointsGroup.build());
+            contrailCategoryBuilder.group(widthAndOpacityGroup.build());
+            contrailCategoryBuilder.group(spawningAndDeletingGroup.build());
+
+            var particlesCategoryBuilder = ConfigCategory.createBuilder()
+                    .name(Text.translatable("jetlag.category.particles"))
+                    .tooltip(Text.translatable("jetlag.category.particles.tooltip"));
+
+            var windGroup = OptionGroup.createBuilder()
+                    .name(Text.translatable("jetlag.wind.group"))
                     .description(OptionDescription.createBuilder()
-                            .text(Text.translatable("jetlag.contrailcolor.tooltip"))
+                            .text(Text.translatable("jetlag.wind.group.tooltip"))
+                            .build());
+
+            var windGusts = Option.<Boolean>createBuilder()
+                    .name(Text.translatable("jetlag.windgusts"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("jetlag.windgusts.tooltip"))
                             .build())
                     .binding(
-                            defaults.contrailColor,
-                            () -> config.contrailColor,
-                            val -> config.contrailColor = val
+                            defaults.windGusts,
+                            () -> config.windGusts,
+                            val -> config.windGusts = val
                     )
-                    .customController(opt -> new ColorController(opt, true))
+                    .customController(opt -> new BooleanController(opt, BooleanController.ON_OFF_FORMATTER, true))
                     .build();
 
-            var testCategory = TestCategory.createBuilder()
-                    .name(Text.of("name"))
-                    .tooltip(Text.of("tooltip"));
+            var useMCWindGusts = Option.<Boolean>createBuilder()
+                    .name(Text.translatable("jetlag.mcwindgusts"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("jetlag.mcwindgusts.tooltip"))
+                            .build())
+                    .binding(
+                            defaults.useMinecraftWindGusts,
+                            () -> config.useMinecraftWindGusts,
+                            val -> config.useMinecraftWindGusts = val
+                    )
+                    .customController(opt -> new BooleanController(opt, BooleanController.YES_NO_FORMATTER, true))
+                    .build();
 
-            contrailGroup.option(maxPoints);
-            contrailGroup.option(fadeInPoints);
-            contrailGroup.option(fadeOutPoints);
-            contrailGroup.option(curvePoints);
-            contrailGroup.option(contrailWidth);
-            contrailGroup.option(contrailWidthAddition);
-            contrailGroup.option(contrailOpacityAdjustment);
-            contrailGroup.option(velocityBasedOpacityAdjust);
-            contrailGroup.option(ticksPerPoint);
-            contrailGroup.option(deleteDelay);
-            contrailGroup.option(pointsPerDelete);
-            contrailGroup.option(contrailColor);
-            defaultCategoryBuilder.group(contrailGroup.build());
+            var fireworkGroup = OptionGroup.createBuilder()
+                    .name(Text.translatable("jetlag.firework.group"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("jetlag.firework.group.tooltip"))
+                            .build());
 
+            var altFireworkParticles = Option.<Boolean>createBuilder()
+                    .name(Text.translatable("jetlag.altfirework"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("jetlag.altfirework.tooltip"))
+                            .build())
+                    .binding(
+                            defaults.altFireworkParticles,
+                            () -> config.altFireworkParticles,
+                            val -> config.altFireworkParticles = val
+                    )
+                    .customController(opt -> new BooleanController(opt, BooleanController.ON_OFF_FORMATTER, true))
+                    .build();
+
+            var alwaysUseAltFireworkParticles = Option.<Boolean>createBuilder()
+                    .name(Text.translatable("jetlag.alwaysaltfirework"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("jetlag.alwaysaltfirework.tooltip"))
+                            .build())
+                    .binding(
+                            defaults.alwaysUseAltFireworkParticles,
+                            () -> config.alwaysUseAltFireworkParticles,
+                            val -> config.alwaysUseAltFireworkParticles = val
+                    )
+                    .customController(opt -> new BooleanController(opt, BooleanController.YES_NO_FORMATTER, true))
+                    .build();
+
+            windGroup.option(windGusts);
+            windGroup.option(useMCWindGusts);
+            fireworkGroup.option(altFireworkParticles);
+            fireworkGroup.option(alwaysUseAltFireworkParticles);
+
+            particlesCategoryBuilder.group(windGroup.build());
+            particlesCategoryBuilder.group(fireworkGroup.build());
 
             return builder
                 .title(Text.translatable("jetlag.title"))
-                .category(defaultCategoryBuilder.build())
-                    .category(testCategory.build());
+                .category(contrailCategoryBuilder.build())
+                    .category(particlesCategoryBuilder.build());
 //
 //            var screenEffectsGroup = OptionGroup.createBuilder()
 //                    .name(Text.translatable("jetlag.screeneffects.group"))

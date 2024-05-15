@@ -1,23 +1,62 @@
 {
   "jetlag.title": "Jet Lag Config",
 
-  "jetlag.category.default": "Visual",
-  "jetlag.category.default.tooltip": "Config options related to visual effects",
+  "jetlag.category.contrail": "Contrails",
+  "jetlag.category.contrail.tooltip": "Config options related to elytra contrails.",
 
-  "jetlag.screeneffects.group": "Screen Effects",
-  "jetlag.screeneffects.group.tooltip": "All options related to screen effects",
-  "jetlag.speedlines": "Speed Lines",
-  "jetlag.speedlines.tooltip": "The white lines that appear on-screen when flying swiftly",
-  "jetlag.speedlines.alt": "Alternative Speed Line Textures",
-  "jetlag.speedlines.alt.tooltip": "Use a different set of textures for the speed lines",
+  "jetlag.points.group": "Points",
+  "jetlag.points.group.tooltip": "Config options related to a contrail's points. Contrails are made up of multiple points connected together.",
+  "jetlag.maxpoints": "Max Points",
+  "jetlag.maxpoint.tooltip": "The max amount of points a contrail can have. This affects the length of a contrail.",
+  "jetlag.fadeinpoints": "Fade In Points",
+  "jetlag.fadeinpoints.tooltip": "The amount of points a contrail should fade in.",
+  "jetlag.fadeoutpoints": "Fade Out Points",
+  "jetlag.fadeoutpoints.tooltip": "The amount of points a contrail should fade out.",
+  "jetlag.curvepoints": "Smooth Points",
+  "jetlag.curvepoints.tooltip": "The amount of extra points between 2 points to help smooth the turn.",
+  "jetlag.contrailcolor": "Contrail Color",
+  "jetlag.contrailcolor.tooltip": "The color of a contrail.",
 
-  "jetlag.particles.group": "Particles",
-  "jetlag.particles.group.tooltip": "All options related to particles",
-  "jetlag.wind": "Wind Gusts",
-  "jetlag.wind.tooltip": "Cartoony wind gusts whenever using a firework whilst flying",
+  "jetlag.widthopacity.group": "Width & Opacity",
+  "jetlag.widthopacity.group.tooltip": "Config options related to a contrail's width & opacity.",
+  "jetlag.contrailwidth": "Contrail Initial Width",
+  "jetlag.contrailwidth.tooltip": "The initial spawning width of a contrail.",
+  "jetlag.contrailwidthadd": "Width Addition Over Time",
+  "jetlag.contrailwidthadd.tooltip": "The amount of extra width added to a contrail as the amount of points increase.",
+  "jetlag.contrailopacityadjustment": "Max Opacity Adjustment",
+  "jetlag.contrailopacityadjustment.tooltip": "The max amount of opacity adjustment to an individual point in a contrail.",
+  "jetlag.velocityopacityadjust": "Velocity Based Opacity Adjustment",
+  "jetlag.velocityopacityadjust.tooltip": "The chance of a opacity adjustment reaching the max opacity adjustment is increased or decreased depending on the elytra user's velocity.",
+
+  "jetlag.spawndelete.group": "Points Spawning & Deleting",
+  "jetlag.spawndelete.group.tooltip": "Config options related to spawning and deleting points",
+  "jetlag.ticksperpoint": "Ticks Per Point",
+  "jetlag.ticksperpoint.tooltip": "The amount of ticks until a new point is spawned.",
+  "jetlag.deletedelay": "Delete Delay",
+  "jetlag.deletedelay.tooltip": "After the elytra user has landed, the amount of ticks until the oldest point is deleted.",
+  "jetlag.pointsperdelete": "Points Deleted Per Deletion",
+  "jetlag.pointsperdelete.tooltip": "The amount of points deleted per delete delay ticks.",
+
+
+
+  "jetlag.category.particles": "Particles",
+  "jetlag.category.particles.tooltip": "Config options related to particles",
+
+  "jetlag.wind.group": "Wind",
+  "jetlag.wind.group.tooltip": "Config options related to wind particles.",
+  "jetlag.windgusts": "Elytra Wind Gusts",
+  "jetlag.windgusts.tooltip": "Shows wind gusts after using a firework rocket whilst flying.",
+  "jetlag.mcwindgusts": "Use Minecraft's Wind Gust",
+  "jetlag.mcwindgusts.tooltip": "If enabled, Minecraft's wind gusts particles will be used instead. Requires Elytra Wind Gusts to be enabled",
+
+  "jetlag.firework.group": "Fireworks",
+  "jetlag.firework.group.tooltip": "Config options related to firework particles.",
   "jetlag.altfirework": "Alternative Firework Particles",
-  "jetlag.altfirework.tooltip": "Cartoon like smoke particles for fireworks only activated while flying",
-  "jetlag.altfireworkeverywhere": "Always Use Alternative Firework Particles",
-  "jetlag.altfireworkeverywhere.tooltip": "Always use the alternative firework particles, even if the user isn't flying",
-  "jetlag.altfireworkeverywhere.tooltip.examples": "e.g. shooting a firework using a crossbow"
+  "jetlag.altfirework.tooltip": "Cartoon like smoke particles for fireworks only activated while flying.",
+  "jetlag.alwaysaltfirework": "Always Use Alternative Firework Particles",
+  "jetlag.alwaysaltfirework.tooltip": "Allows the alternative firework particles to replace the normal firework particles even outside of flying, like fireworks shot from crossbows.",
+
+  "jetlag.lagwarning": "§cWarning§r: Setting this option to a high number may cause lag!",
+  "jetlag.superlagwarning": "§c§lWARNING§r: Setting this option to a high number will likely cause lag!!!",
+  "jetlag.artifactwarning": "§cWarning§r: Settings this option to a high number may cause rendering artifacts, such as opacity overlapping. This does NOT cause any performance issues, but may look slightly odd in small spots of the contrail."
 }

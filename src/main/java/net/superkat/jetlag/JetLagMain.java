@@ -10,6 +10,9 @@ import net.superkat.jetlag.config.JetLagConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class JetLagMain implements ModInitializer {
     public static final String MOD_ID = "jetlag";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
@@ -17,6 +20,7 @@ public class JetLagMain implements ModInitializer {
     public static final DefaultParticleType WIND1 = FabricParticleTypes.simple();
     public static final DefaultParticleType WIND2 = FabricParticleTypes.simple();
     public static final DefaultParticleType WIND3 = FabricParticleTypes.simple();
+    public static final List<DefaultParticleType> windParticles = Arrays.asList(WIND1, WIND2, WIND3);
 
     @Override
     public void onInitialize() {

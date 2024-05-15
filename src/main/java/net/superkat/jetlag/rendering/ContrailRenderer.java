@@ -3,12 +3,10 @@ package net.superkat.jetlag.rendering;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -80,29 +78,6 @@ public class ContrailRenderer {
         RenderSystem.enableCull();
         MinecraftClient.getInstance().gameRenderer.getLightmapTextureManager().disable();
 
-        matrixStack.pop();
-    }
-
-    public static void renderGuiContrail(DrawContext context, Contrail contrail) {
-        context.drawTextWithShadow(MinecraftClient.getInstance().textRenderer, Text.of("Hey little guy"), 50, 30, Color.white.getRGB());
-        MatrixStack matrixStack = context.getMatrices();
-        matrixStack.push();
-        matrixStack.translate(100, 0, 0);
-//        matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180f));
-        matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees((System.currentTimeMillis() % 5000) / 5000f * 360f));
-//        context.drawHorizontalLine(50, 100, 30, Color.YELLOW.getRGB());
-        Color contrailColor = getInstance().contrailColor;
-        Vec3d firstPoint = contrail.getLeftPoints().get(0);
-        Vec3d secondPoint = contrail.getLeftPoints().get(1);
-        float opacityAdjustOne = contrail.getOpacityAdjustments().get(0);
-        float opacityAdjustTwo = contrail.getOpacityAdjustments().get(1);
-        int opacityAdjust = (int) (MathHelper.lerp(MinecraftClient.getInstance().getTickDelta(), opacityAdjustOne, opacityAdjustTwo) * 255f);
-        Color color = new Color(contrailColor.getRed(), contrailColor.getGreen(), contrailColor.getBlue(), MathHelper.clamp(contrailColor.getAlpha() + opacityAdjust, 0, 255));
-        RenderSystem.disableCull();
-        context.fill((int) firstPoint.getX(), (int) firstPoint.getY(), (int) secondPoint.getX(), (int) secondPoint.getY(), color.getRGB());
-        RenderSystem.enableCull();
-
-//        context.fill(50, 50, 70, 70, contrailColor.getRGB());
         matrixStack.pop();
     }
 
