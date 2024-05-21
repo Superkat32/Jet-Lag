@@ -2,6 +2,8 @@ package net.superkat.jetlag.mixin;
 
 import com.google.common.collect.Lists;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.superkat.jetlag.JetLagMain;
+import net.superkat.jetlag.WindLineHandler;
 import net.superkat.jetlag.config.JetLagConfig;
 import net.superkat.jetlag.contrail.Contrail;
 import net.superkat.jetlag.contrail.JetLagPlayer;
@@ -16,6 +18,7 @@ public class ClientPlayerEntityMixin implements JetLagPlayer {
     @Nullable
     Contrail currentContrail = null;
     public int ticksUntilPoint = 0;
+    public int ticksUntilWindLine = 20;
     @Override
     public List<Contrail> jetlag$getContrails() {
         return contrails;
@@ -39,15 +42,15 @@ public class ClientPlayerEntityMixin implements JetLagPlayer {
 
     @Override
     public void jetlag$tick() {
-        //renders air streaks if any exists
+        //renders contrails if any exists
         jetlag$renderContrailSets();
 
         //checks if the player is flying with an elytra
         ClientPlayerEntity player = (ClientPlayerEntity) (Object) this;
         if(player.isFallFlying()) {
             if(currentContrail != null) {
-                //adds new points to the newest air streak
-                if(Contrail.tickPoints()) {
+                //adds new points to the newest contrail
+                if(JetLagMain.canTick()) {
                     if(jetlag$hasContrails()) {
                         if(ticksUntilPoint <= 0) {
                             currentContrail.addPoint();
@@ -57,9 +60,19 @@ public class ClientPlayerEntityMixin implements JetLagPlayer {
                     }
                 }
             } else {
-                //creates and sets the current air streak
+                //creates and sets the current contrail
                 jetlag$createContrail();
             }
+
+            //wind lines
+            if(JetLagMain.canTick()) {
+                ticksUntilWindLine--;
+                if(ticksUntilWindLine <= 0) {
+                    WindLineHandler.spawnWindLineParticles(player);
+                    ticksUntilWindLine = player.getWorld().random.nextBetween(3, 13);
+                }
+            }
+
         } else if (currentContrail != null) {
             currentContrail.startDeletingPoints();
             currentContrail = null;

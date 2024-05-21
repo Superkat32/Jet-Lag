@@ -1,10 +1,10 @@
 package net.superkat.jetlag.contrail;
 
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
+import net.superkat.jetlag.JetLagMain;
 import net.superkat.jetlag.config.JetLagConfig;
 import net.superkat.jetlag.rendering.ContrailRenderer;
 import org.spongepowered.include.com.google.common.collect.Lists;
@@ -34,7 +34,7 @@ public class Contrail {
             maxOpacityAdjustment *= (float) this.player.getVelocity().lengthSquared();
         }
         contrailOpacityAdjustments.add(0, MathHelper.nextBetween(this.random, -maxOpacityAdjustment, maxOpacityAdjustment));
-        if(shouldRemoveOldestPoint() && Contrail.tickPoints()) {
+        if(shouldRemoveOldestPoint() && JetLagMain.canTick()) {
             removeOldestPoint();
         }
     }
@@ -48,7 +48,7 @@ public class Contrail {
     public void render() {
         maxPoints = JetLagConfig.getInstance().maxPoints;
 
-        if(startDeletingPoints && !noPointsLeft() && Contrail.tickPoints()) {
+        if(startDeletingPoints && !noPointsLeft() && JetLagMain.canTick()) {
             ticksUntilNextDelete--;
             if(ticksUntilNextDelete <= 0) {
                 for (int i = 0; i < JetLagConfig.getInstance().pointsDeletedPerDelay; i++) {
@@ -95,10 +95,6 @@ public class Contrail {
         List<Vec3d> points = Lists.newArrayList();
         contrailPoints.stream().map(ContrailPos::getRightPoint).forEach(points::add);
         return points;
-    }
-    public static boolean tickPoints() {
-        MinecraftClient client = MinecraftClient.getInstance();
-        return !client.isPaused() && (client.world == null || client.world.getTickManager().shouldTick());
     }
     public static class ContrailPos {
         //opacity adjustment here instead?
