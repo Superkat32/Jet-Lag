@@ -26,6 +26,7 @@ public class ClientPlayerEntityMixin implements JetLagPlayer {
 
     @Override
     public void jetlag$createContrail() {
+        if(!JetLagConfig.getInstance().contrailsEnabled) return;
         currentContrail = new Contrail((ClientPlayerEntity) (Object) this);
         contrails.add(currentContrail);
     }
@@ -50,7 +51,8 @@ public class ClientPlayerEntityMixin implements JetLagPlayer {
         if(player.isFallFlying()) {
             if(currentContrail != null) {
                 //adds new points to the newest contrail
-                if(JetLagMain.canTick()) {
+                //config check here to ensure that if contrails are disabled mid-flight, new points don't keep spawning
+                if(JetLagConfig.getInstance().contrailsEnabled && JetLagMain.canTick()) {
                     if(jetlag$hasContrails()) {
                         if(ticksUntilPoint <= 0) {
                             currentContrail.addPoint();
@@ -65,7 +67,7 @@ public class ClientPlayerEntityMixin implements JetLagPlayer {
             }
 
             //wind lines
-            if(JetLagMain.canTick()) {
+            if(JetLagConfig.getInstance().windLines && JetLagMain.canTick()) {
                 ticksUntilWindLine--;
                 if(ticksUntilWindLine <= 0) {
                     WindLineHandler.spawnWindLineParticles(player);

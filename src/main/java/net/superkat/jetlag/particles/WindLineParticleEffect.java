@@ -11,6 +11,7 @@ import net.superkat.jetlag.JetLagMain;
 import java.util.Locale;
 
 public class WindLineParticleEffect implements ParticleEffect {
+    @SuppressWarnings("deprecation")
     public static final ParticleEffect.Factory<WindLineParticleEffect> PARAMETER_FACTORY = new ParticleEffect.Factory<>() {
         @Override
         public WindLineParticleEffect read(ParticleType<WindLineParticleEffect> type, StringReader reader) throws CommandSyntaxException {

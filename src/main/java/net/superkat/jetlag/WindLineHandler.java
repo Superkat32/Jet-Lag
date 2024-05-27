@@ -1,12 +1,16 @@
 package net.superkat.jetlag;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
+import net.superkat.jetlag.config.JetLagConfig;
 import net.superkat.jetlag.particles.WindLineParticleEffect;
 
 public class WindLineHandler {
     public static void spawnWindLineParticles(LivingEntity entity) {
+        if(!JetLagConfig.getInstance().windLinesInFirstPerson && MinecraftClient.getInstance().options.getPerspective().isFirstPerson()) return;
+
         int max = (int) Math.round(entity.getVelocity().lengthSquared()) + 2;
         int min = (int) Math.round(entity.getVelocity().length());
         int amount = entity.getRandom().nextBetween(min, max);

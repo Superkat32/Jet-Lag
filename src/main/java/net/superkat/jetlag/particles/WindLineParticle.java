@@ -8,7 +8,10 @@ import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.superkat.jetlag.config.JetLagConfig;
 import org.joml.Vector3f;
+
+import java.awt.*;
 
 @Environment(EnvType.CLIENT)
 public class WindLineParticle extends SpriteBillboardParticle {
@@ -40,6 +43,9 @@ public class WindLineParticle extends SpriteBillboardParticle {
         this.yaw = -yaw + 90f;
         this.angle = (float) Math.toRadians(pitch);
         this.prevAngle = angle;
+
+        Color color = JetLagConfig.getInstance().windLinesColor;
+        this.setColor(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f);
 
         this.setSpriteForAge(spriteProvider);
     }

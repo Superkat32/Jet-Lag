@@ -3,6 +3,8 @@
 
   "jetlag.category.contrail": "Contrails",
   "jetlag.category.contrail.tooltip": "Config options related to elytra contrails.",
+  "jetlag.contrailsenabled": "Contrails",
+  "jetlag.contrailsenabled.tooltip": "A trail from the edge of each elytra wing.",
 
   "jetlag.points.group": "Points",
   "jetlag.points.group.tooltip": "Config options related to a contrail's points. Contrails are made up of multiple points connected together.",
@@ -40,10 +42,16 @@
 
 
   "jetlag.category.particles": "Particles",
-  "jetlag.category.particles.tooltip": "Config options related to particles",
+  "jetlag.category.particles.tooltip": "Config options related to particles.",
 
   "jetlag.wind.group": "Wind",
   "jetlag.wind.group.tooltip": "Config options related to wind particles.",
+  "jetlag.windlines": "Wind Lines",
+  "jetlag.windlines.tooltip": "Multiple thin lines of wind whilst flying.",
+  "jetlag.windlinescolor": "Wind Lines Color",
+  "jetlag.windlinescolor.tooltip": "The color of the wind lines.",
+  "jetlag.firstpersonwindlines": "Show Wind Lines In First Person",
+  "jetlag.firstpersonwindlines.tooltip": "Spawn the wind lines while in first person.",
   "jetlag.windgusts": "Elytra Wind Gusts",
   "jetlag.windgusts.tooltip": "Shows wind gusts after using a firework rocket whilst flying.",
   "jetlag.mcwindgusts": "Use Minecraft's Wind Gust",
@@ -56,7 +64,26 @@
   "jetlag.alwaysaltfirework": "Always Use Alternative Firework Particles",
   "jetlag.alwaysaltfirework.tooltip": "Allows the alternative firework particles to replace the normal firework particles even outside of flying, like fireworks shot from crossbows.",
 
+
+
+  "jetlag.category.screen": "Screen VFXs",
+  "jetlag.category.screen.tooltip": "Config options related to on-screen visual effects.",
+  "jetlag.speedlines.group": "Speedlines",
+  "jetlag.speedlines.group.tooltip": "Config options related to speedlines.",
+  "jetlag.showspeedlines": "Screen Speedlines",
+  "jetlag.showspeedlines.tooltip": "On-screen speedlines to help give a feeling of speed.",
+  "jetlag.velspeedlinesopacity": "Velocity Based Opacity Adjustment",
+  "jetlag.velspeedlinesopacity.tooltip": "The opacity of the speedlines effect is determined by your velocity. If enabled, this option overrides the opacity value of the speedlines' color.",
+  "jetlag.speedlinescolor": "Speedlines Color",
+  "jetlag.speedlinescolor.tooltip": "The color of the speedlines.",
+  "jetlag.rainbowspeedlines": "§dR§5a§1i§9nb§bow§r Speedlines",
+  "jetlag.rainbowspeedlines.tooltip": "Adjusts the color of the speedlines to be somewhat rainbow colored in addition to the speedlines' color.",
+  "jetlag.firstpersonspeedlines": "First Person Only",
+  "jetlag.firstpersonspeedlines.tooltip": "Only show speedlines when in first person. ",
+
+
+
   "jetlag.lagwarning": "§cWarning§r: Setting this option to a high number may cause lag!",
   "jetlag.superlagwarning": "§c§lWARNING§r: Setting this option to a high number will likely cause lag!!!",
-  "jetlag.artifactwarning": "§cWarning§r: Settings this option to a high number may cause rendering artifacts, such as opacity overlapping. This does NOT cause any performance issues, but may look slightly odd in small spots of the contrail."
+  "jetlag.artifactwarning": "§6Warning§r: Settings this option to a high number may cause rendering artifacts, such as opacity overlapping. This does NOT cause any performance issues, but may look slightly odd in small spots of the contrail."
 }
