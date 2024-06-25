@@ -4,7 +4,6 @@
 
 uniform sampler2D Sampler0;
 uniform vec4 ColorModulator;
-uniform float GameTime;
 in vec2 texCoord0;
 in vec2 uv;
 out vec4 fragColor;
@@ -19,9 +18,6 @@ void main() {
         discard;
     }
 
-//    float time = abs(sin(GameTime * 1200.0));
-    float time = abs(sin(GameTime * 20)) * 60;
-
     vec3 lightblue = vec3(0.3, 0.9, 1.0);
     float lightblueradius = 1.5;
     vec3 blue = vec3(0.3, 0.4, 1.0);
@@ -30,8 +26,6 @@ void main() {
     float purpleradius = 1.05;
     vec3 pink = vec3(1.0, 0.4, 0.9);
     float pinkradius = 1.1;
-//    vec3 yellow = vec3(1.0, 0.8, 0.5);
-//    float yellowradius = 1.35;
     float remainingradius = 1.5;
     float finalradius = 2.0;
 
@@ -40,55 +34,11 @@ void main() {
     vec3 mixed = mix(lightblue, blue, smoothstep(0.0, lightblueradius, dist));
     mixed = mix(mixed, purple, smoothstep(blueradius, purpleradius, dist));
     mixed = mix(mixed, pink, smoothstep(purpleradius, pinkradius, dist));
-//    mixed = mix(mixed, yellow, smoothstep(pinkradius, yellowradius, dist));
     mixed = mix(mixed, lightblue, smoothstep(pinkradius, remainingradius, dist));
     mixed = mix(mixed, lightblue, smoothstep(remainingradius, finalradius, dist));
 
     //well that was pretty shrimple - who needs DRY anyways?
     color *= vec4(mixed, 1.0);
-
-
-//    vec2 gradientCenter = vec2(texCoord0.x / 2.0, texCoord0.y / 2.0);
-//    vec2 gradientDim = vec2(texCoord0.x + 1.0, texCoord0.y);
-//    gradientDim *= lightblueradius;
-//
-//    vec2 gradient = gradientCenter - uv;
-//    float d = length(gradient);
-//    vec3 mixed = mix(lightblue, blue, d * 2.0);
-//
-//    if(inCircle(uv, lightblueradius)) {
-//    } else if (inCircle(uv, blueradius)) {
-//        gradient = gradientCenter - uv;
-//        d = length(gradient) + blueradius;
-//        mixed = mix(yellow, pink, d);
-//    }
-//    color *= vec4(mixed, 1.0);
-
-//    if(inCircle(uv, lightblueradius)) {
-//        color *= vec4(lightblue, 1.0);
-//    } else if(inCircle(uv, blueradius)) {
-//        vec2 gradientCenter = vec2(texCoord0.x / 2.0, texCoord0.y / 2.0);
-//        vec2 gradientDim = vec2(texCoord0.x, texCoord0.y);
-//
-//        vec2 gradient = gradientCenter - uv;
-//        gradient.x = gradient.x * (1.0 / gradientDim.x);
-//        gradient.y = gradient.y * (1.0 / gradientDim.y);
-//        float d = length(gradient);
-//        vec3 mixed = mix(lightblue, blue, d * 2.0);
-//        color *= vec4(mixed, 1.0);
-//    } else if(inCircle(uv, purpleradius)) {
-//        color *= vec4(purple, 1.0);
-//    } else if(inCircle(uv, pinkradius)) {
-//        color *= vec4(pink, 1.0);
-//    } else if(inCircle(uv, yellowradius)) {
-//        color *= vec4(yellow, 1.0);
-//    } else {
-//        color *= vec4(blue, 1.0);
-//    }
-
-//    vec3 col = 0.5 + 0.5*cos(time+vec3(0,2,4));
-//    vec4 rainbow = vec4(col, 1.0);
-//    color *= rainbow;
 
     fragColor = color * ColorModulator;
 }

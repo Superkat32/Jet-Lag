@@ -5,6 +5,7 @@ import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.CoreShaderRegistrationCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.util.Identifier;
@@ -33,5 +34,9 @@ public class JetLagClient implements ClientModInitializer {
 
         WorldRenderEvents.END.register(ContrailRenderer::airStreakWorldRendering);
         HudRenderCallback.EVENT.register(SpeedlineRenderer::speedlineRendering);
+    }
+
+    public static boolean DABRLoaded() {
+        return FabricLoader.getInstance().isModLoaded("do_a_barrel_roll");
     }
 }
