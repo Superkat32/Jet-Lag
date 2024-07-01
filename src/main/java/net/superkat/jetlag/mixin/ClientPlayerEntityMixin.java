@@ -2,26 +2,38 @@ package net.superkat.jetlag.mixin;
 
 import com.google.common.collect.Lists;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.superkat.jetlag.JetLagMain;
 import net.superkat.jetlag.WindLineHandler;
 import net.superkat.jetlag.config.JetLagConfig;
 import net.superkat.jetlag.contrail.Contrail;
+import net.superkat.jetlag.contrail.ContrailHandler;
 import net.superkat.jetlag.contrail.JetLagPlayer;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
 
 @Mixin(ClientPlayerEntity.class)
 public class ClientPlayerEntityMixin implements JetLagPlayer {
-    List<Contrail> contrails = Lists.newArrayList();
+    public List<Contrail> contrails = Lists.newArrayList();
     @Nullable
-    Contrail currentContrail = null;
-    public int ticksUntilPoint = 0;
-    public int ticksUntilWindLine = 20;
+    public Contrail currentContrail = null;
+    @Unique
+    public int pointTicks = 0;
+    @Unique
+    public int windLineTicks = 20;
+
     @Override
     public List<Contrail> jetlag$getContrails() {
         return contrails;
+    }
+
+    @Override
+    public Contrail jetlag$getCurrentContrail() {
+        return currentContrail;
     }
 
     @Override
@@ -36,60 +48,47 @@ public class ClientPlayerEntityMixin implements JetLagPlayer {
         contrails = Lists.newArrayList();
     }
 
-    @Override
-    public void jetlag$onElytraEnd() {
-        //DELETEME - perhaps easier without this?
+    @Inject(
+            method = "tick",
+            at = @At("TAIL")
+    )
+    public void jetlag$tick(CallbackInfo ci) {
+        //bring code handling outside the mixin
+        ClientPlayerEntity self = (ClientPlayerEntity) (Object) this;
+        ContrailHandler.tickJetlagPlayer(self);
+        WindLineHandler.tickJetlagPlayer(self);
     }
 
     @Override
-    public void jetlag$tick() {
-        //renders contrails if any exists
-        jetlag$renderContrailSets();
-
-        //checks if the player is flying with an elytra
-        ClientPlayerEntity player = (ClientPlayerEntity) (Object) this;
-        if(player.isFallFlying()) {
-            if(currentContrail != null) {
-                //adds new points to the newest contrail
-                //config check here to ensure that if contrails are disabled mid-flight, new points don't keep spawning
-                if(JetLagConfig.getInstance().contrailsEnabled && JetLagMain.canTick()) {
-                    if(jetlag$hasContrails()) {
-                        if(ticksUntilPoint <= 0) {
-                            currentContrail.addPoint();
-                            ticksUntilPoint = JetLagConfig.getInstance().ticksPerPoint;
-                        }
-                        ticksUntilPoint--;
-                    }
-                }
-            } else {
-                //creates and sets the current contrail
-                jetlag$createContrail();
-            }
-
-            //wind lines
-            if(JetLagConfig.getInstance().windLines && JetLagMain.canTick()) {
-                ticksUntilWindLine--;
-                if(ticksUntilWindLine <= 0) {
-                    WindLineHandler.spawnWindLineParticles(player);
-                    ticksUntilWindLine = player.getWorld().random.nextBetween(3, 13);
-                }
-            }
-
-        } else if (currentContrail != null) {
-            currentContrail.startDeletingPoints();
-            currentContrail = null;
-        }
-    }
-
-    @Override
-    public void jetlag$renderContrailSets() {
-        for(Contrail contrail : contrails) {
-            contrail.render();
+    public void jetlag$endCurrentContrail() {
+        if(this.currentContrail != null) {
+            this.currentContrail.startDeletingPoints();
+            this.currentContrail = null;
         }
     }
 
     @Override
     public boolean jetlag$hasContrails() {
         return !contrails.isEmpty();
+    }
+
+    @Override
+    public int jetlag$pointTicks() {
+        return pointTicks;
+    }
+
+    @Override
+    public void jetlag$setPointTicks(int ticks) {
+        this.pointTicks = ticks;
+    }
+
+    @Override
+    public int jetlag$windLineTicks() {
+        return windLineTicks;
+    }
+
+    @Override
+    public void jetlag$setWindLineTicks(int ticks) {
+        this.windLineTicks = ticks;
     }
 }

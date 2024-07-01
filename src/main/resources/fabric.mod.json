@@ -19,7 +19,7 @@
 		], "client": [
 			"net.superkat.jetlag.JetLagClient"
 		], "modmenu": [
-        "net.superkat.jetlag.config.ModMenuIntegration"
+        	"net.superkat.jetlag.config.ModMenuIntegration"
 		]
 	},
 	"mixins": [

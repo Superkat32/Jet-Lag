@@ -50,6 +50,7 @@ public class JetLagConfig {
     @SerialEntry public double contrailWidth = 0.1;
     @SerialEntry public double contrailWidthAddition = 0.04;
     @SerialEntry public float contrailOpacityAdjustment = 0.25f;
+    @SerialEntry public boolean mirrorOpacity = false;
     @SerialEntry public boolean velocityBasedOpacityAdjust = true;
     @SerialEntry public int ticksPerPoint = 1;
     @SerialEntry public int contrailDeletionDelay = 1;
@@ -144,7 +145,7 @@ public class JetLagConfig {
                             () -> config.contrailCurvePoints,
                             val -> config.contrailCurvePoints = val
                     )
-                    .customController(opt -> new IntegerSliderController(opt, 1, 36, 1))
+                    .customController(opt -> new IntegerSliderController(opt, 1, 24, 1))
                     .build();
 
             var contrailColor = Option.<Color>createBuilder()
@@ -205,6 +206,19 @@ public class JetLagConfig {
                             val -> config.contrailOpacityAdjustment = val
                     )
                     .customController(opt -> new FloatSliderController(opt, 0, 1f, 0.05f))
+                    .build();
+
+            var mirrorOpacity = Option.<Boolean>createBuilder()
+                    .name(Text.translatable("jetlag.mirroropacity"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("jetlag.mirroropacity.tooltip"))
+                            .build())
+                    .binding(
+                            defaults.mirrorOpacity,
+                            () -> config.mirrorOpacity,
+                            val -> config.mirrorOpacity = val
+                    )
+                    .customController(opt -> new BooleanController(opt, BooleanController.YES_NO_FORMATTER, true))
                     .build();
 
             var velocityBasedOpacityAdjust = Option.<Boolean>createBuilder()
@@ -274,6 +288,7 @@ public class JetLagConfig {
             widthAndOpacityGroup.option(contrailWidth);
             widthAndOpacityGroup.option(contrailWidthAddition);
             widthAndOpacityGroup.option(contrailOpacityAdjustment);
+            widthAndOpacityGroup.option(mirrorOpacity);
             widthAndOpacityGroup.option(velocityBasedOpacityAdjust);
             spawningAndDeletingGroup.option(ticksPerPoint);
             spawningAndDeletingGroup.option(deleteDelay);

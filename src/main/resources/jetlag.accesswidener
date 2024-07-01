@@ -3,3 +3,5 @@ accessWidener v2 named
 accessible field net/minecraft/client/render/entity/model/ElytraEntityModel leftWing Lnet/minecraft/client/model/ModelPart;
 accessible field net/minecraft/client/render/entity/model/ElytraEntityModel rightWing Lnet/minecraft/client/model/ModelPart;
 accessible field net/minecraft/client/particle/BillboardParticle rotation Lorg/joml/Quaternionf;
+accessible class net/minecraft/client/render/RenderLayer$MultiPhaseParameters
+accessible class net/minecraft/client/render/RenderPhase$Texture

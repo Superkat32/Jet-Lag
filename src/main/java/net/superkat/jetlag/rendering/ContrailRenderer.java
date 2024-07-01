@@ -28,12 +28,43 @@ import static net.superkat.jetlag.config.JetLagConfig.getInstance;
 public class ContrailRenderer {
     public static final Identifier CONTRAIL_TEXTURE = new Identifier(JetLagMain.MOD_ID, "textures/contrail.png");
 
+    public static final RenderLayer CONTRAIL = RenderLayer.of(
+            "contrail",
+            VertexFormats.POSITION_COLOR_TEXTURE_LIGHT,
+            VertexFormat.DrawMode.TRIANGLE_STRIP,
+            1536,
+            false,
+            true,
+            RenderLayer.MultiPhaseParameters.builder()
+                    .program(RenderPhase.TRIPWIRE_PROGRAM)
+                    .texture(new RenderPhase.Texture(CONTRAIL_TEXTURE, false, false))
+                    .transparency(RenderLayer.TRANSLUCENT_TRANSPARENCY)
+                    .cull(RenderPhase.DISABLE_CULLING)
+                    .lightmap(RenderPhase.ENABLE_LIGHTMAP)
+                    .build(false)
+    );
+
     public static void airStreakWorldRendering(WorldRenderContext context) {
         List<AbstractClientPlayerEntity> players = context.world().getPlayers();
         for(AbstractClientPlayerEntity abstractPlayer : players) {
             if(abstractPlayer instanceof ClientPlayerEntity player) {
-                JetLagPlayer jetLagPlayer = (JetLagPlayer) player;
-                jetLagPlayer.jetlag$tick();
+//                MatrixStack matrices = context.matrixStack();
+//                matrices.push();
+//                Vec3d targetPos = new Vec3d(0, -59, 0);
+//                Vec3d pos = targetPos.subtract(context.camera().getPos());
+//
+//                matrices.translate(pos.getX(), pos.getY(), pos.getZ());
+//
+//                Matrix4f posMatrix = matrices.peek().getPositionMatrix();
+//                int light = LightmapTextureManager.pack(15, 15);
+//                VertexConsumer vertexConsumer = context.consumers().getBuffer(RenderLayer.getLeash());
+//                vertexConsumer.vertex(posMatrix, 0, 0, 0).color(1, 1, 1,1).light(light).next();
+//                vertexConsumer.vertex(posMatrix, 0, 1, 0).color(0f, 1, 1,1).light(light).next();
+//                vertexConsumer.vertex(posMatrix, 1, 0, 0).color(1, 0f, 1,1).light(light).next();
+//                vertexConsumer.vertex(posMatrix, 1, 1, 0).color(1, 1, 0f,1).light(light).next();
+//                matrices.pop();
+
+                renderContrails(player, context);
             }
         }
     }
@@ -43,25 +74,20 @@ public class ContrailRenderer {
      *
      * @param player Renders this player's existing contrails
      */
-    public static void renderContrails(ClientPlayerEntity player) {
+    public static void renderContrails(ClientPlayerEntity player, WorldRenderContext context) {
         JetLagPlayer jetLagPlayer = (JetLagPlayer) player;
         List<Contrail> playerContrails = jetLagPlayer.jetlag$getContrails();
-        playerContrails.forEach(ContrailRenderer::renderContrails);
+        playerContrails.forEach(contrail -> renderContrail(contrail, context));
     }
 
     /**
-     * Render a contrail's points. The main method to be called.
+     * Render a contrail's points and sets the rendering settings. The main method to be called.
      *
      * @param contrail The contrail to be rendered
      */
-    public static void renderContrails(Contrail contrail) {
-        MatrixStack matrixStack = new MatrixStack();
-        matrixStack.push();
-
-        RenderSystem.setShader(GameRenderer::getRenderTypeTripwireProgram);
-        RenderSystem.setShaderTexture(0, CONTRAIL_TEXTURE);
-//        RenderSystem.enableDepthTest(); //I have no clue what these 2 commented out things here do
-//        RenderSystem.depthFunc(GL11.GL_LEQUAL);
+    public static void renderContrail(Contrail contrail, WorldRenderContext context) {
+        MatrixStack matrices = context.matrixStack();
+        matrices.push();
 
         RenderSystem.disableCull();
         RenderSystem.enableBlend();
@@ -69,22 +95,22 @@ public class ContrailRenderer {
         RenderSystem.setShaderColor(contrailColor.getRed() / 255f, contrailColor.getGreen() / 255f, contrailColor.getBlue() / 255f, contrailColor.getAlpha() / 255f);
         MinecraftClient.getInstance().gameRenderer.getLightmapTextureManager().enable();
 
-        Tessellator tessellator = Tessellator.getInstance();
-        renderContrail(matrixStack, tessellator, contrail);
-//        renderTest(matrixStack, tessellator);
+        VertexConsumerProvider consumers = context.consumers();
+
+        renderContrail(contrail, matrices, consumers);
 
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
         RenderSystem.disableBlend();
         RenderSystem.enableCull();
         MinecraftClient.getInstance().gameRenderer.getLightmapTextureManager().disable();
 
-        matrixStack.pop();
+        matrices.pop();
     }
 
-    private static void renderTest(MatrixStack matrixStack, Tessellator tessellator) {
+    private static void renderTest(MatrixStack matrixStack, VertexConsumerProvider consumers) {
 
-        BufferBuilder buffer = tessellator.getBuffer();
-        buffer.begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR_TEXTURE_LIGHT);
+//        BufferBuilder buffer = tessellator.getBuffer();
+//        buffer.begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR_TEXTURE_LIGHT);
 
         Vec3d point1 = new Vec3d(0, -58, 0);
         Vec3d point2 = new Vec3d(0, -58, -5);
@@ -160,34 +186,49 @@ public class ContrailRenderer {
 //            }
 //        }
 
-        renderList(matrixStack, buffer, points);
+        VertexConsumer vertexConsumer = consumers.getBuffer(RenderLayer.getLeash());
+        renderList(matrixStack, vertexConsumer, points);
 
-        tessellator.draw();
+//        tessellator.draw();
     }
 
-    private static void renderContrail(MatrixStack matrixStack, Tessellator tessellator, Contrail contrail) {
+    /**
+     * Renders a contrail.
+     *
+     * @param contrail The contrail to be rendered.
+     * @param matrixStack The MatrixStack to use.
+     * @param consumers The VertexConsumerProvider to use.
+     */
+    private static void renderContrail(Contrail contrail, MatrixStack matrixStack, VertexConsumerProvider consumers) {
         matrixStack.push();
         if(contrail != null) {
+            //The VertexConsumerProvider given by the WorldRenderContext is the same as getting the
+            //MinecraftClient.getInstance().getBufferBuilders().getEntityVertexConsumers();
+            //which returns a VertexConsumerProvider.Immediate
+            VertexConsumerProvider.Immediate immediate = (VertexConsumerProvider.Immediate) consumers;
 
-            List<Float> opacityAdjustments = contrail.getOpacityAdjustments();
+            //It is EXTREMELY important that TRIANGLES_STRIP is used on the RenderLayer,
+            //as it has "shareVertices" option enabled allowing the drawn line here to be connected seamlessly.
 
-            //It is EXTREMELY important that TRIANGLES_STRIP is used, as it has "shareVertices" option enabled,
-            //allowing the drawn line here to be connected seamlessly.
-            //It is also important the teh tessellator gets drawn individually for each list,
+            //It is also important the Immediate gets drawn individually for each list,
             //as not doing so would connect the two drawn lists together, forming an "N" shape
-            BufferBuilder buffer = tessellator.getBuffer();
 
-            buffer.begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR_TEXTURE_LIGHT);
+            //Two different VertexConsumers are used instead of one because
+            //the "getBuffer" method calls some extra methods for drawing/beginning the rendering
+
             //renders all left wing points
+            VertexConsumer leftVertexConsumer = immediate.getBuffer(CONTRAIL);
             List<Vec3d> leftPoints = contrail.getLeftPoints();
-            renderList(matrixStack, buffer, leftPoints, opacityAdjustments);
-            tessellator.draw();
+            List<Float> leftOpacity = contrail.getLeftOpacity();
+            renderList(matrixStack, leftVertexConsumer, leftPoints, leftOpacity);
+            immediate.draw(CONTRAIL);
 
-            buffer.begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR_TEXTURE_LIGHT);
             //renders all right wing points
+            VertexConsumer rightVertexConsumer = immediate.getBuffer(CONTRAIL);
             List<Vec3d> rightPoints = contrail.getRightPoints();
-            renderList(matrixStack, buffer, rightPoints, opacityAdjustments);
-            tessellator.draw();
+            List<Float> rightOpacity = contrail.getRightOpacity();
+            renderList(matrixStack, rightVertexConsumer, rightPoints, rightOpacity);
+            immediate.draw(CONTRAIL);
         }
         matrixStack.pop();
     }
@@ -195,21 +236,21 @@ public class ContrailRenderer {
     /**
      * Renders a connected line of Vec3d's given in a list. The list is rendering in order starting from 0(oldest point). Called by each set of player contrails.
      * @param matrixStack The MatrixStack used in rendering.
-     * @param buffer The BufferBuilder used in rendering
+     * @param vertexConsumer The VertexConsumer used in rendering
      * @param points The list of Vec3d points to be rendered.
      */
-    private static void renderList(MatrixStack matrixStack, BufferBuilder buffer, List<Vec3d> points) {
-        renderList(matrixStack, buffer, points, null);
+    private static void renderList(MatrixStack matrixStack, VertexConsumer vertexConsumer, List<Vec3d> points) {
+        renderList(matrixStack, vertexConsumer, points, null);
     }
 
     /**
      * Renders a connected line of Vec3d's given in a list. The list is rendering in order starting from 0(oldest point). Called by each set of player contrails.
      * @param matrixStack The MatrixStack used in rendering.
-     * @param buffer The BufferBuilder used in rendering
+     * @param vertexConsumer The VertexConsumer used in rendering
      * @param points The list of Vec3d points to be rendered.
      * @param opacityAdjustment A list matching the size of the points, used for adjusting the opacity per point
      */
-    private static void renderList(MatrixStack matrixStack, BufferBuilder buffer, List<Vec3d> points, @Nullable List<Float> opacityAdjustment) {
+    private static void renderList(MatrixStack matrixStack, VertexConsumer vertexConsumer, List<Vec3d> points, @Nullable List<Float> opacityAdjustment) {
         matrixStack.push();
         int curvePoints = getInstance().contrailCurvePoints;
 
@@ -230,14 +271,16 @@ public class ContrailRenderer {
         float widthAdd = (float) (getInstance().contrailWidthAddition / 10f);
 
         for (int i = 0; i < points.size() - 1; i++) {
+            //Catmull spline points
             Vec3d prevPoint = points.get(i != 0 ? i - 1 : 0);
             Vec3d originPoint = points.get(i);
             Vec3d targetPoint = points.get(i + 1);
             Vec3d nextPoint = points.get(i + 2 <= points.size() - 1 ? i + 2 : i + 1);
 
+            //Extra point used for catmull spline during smoothing
             Vec3d prevCurvePoint = prevPoint;
 
-            //light adjustment
+            //light adjustment - interpolates between the origin and target points
             int originBlockLight = getLightLevel(LightType.BLOCK, originPoint);
             int targetBlockLight = getLightLevel(LightType.BLOCK, targetPoint);
             int originSkyLight = getLightLevel(LightType.SKY, originPoint);
@@ -270,21 +313,30 @@ public class ContrailRenderer {
                 float usedOpacity = MathHelper.clamp(opacity + opacityAdjust, minOpacity, 1f);
 
                 if(delta > 0f) {
-                    renderSegment(matrixStack, buffer, curvePoint, prevCurvePoint, usedOpacity, light, width);
+                    renderSegment(matrixStack, vertexConsumer, curvePoint, prevCurvePoint, usedOpacity, light, width);
                 }
                 prevCurvePoint = curvePoint;
             }
 
-            //fading stuff
-            //fading out takes priority over fading in
-            if(i >= points.size() - fadeoutPoints) { //fade out
-                opacity = (float) (points.size() - i) / fadeoutPoints;
-            } else if(i <= fadeinPoints && fadeinPoints != 0) { //fade in
-                opacity = (float) i / fadeinPoints;
+            //contrail fading - combines both fade in and fade out (i can't believe this worked lol)
+            boolean fadeIn = i <= fadeinPoints && fadeinPoints != 0;
+            float fadeInOpacity = contrailAlpha;
+            boolean fadeOut = i >= points.size() - fadeoutPoints;
+            float fadeOutOpacity = contrailAlpha;
+
+            if(fadeIn) {
+                fadeInOpacity = (float) i / fadeinPoints;
             }
 
-            //lower opacity values get discarded by Minecraft,
-            //so this ensures that all points still get rendered to some degree
+            if(fadeOut) {
+                fadeOutOpacity = (float) (points.size() - i) / fadeoutPoints;
+            }
+
+            opacity = MathHelper.lerp((float) i / points.size(), fadeInOpacity, fadeOutOpacity);
+
+            //lower opacity values get discarded by Minecraft's rendering,
+            //so this ensures that all points have a better chance of getting rendered at lower opacity
+            //(not guaranteed but helpful I think)
             if(opacity <= minOpacity) {
                 opacity = minOpacity + 0.01f;
             }
@@ -298,19 +350,17 @@ public class ContrailRenderer {
      * Translates and rotates the MatrixStack. Also calculates the to-be rendered line's width and length.
      *
      * @param matrixStack The MatrixStack used for rendering.
-     * @param buffer The BufferBuilder used for rendering.
+     * @param vertexConsumer The VertexConsumer used for rendering.
      * @param origin The starting point to render from.
      * @param target The ending point to render to.
      * @param opacity The rendered segment's opacity/alpha value.
      */
-    private static void renderSegment(MatrixStack matrixStack, BufferBuilder buffer, Vec3d origin, Vec3d target, float opacity, int light, float width) {
+    private static void renderSegment(MatrixStack matrixStack, VertexConsumer vertexConsumer, Vec3d origin, Vec3d target, float opacity, int light, float width) {
         Camera camera = MinecraftClient.getInstance().gameRenderer.getCamera();
         Vec3d transformedMatrixPos = origin.subtract(camera.getPos());
         matrixStack.push();
 
         //offsets to the origin's pos
-        matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
-        matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(camera.getYaw() + 180f));
         matrixStack.translate(transformedMatrixPos.x, transformedMatrixPos.y, transformedMatrixPos.z);
 
         //calculates length
@@ -325,7 +375,7 @@ public class ContrailRenderer {
         matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees((float) Math.toDegrees(rightAngle - o))); //rotates left/right
         matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees((float) Math.toDegrees(rightAngle + n))); //rotates up/down
 
-        drawTriangle(matrixStack.peek().getPositionMatrix(), buffer, width, -length, opacity, light);
+        drawTriangle(matrixStack.peek().getPositionMatrix(), vertexConsumer, width, -length, opacity, light);
 
         matrixStack.pop();
     }
@@ -334,15 +384,15 @@ public class ContrailRenderer {
      * Renders a triangle with a specific width and length. For Contrail rendering, this is called after the MatrixStack has been translated/rotated.
      *
      * @param matrix The MatrixStack's Position Matrix used for rendering.
-     * @param buffer The BufferBuilder used for rendering
+     * @param vertexConsumer The VertexConsumer used for rendering
      * @param width The rendered rectangle's width. Should be determined by a config option.
-     * @param length The rendered rectangle's length. Should be determined by the length from the origin point to the target point in {@link #renderSegment(MatrixStack, BufferBuilder, Vec3d, Vec3d, float, int, float)}.
+     * @param length The rendered rectangle's length. Should be determined by the length from the origin point to the target point in {@link #renderSegment(MatrixStack, VertexConsumer, Vec3d, Vec3d, float, int, float)}.
      * @param opacity The rendered rectangle's opacity/alpha value.
      */
-    private static void drawTriangle(Matrix4f matrix, BufferBuilder buffer, float width, float length, float opacity, int light) {
+    private static void drawTriangle(Matrix4f matrix, VertexConsumer vertexConsumer, float width, float length, float opacity, int light) {
         //dividing the width by 2 to ensure that the width given is accurately rendered
-        buffer.vertex(matrix, width / 2f, 0, length).color(1f, 1f, 1f, opacity).texture(0f, 0f).light(light).next();
-        buffer.vertex(matrix, -width / 2f, 0, length).color(1f, 1f, 1f, opacity).texture(1f, 1f).light(light).next();
+        vertexConsumer.vertex(matrix, width / 2f, 0, length).color(1f, 1f, 1f, opacity).texture(0f, 0f).light(light).next();
+        vertexConsumer.vertex(matrix, -width / 2f, 0, length).color(1f, 1f, 1f, opacity).texture(1f, 1f).light(light).next();
     }
 
     private static int getLightLevel(LightType lightType, Vec3d pos) {
@@ -352,6 +402,8 @@ public class ContrailRenderer {
         }
         return LightmapTextureManager.pack(7, 15);
     }
+
+    //All the methods beneath this comment have a 1% of actually working
 
     private static void drawCube(MatrixStack matrixStack, BufferBuilder buffer, Vec3d origin, Vec3d target) {
         Vec3d vec3d = target.subtract(origin);

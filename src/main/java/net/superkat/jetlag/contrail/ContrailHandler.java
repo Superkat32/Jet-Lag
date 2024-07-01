@@ -4,23 +4,66 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.particle.ParticleTypes;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
 import net.superkat.jetlag.JetLagClient;
 import net.superkat.jetlag.compat.DABRCompat;
+import net.superkat.jetlag.config.JetLagConfig;
 import net.superkat.jetlag.contrail.Contrail.ContrailPos;
-import nl.enjarai.doabarrelroll.api.RollEntity;
-import org.joml.*;
-
-import java.lang.Math;
+import org.joml.Quaterniond;
+import org.joml.Vector3d;
 
 public class ContrailHandler {
-    //This is really just a utils class which can be hot swapped
     private static final float maxElytraRoll = 1.5707958f; //can probably be modified by other mods... hopefully shouldn't though
 
-    public static ContrailPos getAirStreakPos(ClientPlayerEntity player) {
+    public static void tickJetlagPlayer(ClientPlayerEntity player) {
+        JetLagPlayer jetLagPlayer = (JetLagPlayer) player;
+        Contrail currentContrail = jetLagPlayer.jetlag$getCurrentContrail();
+
+        //if player is flying with an elytra
+        if(player.isFallFlying()) {
+            //tick current contrail
+            if(currentContrail != null) {
+                //adds new points to the current contrail
+                if (JetLagConfig.getInstance().contrailsEnabled && shouldTick()) {
+                    int pointTicks = jetLagPlayer.jetlag$pointTicks();
+                    jetLagPlayer.jetlag$setPointTicks(pointTicks--);
+                    if(pointTicks <= 0) {
+                        currentContrail.addPoint();
+                        jetLagPlayer.jetlag$setPointTicks(JetLagConfig.getInstance().ticksPerPoint);
+                    }
+                }
+            } else {
+                //no current contrail exists yet
+                jetLagPlayer.jetlag$createContrail();
+            }
+        } else if(currentContrail != null) {
+            //player has just landed
+            jetLagPlayer.jetlag$endCurrentContrail();
+        }
+
+        for (Contrail contrail : jetLagPlayer.jetlag$getContrails()) {
+            contrail.tick();
+        }
+    }
+
+    /**
+     * @return If the contrails tick(add/delete points)
+     */
+    public static boolean shouldTick() {
+        MinecraftClient client = MinecraftClient.getInstance();
+        return !client.isPaused() && (client.world == null || client.world.getTickManager().shouldTick());
+    }
+
+    /**
+     * Find a ContrailPos based on a player's position and rotation, in theory at the edge of both elytra wings. Opacity is NOT applied here.
+     *
+     * @param player The player whom the contrail is coming from - used for position and rotation
+     * @return A new ContrailPos, in theory at the edge of both elytra wings
+     *
+     * @see Contrail#addPoint()
+     */
+    public static ContrailPos getContrailPos(ClientPlayerEntity player) {
         double yaw = MathHelper.lerp(MinecraftClient.getInstance().getTickDelta(), player.prevYaw, player.getYaw(MinecraftClient.getInstance().getTickDelta()));
         double pitch = MathHelper.lerp(MinecraftClient.getInstance().getTickDelta(), player.prevPitch, player.getPitch(MinecraftClient.getInstance().getTickDelta()));
         double yawRadians = Math.toRadians(yaw);
@@ -52,10 +95,8 @@ public class ContrailHandler {
         Vector3d rightRot = new Vector3d(-width, forward, height).rotate(rotation).mul(elytraWingOffset);
         Vec3d right = new Vec3d(rightRot.x, rightRot.z, rightRot.y).add(playerPos);
 
-        //FIXME - for some reason the contrails appear on a different spot(almost perpendicular) than the end rod particles...?????????
-        //Check contrail rendering code - something to do with the camera?
-        MinecraftClient.getInstance().world.addParticle(ParticleTypes.END_ROD, left.getX(), left.getY(), left.getZ(), 0, 0, 0);
-        MinecraftClient.getInstance().world.addParticle(ParticleTypes.END_ROD, right.getX(), right.getY(), right.getZ(), 0, 0, 0);
+//        MinecraftClient.getInstance().world.addParticle(ParticleTypes.END_ROD, left.getX(), left.getY(), left.getZ(), 0, 0, 0);
+//        MinecraftClient.getInstance().world.addParticle(ParticleTypes.END_ROD, right.getX(), right.getY(), right.getZ(), 0, 0, 0);
         return new ContrailPos(left, right);
     }
 
@@ -65,6 +106,9 @@ public class ContrailHandler {
      * @param player The player whose roll should be returned.
      * @param tickDelta Minecraft tick delta.
      * @return The player's roll in radians.
+     *
+     * @see net.minecraft.client.render.entity.PlayerEntityRenderer#setupTransforms(AbstractClientPlayerEntity, MatrixStack, float, float, float)
+     * @see DABRCompat
      */
     public static double getPlayerRoll(AbstractClientPlayerEntity player, float tickDelta) {
         MinecraftClient.getInstance().getTickDelta();
@@ -93,7 +137,7 @@ public class ContrailHandler {
             }
         }
 
-        //fixes flickering
+        //fixes flickering while flying without moving(player model still flickers)
         if(Double.isNaN(roll)) {
             roll = 0d;
         }

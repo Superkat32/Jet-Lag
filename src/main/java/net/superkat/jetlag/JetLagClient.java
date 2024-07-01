@@ -17,6 +17,7 @@ import net.superkat.jetlag.rendering.SpeedlineRenderer;
 
 public class JetLagClient implements ClientModInitializer {
     public static ShaderProgram rainbowShader;
+
     @Override
     public void onInitializeClient() {
 //        JetLagConfig.INSTANCE.load();
@@ -32,7 +33,9 @@ public class JetLagClient implements ClientModInitializer {
             context.register(id, VertexFormats.POSITION, program -> rainbowShader = program);
         });
 
-        WorldRenderEvents.END.register(ContrailRenderer::airStreakWorldRendering);
+        //BEFORE_DEBUG_RENDER is called as closely to the particles being rendered as I can get with Fabric API.
+        //In theory, no matrix stack changes should be made between the debug render and the particles render
+        WorldRenderEvents.BEFORE_DEBUG_RENDER.register(ContrailRenderer::airStreakWorldRendering);
         HudRenderCallback.EVENT.register(SpeedlineRenderer::speedlineRendering);
     }
 

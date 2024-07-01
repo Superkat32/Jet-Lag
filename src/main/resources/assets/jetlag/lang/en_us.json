@@ -27,6 +27,8 @@
   "jetlag.contrailwidthadd.tooltip": "The amount of extra width added to a contrail as the amount of points increase.",
   "jetlag.contrailopacityadjustment": "Max Opacity Adjustment",
   "jetlag.contrailopacityadjustment.tooltip": "The max amount of opacity adjustment to an individual point in a contrail.",
+  "jetlag.mirroropacity": "Mirror Opacity Adjustments",
+  "jetlag.mirroropacity.tooltip": "Should the opacity adjustments be mirrored?",
   "jetlag.velocityopacityadjust": "Velocity Based Opacity Adjustment",
   "jetlag.velocityopacityadjust.tooltip": "The chance of a opacity adjustment reaching the max opacity adjustment is increased or decreased depending on the elytra user's velocity.",
 
