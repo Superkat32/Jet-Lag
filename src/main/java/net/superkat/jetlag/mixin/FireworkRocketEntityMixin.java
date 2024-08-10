@@ -2,11 +2,13 @@ package net.superkat.jetlag.mixin;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.projectile.FireworkRocketEntity;
 import net.minecraft.particle.DefaultParticleType;
 import net.minecraft.particle.ParticleTypes;
 import net.superkat.jetlag.JetLagMain;
+import net.superkat.jetlag.contrail.JetLagPlayer;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -21,8 +23,28 @@ import static net.superkat.jetlag.config.JetLagConfig.getInstance;
 public abstract class FireworkRocketEntityMixin {
     @Shadow @Nullable private LivingEntity shooter;
 
+    @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;getRotationVector()Lnet/minecraft/util/math/Vec3d;"))
+    public void jetlag$setPlayerRocketBoosting(CallbackInfo ci) {
+        if(this.shooter != null) {
+            if(this.shooter instanceof ClientPlayerEntity player) {
+                JetLagPlayer jetLagPlayer = (JetLagPlayer) player;
+                jetLagPlayer.jetlag$setRocketBoosting(true);
+            }
+        }
+    }
+
+    @Inject(method = "handleStatus", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/projectile/FireworkRocketEntity;hasExplosionEffects()Z"))
+    public void jetlag$removePlayerRocketBoosting(byte status, CallbackInfo ci) {
+        if(this.shooter != null) {
+            if(this.shooter instanceof ClientPlayerEntity player) {
+                JetLagPlayer jetLagPlayer = (JetLagPlayer) player;
+                jetLagPlayer.jetlag$setRocketBoosting(false);
+            }
+        }
+    }
+
     @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;addParticle(Lnet/minecraft/particle/ParticleEffect;DDDDDD)V"), cancellable = true)
-    public void init(CallbackInfo ci) {
+    public void jetlag$replaceFireworkParticles(CallbackInfo ci) {
         FireworkRocketEntity self = (FireworkRocketEntity) (Object) this;
 
         //firework particles

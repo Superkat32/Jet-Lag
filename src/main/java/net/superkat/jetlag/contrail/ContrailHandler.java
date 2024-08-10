@@ -17,6 +17,7 @@ public class ContrailHandler {
     private static final float maxElytraRoll = 1.5707958f; //can probably be modified by other mods... hopefully shouldn't though
 
     public static void tickJetlagPlayer(ClientPlayerEntity player) {
+        //TODO - move most of this back into ClientPlayerEntityMixin because I don't like the way this looks
         JetLagPlayer jetLagPlayer = (JetLagPlayer) player;
         Contrail currentContrail = jetLagPlayer.jetlag$getCurrentContrail();
 

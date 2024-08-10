@@ -48,22 +48,6 @@ public class ContrailRenderer {
         List<AbstractClientPlayerEntity> players = context.world().getPlayers();
         for(AbstractClientPlayerEntity abstractPlayer : players) {
             if(abstractPlayer instanceof ClientPlayerEntity player) {
-//                MatrixStack matrices = context.matrixStack();
-//                matrices.push();
-//                Vec3d targetPos = new Vec3d(0, -59, 0);
-//                Vec3d pos = targetPos.subtract(context.camera().getPos());
-//
-//                matrices.translate(pos.getX(), pos.getY(), pos.getZ());
-//
-//                Matrix4f posMatrix = matrices.peek().getPositionMatrix();
-//                int light = LightmapTextureManager.pack(15, 15);
-//                VertexConsumer vertexConsumer = context.consumers().getBuffer(RenderLayer.getLeash());
-//                vertexConsumer.vertex(posMatrix, 0, 0, 0).color(1, 1, 1,1).light(light).next();
-//                vertexConsumer.vertex(posMatrix, 0, 1, 0).color(0f, 1, 1,1).light(light).next();
-//                vertexConsumer.vertex(posMatrix, 1, 0, 0).color(1, 0f, 1,1).light(light).next();
-//                vertexConsumer.vertex(posMatrix, 1, 1, 0).color(1, 1, 0f,1).light(light).next();
-//                matrices.pop();
-
                 renderContrails(player, context);
             }
         }

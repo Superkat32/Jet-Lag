@@ -34,10 +34,6 @@ public class FireworkParticle extends SpriteBillboardParticle {
         if (this.age++ >= this.maxAge || this.scale <= 0) {
             this.markDead();
         } else {
-//            this.setSpriteForAge(this.spriteProvider);
-//            velocityX *= 1.025;
-//            velocityY *= 1.025;
-//            velocityZ *= 1.025;
             if(this.age >= this.maxAge * 0.85) {
                 this.scale *= 0.92;
                 this.alpha *= 0.90;

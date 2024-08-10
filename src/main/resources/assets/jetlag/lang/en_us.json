@@ -30,7 +30,7 @@
   "jetlag.mirroropacity": "Mirror Opacity Adjustments",
   "jetlag.mirroropacity.tooltip": "Should the opacity adjustments be mirrored?",
   "jetlag.velocityopacityadjust": "Velocity Based Opacity Adjustment",
-  "jetlag.velocityopacityadjust.tooltip": "The chance of a opacity adjustment reaching the max opacity adjustment is increased or decreased depending on the elytra user's velocity.",
+  "jetlag.velocityopacityadjust.tooltip": "The chance of an opacity adjustment reaching the max opacity adjustment is increased or decreased depending on the elytra user's velocity.",
 
   "jetlag.spawndelete.group": "Points Spawning & Deleting",
   "jetlag.spawndelete.group.tooltip": "Config options related to spawning and deleting points",

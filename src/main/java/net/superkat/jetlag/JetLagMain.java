@@ -2,7 +2,6 @@ package net.superkat.jetlag;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.particle.v1.FabricParticleTypes;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.particle.DefaultParticleType;
 import net.minecraft.particle.ParticleType;
 import net.minecraft.registry.Registries;
@@ -19,12 +18,16 @@ import java.util.List;
 public class JetLagMain implements ModInitializer {
     public static final String MOD_ID = "jetlag";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
+
     public static final DefaultParticleType FIREWORKPARTICLE = FabricParticleTypes.simple();
     public static final DefaultParticleType WIND1 = FabricParticleTypes.simple();
     public static final DefaultParticleType WIND2 = FabricParticleTypes.simple();
     public static final DefaultParticleType WIND3 = FabricParticleTypes.simple();
     public static final List<DefaultParticleType> windParticles = Arrays.asList(WIND1, WIND2, WIND3);
     public static final ParticleType<WindLineParticleEffect> WIND_LINE = FabricParticleTypes.complex(WindLineParticleEffect.PARAMETER_FACTORY);
+    public static final DefaultParticleType CAMERA_TEST = FabricParticleTypes.simple();
+    public static final DefaultParticleType SPEEDLINE = FabricParticleTypes.simple();
+    public static final DefaultParticleType ROCKET_SPEEDLINE = FabricParticleTypes.simple();
 
     @Override
     public void onInitialize() {
@@ -35,10 +38,8 @@ public class JetLagMain implements ModInitializer {
         Registry.register(Registries.PARTICLE_TYPE, new Identifier(MOD_ID, "wind2"), WIND2);
         Registry.register(Registries.PARTICLE_TYPE, new Identifier(MOD_ID, "wind3"), WIND3);
         Registry.register(Registries.PARTICLE_TYPE, new Identifier(MOD_ID, "windline"), WIND_LINE);
-    }
-
-    public static boolean canTick() {
-        MinecraftClient client = MinecraftClient.getInstance();
-        return !client.isPaused() && (client.world == null || client.world.getTickManager().shouldTick());
+        Registry.register(Registries.PARTICLE_TYPE, new Identifier(MOD_ID, "camera_test"), CAMERA_TEST);
+        Registry.register(Registries.PARTICLE_TYPE, new Identifier(MOD_ID, "speedline"), SPEEDLINE);
+        Registry.register(Registries.PARTICLE_TYPE, new Identifier(MOD_ID, "rocket_speedline"), ROCKET_SPEEDLINE);
     }
 }

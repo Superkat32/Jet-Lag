@@ -25,6 +25,18 @@ public class ClientPlayerEntityMixin implements JetLagPlayer {
     public int pointTicks = 0;
     @Unique
     public int windLineTicks = 20;
+    @Unique
+    public boolean rocketBoosted = false;
+
+    @Override
+    public boolean jetlag$rocketBoosting() {
+        return rocketBoosted;
+    }
+
+    @Override
+    public void jetlag$setRocketBoosting(boolean boosting) {
+        this.rocketBoosted = boosting;
+    }
 
     @Override
     public List<Contrail> jetlag$getContrails() {

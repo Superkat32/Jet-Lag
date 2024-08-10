@@ -14,6 +14,7 @@ public class WindLineHandler {
 
     public static void tickJetlagPlayer(ClientPlayerEntity player) {
         if(player.isFallFlying()) {
+            //TODO - move most of this back into ClientPlayerEntityMixin because I don't like the way this looks
             JetLagPlayer jetLagPlayer = (JetLagPlayer) player;
             int windLineTicks = jetLagPlayer.jetlag$windLineTicks();
             windLineTicks--;

@@ -5,6 +5,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public interface JetLagPlayer {
+    //General
+    boolean jetlag$rocketBoosting();
+    void jetlag$setRocketBoosting(boolean boosting);
 
     //Contrails
     List<Contrail> jetlag$getContrails();
