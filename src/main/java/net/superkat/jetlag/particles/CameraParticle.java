@@ -17,7 +17,8 @@ import org.joml.Vector3f;
  * A particle that gets rendered right in front of the camera. The z value is used to determine the distance from the camera(1 should be default).
  */
 public class CameraParticle extends SpriteBillboardParticle {
-    protected float stretch = 1f;
+    protected float width = 1f;
+    protected float length = 1f;
     /**
      * NOTE - x, y, and z are set to 0, 0, and 1 respectfully by the {@link Factory}. Make sure this gets changed when inheriting.
      */
@@ -46,48 +47,55 @@ public class CameraParticle extends SpriteBillboardParticle {
 //            this.rotation.z = (float) Math.toRadians(MathHelper.lerp(tickDelta, this.prevAngle, this.angle));
         }
 
-        Vector3f[] vector3fs = new Vector3f[]{
-                new Vector3f(-1.0F, -1.0F, 0.0F), new Vector3f(-1.0F, 1.0F, 0.0F), new Vector3f(1.0F, 1.0F, 0.0F), new Vector3f(1.0F, -1.0F, 0.0F)
-        };
-        float i = this.getSize(tickDelta);
+        if(this.shouldRender()) {
+            Vector3f[] vector3fs = new Vector3f[]{
+                    new Vector3f(-1.0F, -1.0F, 0.0F), new Vector3f(-1.0F, 1.0F, 0.0F), new Vector3f(1.0F, 1.0F, 0.0F), new Vector3f(1.0F, -1.0F, 0.0F)
+            };
+            float i = this.getSize(tickDelta);
 
-        for(int j = 0; j < 4; ++j) {
-            Vector3f vector3f = vector3fs[j];
-            vector3f.x += vector3f.x == -1.0f ? -stretch : stretch;
-            vector3f.rotate(this.rotation);
-            vector3f.mul(i);
-//            vector3f.x += vector3f.x == 1 ? stretch : -stretch;
-            vector3f.add(x, y, z);
+            for(int j = 0; j < 4; ++j) {
+                Vector3f vector3f = vector3fs[j];
+                vector3f.x *= length;
+                vector3f.y *= width;
+                vector3f.rotate(this.rotation);
+                vector3f.mul(i);
+                vector3f.add(x, y, z);
+            }
+
+            float k = this.getMinU();
+            float l = this.getMaxU();
+            float m = this.getMinV();
+            float n = this.getMaxV();
+            int o = this.getBrightness(tickDelta);
+            Matrix4f posMatrix = matrices.peek().getPositionMatrix();
+            vertexConsumer.vertex(posMatrix, vector3fs[0].x(), vector3fs[0].y(), vector3fs[0].z())
+                    .texture(l, n)
+                    .color(this.red, this.green, this.blue, this.alpha)
+                    .light(o)
+                    .next();
+            vertexConsumer.vertex(posMatrix, vector3fs[1].x(), vector3fs[1].y(), vector3fs[1].z())
+                    .texture(l, m)
+                    .color(this.red, this.green, this.blue, this.alpha)
+                    .light(o)
+                    .next();
+            vertexConsumer.vertex(posMatrix, vector3fs[2].x(), vector3fs[2].y(), vector3fs[2].z())
+                    .texture(k, m)
+                    .color(this.red, this.green, this.blue, this.alpha)
+                    .light(o)
+                    .next();
+            vertexConsumer.vertex(posMatrix, vector3fs[3].x(), vector3fs[3].y(), vector3fs[3].z())
+                    .texture(k, n)
+                    .color(this.red, this.green, this.blue, this.alpha)
+                    .light(o)
+                    .next();
         }
 
-        float k = this.getMinU();
-        float l = this.getMaxU();
-        float m = this.getMinV();
-        float n = this.getMaxV();
-        int o = this.getBrightness(tickDelta);
-        Matrix4f posMatrix = matrices.peek().getPositionMatrix();
-        vertexConsumer.vertex(posMatrix, vector3fs[0].x(), vector3fs[0].y(), vector3fs[0].z())
-                .texture(l, n)
-                .color(this.red, this.green, this.blue, this.alpha)
-                .light(o)
-                .next();
-        vertexConsumer.vertex(posMatrix, vector3fs[1].x(), vector3fs[1].y(), vector3fs[1].z())
-                .texture(l, m)
-                .color(this.red, this.green, this.blue, this.alpha)
-                .light(o)
-                .next();
-        vertexConsumer.vertex(posMatrix, vector3fs[2].x(), vector3fs[2].y(), vector3fs[2].z())
-                .texture(k, m)
-                .color(this.red, this.green, this.blue, this.alpha)
-                .light(o)
-                .next();
-        vertexConsumer.vertex(posMatrix, vector3fs[3].x(), vector3fs[3].y(), vector3fs[3].z())
-                .texture(k, n)
-                .color(this.red, this.green, this.blue, this.alpha)
-                .light(o)
-                .next();
 
         matrices.pop();
+    }
+
+    public boolean shouldRender() {
+        return true;
     }
 
     @Override

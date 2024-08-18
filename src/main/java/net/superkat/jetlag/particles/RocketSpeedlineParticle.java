@@ -7,25 +7,17 @@ import net.minecraft.client.particle.ParticleFactory;
 import net.minecraft.client.particle.SpriteProvider;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.particle.DefaultParticleType;
-
-import java.awt.*;
+import net.superkat.jetlag.config.JetLagConfig;
+import net.superkat.jetlag.config.SpeedlineConfigInstance;
 
 public class RocketSpeedlineParticle extends SpeedlineParticle {
     public RocketSpeedlineParticle(ClientWorld clientWorld, double x, double y, double z, double velX, double velY, double velZ) {
         super(clientWorld, x, y, z, velX, velY, velZ);
-        //set custom color
-        Color color = new Color(30, 210, 234);
-        this.red = color.getRed() / 255f;
-        this.green = color.getGreen() / 255f;
-        this.blue = color.getBlue() / 255f;
-
-        this.scale += 0.17f;
-        this.velocityMultiplier += 2.5f;
     }
 
     @Override
-    public float radius() {
-        return 6.25f;
+    protected SpeedlineConfigInstance getSpeedlineConfigInstance() {
+        return JetLagConfig.getInstance().rocketConfig;
     }
 
     @Environment(EnvType.CLIENT)

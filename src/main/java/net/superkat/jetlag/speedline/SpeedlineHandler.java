@@ -3,6 +3,7 @@ package net.superkat.jetlag.speedline;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.superkat.jetlag.JetLagMain;
+import net.superkat.jetlag.config.JetLagConfig;
 import net.superkat.jetlag.contrail.ContrailHandler;
 import net.superkat.jetlag.contrail.JetLagPlayer;
 
@@ -16,6 +17,8 @@ public class SpeedlineHandler {
                 speedlineTicks--;
             }
             if(speedlineTicks <= 0) {
+                if(!JetLagConfig.getInstance().speedlinesEnabled) return;
+
                 JetLagPlayer jetLagPlayer = (JetLagPlayer) player;
                 int count = player.getRandom().nextBetween(1, 3);
                 for (int i = 0; i < count; i++) {
@@ -27,12 +30,11 @@ public class SpeedlineHandler {
     }
 
     public static void addSpeedline(ClientPlayerEntity player, boolean rocketBoosted) {
-        if(rocketBoosted) {
+        if(JetLagConfig.getInstance().rocketSpeedlinesEnabled && rocketBoosted) {
             addRocketSpeedline(player);
         } else {
             addSpeedline(player);
         }
-
     }
 
     private static void addSpeedline(ClientPlayerEntity player) {

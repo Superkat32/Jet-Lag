@@ -43,6 +43,61 @@
 
 
 
+  "jetlag.category.speedlines": "Speedlines (WIP)",
+  "jetlag.category.speedlines.tooltip": "Config options related to speedlines.",
+  "jetlag.category.speedlines.wipwarning": "§6Notice§r: This feature is a Work In Progress! Things may change in the future!",
+  "jetlag.speedlinesenabled": "Speedlines",
+  "jetlag.speedlinesenabled.tooltip": "Visual lines of wind on your screen when flying.",
+  "jetlag.rocketspeedlinesenabled": "Rocket Speedlines",
+  "jetlag.rocketspeedlinesenabled.tooltip": "A different set of speedlines for when you boost with a firework rocket.",
+
+  "jetlag.speedlinepresets.group": "Presets",
+  "jetlag.speedlinepresets.group.tooltip": "Some presets for the speedlines based on different types of speedlines.",
+  "jetlag.speedlines.group": "Speedlines",
+  "jetlag.speedlines.group.tooltip": "Config options related to how the individual speedlines should act.",
+  "jetlag.rocketspeedlines.group": "Rocket Speedlines",
+  "jetlag.rocketspeedlines.group.tooltip": "Config options related to how the individual rocket speedlines should act.",
+
+  "jetlag.speedlinepreset.preview": "Set",
+  "jetlag.speedlinepreset.previewing": "Previewing ",
+  "jetlag.speedlinepreset.subtle": "Subtle & Sweet (Default)",
+  "jetlag.speedlinepreset.bold": "Nice & Noticeable",
+  "jetlag.speedlinepreset.anime": "Anime Styled",
+
+  "jetlag.speedlinewidth": "Width",
+  "jetlag.speedlinewidth.tooltip": "The width of a spawned speedline.",
+  "jetlag.speedlinelength": "Length",
+  "jetlag.speedlinelength.tooltip": "The length of a spawned speedline.",
+  "jetlag.speedlinespawnradius": "Spawn Radius",
+  "jetlag.speedlinespawnradius.tooltip": "The radius from the center of the screen where a speedline will spawn.",
+  "jetlag.speedlinerandomspawnradius": "Random Spawn Radius",
+  "jetlag.speedlinerandomspawnradius.tooltip": "The max amount of extra spawn radius from 0 that will be added to a speedline.",
+  "jetlag.speedlinevelbasedspawnradius": "Velocity Based Spawn Radius",
+  "jetlag.speedlinevelbasedspawnradius.tooltip": "The spawn radius will be affected by your velocity, increasing as you move slower.",
+  "jetlag.speedlinespeed": "Speed",
+  "jetlag.speedlinespeed.tooltip": "The speed of an individual speedline.",
+  "jetlag.speedlinevelmultipler": "Velocity Multiplier",
+  "jetlag.speedlinevelmultipler.tooltip": "The multiplier of an individual speedline over time.",
+  "jetlag.speedlinecolor": "Color",
+  "jetlag.speedlinecolor.tooltip": "The color of a speedline.",
+  "jetlag.speedlinevelbasedopacity": "Velocity Based Opacity",
+  "jetlag.speedlinevelbasedopacity.tooltip": "The speedlines' opacity will be affected by your velocity, increasing as you move faster.",
+  "jetlag.speedlinefadein": "Fade In",
+  "jetlag.speedlinefadein.tooltip": "Determines if a speedline should fade in(easing method is \"easeOutCubic\" if you're curious)",
+  "jetlag.speedlinerainbowmode": "Rainbow Mode",
+  "jetlag.speedlinerainbowmode.tooltip": "A fun and subtle rainbow mode.",
+  "jetlag.speedlineminage": "Minimum Age",
+  "jetlag.speedlineminage.tooltip": "The minimum age in ticks of a speedline.",
+  "jetlag.speedlinemaxage": "Maximum Age",
+  "jetlag.speedlinemaxage.tooltip": "The maximum age in ticks of a speedline.",
+
+  "jetlag.speedlinescale": "Scale",
+  "jetlag.speedlineplacementandvel": "Placement & Velocity",
+  "jetlag.speedlinecolorandopacity": "Color & Opacity",
+  "jetlag.speedlinelifetime": "Lifetime",
+
+
+
   "jetlag.category.particles": "Particles",
   "jetlag.category.particles.tooltip": "Config options related to particles.",
 
@@ -70,8 +125,8 @@
 
   "jetlag.category.screen": "Screen VFXs",
   "jetlag.category.screen.tooltip": "Config options related to on-screen visual effects.",
-  "jetlag.speedlines.group": "Speedlines",
-  "jetlag.speedlines.group.tooltip": "Config options related to speedlines.",
+  "jetlag.oldspeedlines.group": "Speedlines",
+  "jetlag.oldspeedlines.group.tooltip": "Config options related to speedlines.",
   "jetlag.showspeedlines": "Screen Speedlines",
   "jetlag.showspeedlines.tooltip": "On-screen speedlines to help give a feeling of speed.",
   "jetlag.velspeedlinesopacity": "Velocity Based Opacity Adjustment",
@@ -87,5 +142,6 @@
 
   "jetlag.lagwarning": "§cWarning§r: Setting this option to a high number may cause lag!",
   "jetlag.superlagwarning": "§c§lWARNING§r: Setting this option to a high number will likely cause lag!!!",
-  "jetlag.artifactwarning": "§6Warning§r: Settings this option to a high number may cause rendering artifacts, such as opacity overlapping. This does NOT cause any performance issues, but may look slightly odd in small spots of the contrail."
+  "jetlag.artifactwarning": "§6Warning§r: Settings this option to a high number may cause rendering artifacts, such as opacity overlapping. This does NOT cause any performance issues, but may look slightly odd in small spots of the contrail.",
+  "jetlag.speedlineagenotice": "§6Notice§r: If the maximum age is less than the minimum age, the minimum age will be used instead."
 }
