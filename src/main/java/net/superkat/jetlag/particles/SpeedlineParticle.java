@@ -7,12 +7,15 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.Perspective;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleFactory;
+import net.minecraft.client.particle.ParticleTextureSheet;
 import net.minecraft.client.particle.SpriteProvider;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.particle.DefaultParticleType;
 import net.minecraft.util.math.MathHelper;
 import net.superkat.jetlag.config.JetLagConfig;
 import net.superkat.jetlag.config.SpeedlineConfigInstance;
+import net.superkat.jetlag.speedline.FancyParticleTextureSheet;
+import net.superkat.jetlag.speedline.SpeedlineHandler;
 
 import java.awt.*;
 
@@ -20,21 +23,43 @@ public class SpeedlineParticle extends CameraParticle {
     protected boolean fadeIn = false;
     protected float maxAlpha = 1f;
     protected float playerVelocity = 0f;
+    protected boolean rainbowMode = false;
+
+    protected final ParticleTextureSheet particleTextureSheet;
     public SpeedlineParticle(ClientWorld clientWorld, double x, double y, double z, double velX, double velY, double velZ) {
         super(clientWorld, 0, 0, 1, velX, velY, velZ);
+//        //TODO - if the sideways or upwards offset from yaw/pitch is greater than a or b(configurable), limit angle to adjust for that
+//
+//        int maxAngle = 360;
+//        int minAngle = 0;
+//
+//        if(SpeedlineHandler.speedlineXOffset() < -0.1) {
+//            maxAngle = 90;
+//            minAngle = -90;
+//        }
         //determine random rotation
         this.angle = (float) Math.toRadians(this.random.nextBetween(0, 360));
+//        this.angle = (float) Math.toRadians(0);
         this.prevAngle = this.angle;
+
         //find position based on rotation
         this.velocityX = Math.cos(this.angle);
         this.velocityY = Math.sin(this.angle);
+//        this.velocityZ = 0;
 
         //null check in case I decide to make a funny janky speedline editor screen using fake particles... somehow lol
         ClientPlayerEntity player = MinecraftClient.getInstance().player;
         if(player != null) {
             this.playerVelocity = (float) player.getVelocity().lengthSquared();
         }
+
         setFieldsFromConfig(getSpeedlineConfigInstance());
+
+        if(fancyRainbowMode()) {
+            particleTextureSheet = fancyRainbowSheet();
+        } else {
+            particleTextureSheet = ParticleTextureSheet.PARTICLE_SHEET_TRANSLUCENT;
+        }
     }
 
     /**
@@ -50,10 +75,10 @@ public class SpeedlineParticle extends CameraParticle {
         this.velocityMultiplier = config.velMultiplier;
 
         float spawnRadius = config.spawnRadius;
-        if(config.velBasedSpawnRadius) {
-            spawnRadius /= (Math.min(this.playerVelocity, 1f));
+        if(config.velBasedSpawnRadius && this.playerVelocity < 1f) {
+            spawnRadius += (1f - this.playerVelocity) * 5f;
         }
-        setPositionFromRadius(spawnRadius, config.randomSpawnRadius);
+        setPositionFromRadius(spawnRadius, config.randomSpawnRadius, config.moveFromTurn, config.turnMoveMultiplier, config.maxMoveAmountX, config.maxMoveAmountY);
 
         Color color = config.color;
         this.red = color.getRed() / 255f;
@@ -65,8 +90,7 @@ public class SpeedlineParticle extends CameraParticle {
             this.maxAlpha = MathHelper.clamp(maxAlpha * Math.min(this.playerVelocity, 1f), 0.15f, 1.0f);
         }
         this.alpha = this.fadeIn ? 0f : this.maxAlpha;
-
-//        public boolean rainbowMode = false;
+        this.rainbowMode = config.rainbowMode;
 
         int maxAge = config.maxAge;
         int minAge = config.minAge;
@@ -80,10 +104,14 @@ public class SpeedlineParticle extends CameraParticle {
         return JetLagConfig.getInstance().speedlineConfig;
     }
 
-    protected void setPositionFromRadius(float radius, float randomSpawnRadius) {
+    protected void setPositionFromRadius(float radius, float randomSpawnRadius, boolean moveFromTurn, float turnMoveMultiplier, float maxMoveX, float maxMoveY) {
         radius += MathHelper.nextBetween(this.random, 0f, randomSpawnRadius);
-        this.setBoundingBox(this.getBoundingBox().offset(this.velocityX * radius, this.velocityY * radius, 0f));
+        double multiplier = turnMoveMultiplier / 100;
+        double xOffset = moveFromTurn ? MathHelper.clamp(SpeedlineHandler.speedlineXOffset(), -maxMoveX, maxMoveX) * multiplier : 0;
+        double yOffset = moveFromTurn ? MathHelper.clamp(SpeedlineHandler.speedlineYOffset(), -maxMoveY, maxMoveY) * multiplier : 0;
+        this.setBoundingBox(this.getBoundingBox().offset((this.velocityX * radius) + xOffset, (this.velocityY * radius) + yOffset, 0f));
         this.repositionFromBoundingBox();
+
         this.prevPosX = this.x;
         this.prevPosY = this.y;
     }
@@ -111,7 +139,30 @@ public class SpeedlineParticle extends CameraParticle {
 
     @Override
     public boolean shouldRender() {
-        return MinecraftClient.getInstance().options.getPerspective() == Perspective.FIRST_PERSON && !MinecraftClient.getInstance().options.hudHidden;
+        MinecraftClient client = MinecraftClient.getInstance();
+        boolean shouldRender = true;
+
+        if(JetLagConfig.getInstance().hideSpeedlinesInF1 && client.options.hudHidden) {
+            shouldRender = false;
+        } else if(!JetLagConfig.getInstance().thirdPersonSpeedlines && client.options.getPerspective() != Perspective.FIRST_PERSON) {
+            shouldRender = false;
+        }
+
+        return shouldRender;
+    }
+
+    @Override
+    public boolean fancyRainbowMode() {
+        return this.rainbowMode;
+    }
+
+    @Override
+    public ParticleTextureSheet getType() {
+        return this.particleTextureSheet;
+    }
+
+    protected ParticleTextureSheet fancyRainbowSheet() {
+        return FancyParticleTextureSheet.JETLAG_FANCY_RAINBOW_TRANSLUCENT;
     }
 
     @Environment(EnvType.CLIENT)

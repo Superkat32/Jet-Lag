@@ -18,7 +18,6 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.superkat.jetlag.JetLagMain;
-
 import java.awt.*;
 import java.nio.file.Path;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -66,6 +65,8 @@ public class JetLagConfig {
     @SerialEntry public SpeedlineConfigInstance speedlineConfig = new SpeedlineConfigInstance();
     @SerialEntry public boolean rocketSpeedlinesEnabled = true;
     @SerialEntry public SpeedlineConfigInstance rocketConfig = new SpeedlineConfigInstance().rocketMode();
+    @SerialEntry public boolean thirdPersonSpeedlines = false;
+    @SerialEntry public boolean hideSpeedlinesInF1 = true;
 
     //particles
     @SerialEntry public boolean windLines = true;
@@ -113,6 +114,7 @@ public class JetLagConfig {
                     .name(Text.translatable("jetlag.maxpoints"))
                     .description(OptionDescription.createBuilder()
                             .text(Text.translatable("jetlag.maxpoint.tooltip"))
+                            .text(Text.of(""))
                             .text(Text.translatable("jetlag.lagwarning"))
                             .build())
                     .binding(
@@ -153,6 +155,7 @@ public class JetLagConfig {
                     .name(Text.translatable("jetlag.curvepoints"))
                     .description(OptionDescription.createBuilder()
                             .text(Text.translatable("jetlag.curvepoints.tooltip"))
+                            .text(Text.of(""))
                             .text(Text.translatable("jetlag.superlagwarning"))
                             .build())
                     .binding(
@@ -315,7 +318,13 @@ public class JetLagConfig {
 
             var speedlinesCategoryBuilder = ConfigCategory.createBuilder()
                     .name(Text.translatable("jetlag.category.speedlines"))
-                    .tooltip(Text.translatable("jetlag.category.speedlines.tooltip"), Text.translatable("jetlag.category.speedlines.wipwarning"));
+                    .tooltip(Text.translatable("jetlag.category.speedlines.tooltip"));
+
+            var speedlinesGeneralGroup = OptionGroup.createBuilder()
+                    .name(Text.translatable("jetlag.speedlinesgeneral.group"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("jetlag.speedlinesgeneral.group.tooltip"))
+                            .build());
 
             var speedlinesEnabled = Option.<Boolean>createBuilder()
                     .name(Text.translatable("jetlag.speedlinesenabled"))
@@ -343,6 +352,38 @@ public class JetLagConfig {
                     .customController(opt -> new BooleanController(opt, BooleanController.ON_OFF_FORMATTER, true))
                     .build();
 
+            var thirdPersonSpeedlines = Option.<Boolean>createBuilder()
+                    .name(Text.translatable("jetlag.thirdpersonspeedlines"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("jetlag.thirdpersonspeedlines.tooltip"))
+                            .build())
+                    .binding(
+                            defaults.thirdPersonSpeedlines,
+                            () -> config.thirdPersonSpeedlines,
+                            val -> config.thirdPersonSpeedlines = val
+                    )
+                    .customController(opt -> new BooleanController(opt, BooleanController.YES_NO_FORMATTER, true))
+                    .build();
+
+            var hideSpeedlinesInF1 = Option.<Boolean>createBuilder()
+                    .name(Text.translatable("jetlag.hidespeedlinesfone"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("jetlag.hidespeedlinesfone.tooltip"))
+                            .build())
+                    .binding(
+                            defaults.hideSpeedlinesInF1,
+                            () -> config.hideSpeedlinesInF1,
+                            val -> config.hideSpeedlinesInF1 = val
+                    )
+                    .customController(opt -> new BooleanController(opt, BooleanController.TRUE_FALSE_FORMATTER, true))
+                    .build();
+
+            speedlinesGeneralGroup.option(speedlinesEnabled);
+            speedlinesGeneralGroup.option(rocketSpeedlinesEnabled);
+            speedlinesGeneralGroup.option(LabelOption.create(Text.of("")));
+            speedlinesGeneralGroup.option(thirdPersonSpeedlines);
+            speedlinesGeneralGroup.option(hideSpeedlinesInF1);
+
             var speedlinePresetsGroup = OptionGroup.createBuilder()
                     .name(Text.translatable("jetlag.speedlinepresets.group"))
                     .description(OptionDescription.createBuilder()
@@ -368,56 +409,88 @@ public class JetLagConfig {
             rocketSpeedlineOptions.buildOptions();
 
             var subtlePreset = ButtonOption.createBuilder()
-                    .name(Text.translatable("jetlag.speedlinepreset.subtle"))
+                    .name(Text.translatable("jetlag.speedline.preset.subtle"))
                     .action(((yaclScreen, buttonOption) -> {
                         speedlineOptions.applySpeedlineConfig(new SpeedlineConfigInstance().subtleAndSweet());
                         rocketSpeedlineOptions.applySpeedlineConfig(new SpeedlineConfigInstance().rocket_subtleAndSweet());
                         MinecraftClient.getInstance().getToastManager().add(
                                 new SystemToast(new SystemToast.Type(3500),
                                 Text.translatable("jetlag.title"),
-                                Text.translatable("jetlag.speedlinepreset.previewing").append(buttonOption.name())
+                                Text.translatable("jetlag.speedline.preset.previewing").append(buttonOption.name())
                             )
                         );
                     }))
-                    .text(Text.translatable("jetlag.speedlinepreset.preview"))
+                    .text(Text.translatable("jetlag.speedline.preset.preview"))
                     .build();
 
             var boldPreset = ButtonOption.createBuilder()
-                    .name(Text.translatable("jetlag.speedlinepreset.bold"))
+                    .name(Text.translatable("jetlag.speedline.preset.bold"))
                     .action(((yaclScreen, buttonOption) -> {
                         speedlineOptions.applySpeedlineConfig(new SpeedlineConfigInstance().niceAndNoticeable());
                         rocketSpeedlineOptions.applySpeedlineConfig(new SpeedlineConfigInstance().rocket_niceAndNoticeable());
                         MinecraftClient.getInstance().getToastManager().add(
                                 new SystemToast(new SystemToast.Type(3500),
                                         Text.translatable("jetlag.title"),
-                                        Text.translatable("jetlag.speedlinepreset.previewing").append(buttonOption.name())
+                                        Text.translatable("jetlag.speedline.preset.previewing").append(buttonOption.name())
                                 )
                         );
                     }))
-                    .text(Text.translatable("jetlag.speedlinepreset.preview"))
+                    .text(Text.translatable("jetlag.speedline.preset.preview"))
                     .build();
 
             var animePreset = ButtonOption.createBuilder()
-                    .name(Text.translatable("jetlag.speedlinepreset.anime"))
+                    .name(Text.translatable("jetlag.speedline.preset.anime"))
                     .action(((yaclScreen, buttonOption) -> {
                         speedlineOptions.applySpeedlineConfig(new SpeedlineConfigInstance().animeStyled());
                         rocketSpeedlineOptions.applySpeedlineConfig(new SpeedlineConfigInstance().rocket_animeStyled());
                         MinecraftClient.getInstance().getToastManager().add(
                                 new SystemToast(new SystemToast.Type(3500),
                                         Text.translatable("jetlag.title"),
-                                        Text.translatable("jetlag.speedlinepreset.previewing").append(buttonOption.name())
+                                        Text.translatable("jetlag.speedline.preset.previewing").append(buttonOption.name())
                                 )
                         );
                     }))
-                    .text(Text.translatable("jetlag.speedlinepreset.preview"))
+                    .text(Text.translatable("jetlag.speedline.preset.preview"))
+                    .build();
+
+            var hyperdrivePreset = ButtonOption.createBuilder()
+                    .name(Text.translatable("jetlag.speedline.preset.hyperdrive"))
+                    .action(((yaclScreen, buttonOption) -> {
+                        speedlineOptions.applySpeedlineConfig(new SpeedlineConfigInstance().HYPERDRIVE());
+                        rocketSpeedlineOptions.applySpeedlineConfig(new SpeedlineConfigInstance().rocket_HYPERDRIVE());
+                        MinecraftClient.getInstance().getToastManager().add(
+                                new SystemToast(new SystemToast.Type(3500),
+                                        Text.translatable("jetlag.title"),
+                                        Text.translatable("jetlag.speedline.preset.previewing").append(buttonOption.name())
+                                )
+                        );
+                    }))
+                    .text(Text.translatable("jetlag.speedline.preset.preview"))
+                    .build();
+
+            var attemptFovAdjust = ButtonOption.createBuilder()
+                    .name(Text.translatable("jetlag.attemptfov"))
+                    .description(OptionDescription.createBuilder().text(Text.translatable("jetlag.attemptfov.tooltip")).build())
+                    .action(((yaclScreen, buttonOption) -> {
+                        //TODO - eh fov stuff here i guess
+                        MinecraftClient.getInstance().getToastManager().add(
+                                new SystemToast(new SystemToast.Type(3500),
+                                        Text.translatable("jetlag.title"),
+                                        Text.translatable("jetlag.fovbasedadjustment").append(String.valueOf(MinecraftClient.getInstance().options.getFov().getValue()))
+                                )
+                        );
+                    }))
+                    .text(Text.translatable("jetlag.fovadjuststart"))
                     .build();
 
             speedlinePresetsGroup.option(subtlePreset);
             speedlinePresetsGroup.option(boldPreset);
             speedlinePresetsGroup.option(animePreset);
+            speedlinePresetsGroup.option(hyperdrivePreset);
+            speedlinePresetsGroup.option(LabelOption.create(Text.of("")));
+            speedlinePresetsGroup.option(attemptFovAdjust);
 
-            speedlinesCategoryBuilder.option(speedlinesEnabled);
-            speedlinesCategoryBuilder.option(rocketSpeedlinesEnabled);
+            speedlinesCategoryBuilder.group(speedlinesGeneralGroup.build());
             speedlinesCategoryBuilder.group(speedlinePresetsGroup.build());
             speedlinesCategoryBuilder.group(speedlinesGroup.build());
             speedlinesCategoryBuilder.group(rocketSpeedlinesGroup.build());
@@ -926,6 +999,11 @@ public class JetLagConfig {
         public SpeedlineConfigInstance config;
         public Formatting formatting;
 
+        public Option<Integer> maxSpawnTicks;
+        public Option<Integer> minSpawnTicks;
+        public Option<Integer> maxSpawnCount;
+        public Option<Integer> minSpawnCount;
+        public Option<Boolean> velBasedSpawnCount;
         public Option<Float> width;
         public Option<Float> length;
         public Option<Float> spawnRadius;
@@ -937,6 +1015,10 @@ public class JetLagConfig {
         public Option<Boolean> velBasedOpacity;
         public Option<Boolean> fadeIn;
         public Option<Boolean> rainbowMode;
+        public Option<Boolean> moveFromTurn;
+        public Option<Float> moveMultiplier;
+        public Option<Float> maxMoveAmountX;
+        public Option<Float> maxMoveAmountY;
         public Option<Integer> maxAge;
         public Option<Integer> minAge;
 
@@ -948,6 +1030,12 @@ public class JetLagConfig {
         }
 
         public void applySpeedlineConfig(SpeedlineConfigInstance instance) {
+            //FIXME - Sometimes the min/max doesn't set correctly
+            this.maxSpawnTicks.requestSet(instance.maxSpawnTicks);
+            this.minSpawnTicks.requestSet(instance.minSpawnTicks);
+            this.maxSpawnCount.requestSet(instance.maxSpawnAmount);
+            this.minSpawnCount.requestSet(instance.minSpawnAmount);
+            this.velBasedSpawnCount.requestSet(instance.velBasedSpawnAmount);
             this.width.requestSet(instance.width);
             this.length.requestSet(instance.length);
             this.spawnRadius.requestSet(instance.spawnRadius);
@@ -959,15 +1047,126 @@ public class JetLagConfig {
             this.velBasedOpacity.requestSet(instance.velBasedOpacity);
             this.fadeIn.requestSet(instance.fadeIn);
             this.rainbowMode.requestSet(instance.rainbowMode);
+            this.moveFromTurn.requestSet(instance.moveFromTurn);
+            this.moveMultiplier.requestSet(instance.turnMoveMultiplier);
+            this.maxMoveAmountX.requestSet(instance.maxMoveAmountX);
+            this.maxMoveAmountY.requestSet(instance.maxMoveAmountY);
             this.maxAge.requestSet(instance.maxAge);
             this.minAge.requestSet(instance.minAge);
         }
 
         public void buildOptions() {
-            width = Option.<Float>createBuilder()
-                    .name(Text.translatable("jetlag.speedlinewidth"))
+            AtomicInteger pendingMaxSpawnTicks = new AtomicInteger(config.maxSpawnTicks);
+            AtomicInteger pendingMinSpawnTicks = new AtomicInteger(config.minSpawnTicks);
+
+            maxSpawnTicks = Option.<Integer>createBuilder()
+                    .name(Text.translatable("jetlag.speedline.maxspawnticks"))
                     .description(OptionDescription.createBuilder()
-                            .text(Text.translatable("jetlag.speedlinewidth.tooltip"))
+                            .text(Text.translatable("jetlag.speedline.maxspawnticks.tooltip"))
+                            .build())
+                    .binding(
+                            defaults.maxSpawnTicks,
+                            () -> config.maxSpawnTicks,
+                            val -> {
+                                config.maxSpawnTicks = val;
+                                pendingMaxSpawnTicks.set(config.maxSpawnTicks);
+                            }
+                    )
+                    .customController(opt -> new IntegerSliderController(opt, 1, 40, 1))
+                    .listener((integerOption, integer) -> {
+                        pendingMaxSpawnTicks.set(integer);
+                        if(integer < pendingMinSpawnTicks.get()) {
+                            integerOption.requestSet(pendingMinSpawnTicks.get());
+                        }
+                    })
+                    .build();
+
+            minSpawnTicks = Option.<Integer>createBuilder()
+                    .name(Text.translatable("jetlag.speedline.minspawnticks"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("jetlag.speedline.minspawnticks.tooltip"))
+                            .build())
+                    .binding(
+                            defaults.minSpawnTicks,
+                            () -> config.minSpawnTicks,
+                            val -> {
+                                config.minSpawnTicks = val;
+                                pendingMinSpawnTicks.set(config.minSpawnTicks);
+                            }
+                    )
+                    .customController(opt -> new IntegerSliderController(opt, 1, 40, 1))
+                    .listener((integerOption, integer) -> {
+                        pendingMinSpawnTicks.set(integer);
+                        if(integer > pendingMaxSpawnTicks.get()) {
+                            integerOption.requestSet(pendingMaxSpawnTicks.get());
+                        }
+                    })
+                    .build();
+
+            AtomicInteger pendingMaxSpawnCount = new AtomicInteger(config.maxSpawnAmount);
+            AtomicInteger pendingMinSpawnCount = new AtomicInteger(config.minSpawnAmount);
+
+            maxSpawnCount = Option.<Integer>createBuilder()
+                    .name(Text.translatable("jetlag.speedline.maxspawncount"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("jetlag.speedline.maxspawncount.tooltip"))
+                            .build())
+                    .binding(
+                            defaults.maxSpawnAmount,
+                            () -> config.maxSpawnAmount,
+                            val -> {
+                                config.maxSpawnAmount = val;
+                                pendingMaxSpawnCount.set(config.maxSpawnAmount);
+                            }
+                    )
+                    .customController(opt -> new IntegerSliderController(opt, 1, 20, 1))
+                    .listener((integerOption, integer) -> {
+                        pendingMaxSpawnCount.set(integer);
+                        if(integer < pendingMinSpawnCount.get()) {
+                            integerOption.requestSet(pendingMinSpawnCount.get());
+                        }
+                    })
+                    .build();
+
+            minSpawnCount = Option.<Integer>createBuilder()
+                    .name(Text.translatable("jetlag.speedline.minspawncount"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("jetlag.speedline.minspawncount.tooltip"))
+                            .build())
+                    .binding(
+                            defaults.minSpawnAmount,
+                            () -> config.minSpawnAmount,
+                            val -> {
+                                config.minSpawnAmount = val;
+                                pendingMinSpawnCount.set(config.minSpawnAmount);
+                            }
+                    )
+                    .customController(opt -> new IntegerSliderController(opt, 1, 20, 1))
+                    .listener((integerOption, integer) -> {
+                        pendingMinSpawnCount.set(integer);
+                        if(integer > pendingMaxSpawnCount.get()) {
+                            integerOption.requestSet(pendingMaxSpawnCount.get());
+                        }
+                    })
+                    .build();
+
+            velBasedSpawnCount = Option.<Boolean>createBuilder()
+                    .name(Text.translatable("jetlag.speedline.velbasedspawncount"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("jetlag.speedline.velbasedspawncount.tooltip"))
+                            .build())
+                    .binding(
+                            defaults.velBasedSpawnAmount,
+                            () -> config.velBasedSpawnAmount,
+                            val -> config.velBasedSpawnAmount = val
+                    )
+                    .customController(opt -> new BooleanController(opt, BooleanController.ON_OFF_FORMATTER, true))
+                    .build();
+
+            width = Option.<Float>createBuilder()
+                    .name(Text.translatable("jetlag.speedline.width"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("jetlag.speedline.width.tooltip"))
                             .build())
                     .binding(
                             defaults.width,
@@ -978,9 +1177,9 @@ public class JetLagConfig {
                     .build();
 
             length = Option.<Float>createBuilder()
-                    .name(Text.translatable("jetlag.speedlinelength"))
+                    .name(Text.translatable("jetlag.speedline.length"))
                     .description(OptionDescription.createBuilder()
-                            .text(Text.translatable("jetlag.speedlinelength.tooltip"))
+                            .text(Text.translatable("jetlag.speedline.length.tooltip"))
                             .build())
                     .binding(
                             defaults.length,
@@ -991,9 +1190,9 @@ public class JetLagConfig {
                     .build();
 
             spawnRadius = Option.<Float>createBuilder()
-                    .name(Text.translatable("jetlag.speedlinespawnradius"))
+                    .name(Text.translatable("jetlag.speedline.spawnradius"))
                     .description(OptionDescription.createBuilder()
-                            .text(Text.translatable("jetlag.speedlinespawnradius.tooltip"))
+                            .text(Text.translatable("jetlag.speedline.spawnradius.tooltip"))
                             .build())
                     .binding(
                             defaults.spawnRadius,
@@ -1004,9 +1203,9 @@ public class JetLagConfig {
                     .build();
 
             randomSpawnRadius = Option.<Float>createBuilder()
-                    .name(Text.translatable("jetlag.speedlinerandomspawnradius"))
+                    .name(Text.translatable("jetlag.speedline.randomspawnradius"))
                     .description(OptionDescription.createBuilder()
-                            .text(Text.translatable("jetlag.speedlinerandomspawnradius.tooltip"))
+                            .text(Text.translatable("jetlag.speedline.randomspawnradius.tooltip"))
                             .build())
                     .binding(
                             defaults.randomSpawnRadius,
@@ -1017,9 +1216,9 @@ public class JetLagConfig {
                     .build();
 
             velBasedSpawnRadius = Option.<Boolean>createBuilder()
-                    .name(Text.translatable("jetlag.speedlinevelbasedspawnradius"))
+                    .name(Text.translatable("jetlag.speedline.velbasedspawnradius"))
                     .description(OptionDescription.createBuilder()
-                            .text(Text.translatable("jetlag.speedlinevelbasedspawnradius.tooltip"))
+                            .text(Text.translatable("jetlag.speedline.velbasedspawnradius.tooltip"))
                             .build())
                     .binding(
                             defaults.velBasedSpawnRadius,
@@ -1030,9 +1229,9 @@ public class JetLagConfig {
                     .build();
 
             speed = Option.<Float>createBuilder()
-                    .name(Text.translatable("jetlag.speedlinespeed"))
+                    .name(Text.translatable("jetlag.speedline.speed"))
                     .description(OptionDescription.createBuilder()
-                            .text(Text.translatable("jetlag.speedlinespeed.tooltip"))
+                            .text(Text.translatable("jetlag.speedline.speed.tooltip"))
                             .build())
                     .binding(
                             defaults.speed,
@@ -1043,9 +1242,9 @@ public class JetLagConfig {
                     .build();
 
             velMultiplier = Option.<Float>createBuilder()
-                    .name(Text.translatable("jetlag.speedlinevelmultipler"))
+                    .name(Text.translatable("jetlag.speedline.velmultipler"))
                     .description(OptionDescription.createBuilder()
-                            .text(Text.translatable("jetlag.speedlinevelmultipler.tooltip"))
+                            .text(Text.translatable("jetlag.speedline.velmultipler.tooltip"))
                             .build())
                     .binding(
                             defaults.velMultiplier,
@@ -1056,9 +1255,9 @@ public class JetLagConfig {
                     .build();
 
             color = Option.<Color>createBuilder()
-                    .name(Text.translatable("jetlag.speedlinecolor"))
+                    .name(Text.translatable("jetlag.speedline.color"))
                     .description(OptionDescription.createBuilder()
-                            .text(Text.translatable("jetlag.speedlinecolor.tooltip"))
+                            .text(Text.translatable("jetlag.speedline.color.tooltip"))
                             .build())
                     .binding(
                             defaults.color,
@@ -1069,9 +1268,9 @@ public class JetLagConfig {
                     .build();
 
             velBasedOpacity = Option.<Boolean>createBuilder()
-                    .name(Text.translatable("jetlag.speedlinevelbasedopacity"))
+                    .name(Text.translatable("jetlag.speedline.velbasedopacity"))
                     .description(OptionDescription.createBuilder()
-                            .text(Text.translatable("jetlag.speedlinevelbasedopacity.tooltip"))
+                            .text(Text.translatable("jetlag.speedline.velbasedopacity.tooltip"))
                             .build())
                     .binding(
                             defaults.velBasedOpacity,
@@ -1082,9 +1281,9 @@ public class JetLagConfig {
                     .build();
 
             fadeIn = Option.<Boolean>createBuilder()
-                    .name(Text.translatable("jetlag.speedlinefadein"))
+                    .name(Text.translatable("jetlag.speedline.fadein"))
                     .description(OptionDescription.createBuilder()
-                            .text(Text.translatable("jetlag.speedlinefadein.tooltip"))
+                            .text(Text.translatable("jetlag.speedline.fadein.tooltip"))
                             .build())
                     .binding(
                             defaults.fadeIn,
@@ -1095,9 +1294,9 @@ public class JetLagConfig {
                     .build();
 
             rainbowMode = Option.<Boolean>createBuilder()
-                    .name(Text.translatable("jetlag.speedlinerainbowmode"))
+                    .name(Text.translatable("jetlag.speedline.rainbowmode"))
                     .description(OptionDescription.createBuilder()
-                            .text(Text.translatable("jetlag.speedlinerainbowmode.tooltip"))
+                            .text(Text.translatable("jetlag.speedline.rainbowmode.tooltip"))
                             .build())
                     .binding(
                             defaults.rainbowMode,
@@ -1107,15 +1306,66 @@ public class JetLagConfig {
                     .customController(opt -> new BooleanController(opt, BooleanController.TRUE_FALSE_FORMATTER, true))
                     .build();
 
+            moveFromTurn = Option.<Boolean>createBuilder()
+                    .name(Text.translatable("jetlag.speedline.movefromturn"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("jetlag.speedline.movefromturn.tooltip"))
+                            .build())
+                    .binding(
+                            defaults.moveFromTurn,
+                            () -> config.moveFromTurn,
+                            val -> config.moveFromTurn = val
+                    )
+                    .customController(opt -> new BooleanController(opt, BooleanController.ON_OFF_FORMATTER, true))
+                    .build();
+
+            moveMultiplier = Option.<Float>createBuilder()
+                    .name(Text.translatable("jetlag.speedline.movemultiplier"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("jetlag.speedline.movemultiplier.tooltip"))
+                            .build())
+                    .binding(
+                            defaults.turnMoveMultiplier,
+                            () -> config.turnMoveMultiplier,
+                            val -> config.turnMoveMultiplier = val
+                    )
+                    .customController(opt -> new FloatSliderController(opt, 0, 20f, 0.05f))
+                    .build();
+
+            maxMoveAmountX = Option.<Float>createBuilder()
+                    .name(Text.translatable("jetlag.speedline.maxmoveamountx"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("jetlag.speedline.maxmoveamountx.tooltip"), Text.of(""), Text.translatable("jetlag.speedline.maxmovenote"))
+                            .build())
+                    .binding(
+                            defaults.maxMoveAmountX,
+                            () -> config.maxMoveAmountX,
+                            val -> config.maxMoveAmountX = val
+                    )
+                    .customController(opt -> new FloatSliderController(opt, 0, 100, 0.5f))
+                    .build();
+
+            maxMoveAmountY = Option.<Float>createBuilder()
+                    .name(Text.translatable("jetlag.speedline.maxmoveamounty"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("jetlag.speedline.maxmoveamounty.tooltip"), Text.of(""), Text.translatable("jetlag.speedline.maxmovenote"))
+                            .build())
+                    .binding(
+                            defaults.maxMoveAmountY,
+                            () -> config.maxMoveAmountY,
+                            val -> config.maxMoveAmountY = val
+                    )
+                    .customController(opt -> new FloatSliderController(opt, 0, 100, 0.5f))
+                    .build();
+
             //pure magic this works but really happy with it
             AtomicInteger pendingMaxAge = new AtomicInteger(config.maxAge);
             AtomicInteger pendingMinAge = new AtomicInteger(config.minAge);
 
             maxAge = Option.<Integer>createBuilder()
-                    .name(Text.translatable("jetlag.speedlinemaxage"))
+                    .name(Text.translatable("jetlag.speedline.maxage"))
                     .description(OptionDescription.createBuilder()
-                            .text(Text.translatable("jetlag.speedlinemaxage.tooltip"))
-                            .text(Text.translatable("jetlag.speedlineagenotice"))
+                            .text(Text.translatable("jetlag.speedline.maxage.tooltip"))
                             .build())
                     .binding(
                             defaults.maxAge,
@@ -1135,10 +1385,9 @@ public class JetLagConfig {
                     .build();
 
             minAge = Option.<Integer>createBuilder()
-                    .name(Text.translatable("jetlag.speedlineminage"))
+                    .name(Text.translatable("jetlag.speedline.minage"))
                     .description(OptionDescription.createBuilder()
-                            .text(Text.translatable("jetlag.speedlineminage.tooltip"))
-                            .text(Text.translatable("jetlag.speedlineagenotice"))
+                            .text(Text.translatable("jetlag.speedline.minage.tooltip"))
                             .build())
                     .binding(
                             defaults.minAge,
@@ -1157,21 +1406,32 @@ public class JetLagConfig {
                     })
                     .build();
 
-            this.group.option(LabelOption.create(Text.translatable("jetlag.speedlinescale").formatted(formatting)));
+            this.group.option(LabelOption.create(Text.translatable("jetlag.speedline.spawning").formatted(formatting)));
+            this.group.option(maxSpawnTicks);
+            this.group.option(minSpawnTicks);
+            this.group.option(maxSpawnCount);
+            this.group.option(minSpawnCount);
+            this.group.option(velBasedSpawnCount);
+            this.group.option(LabelOption.create(Text.translatable("jetlag.speedline.scale").formatted(formatting)));
             this.group.option(width);
             this.group.option(length);
-            this.group.option(LabelOption.create(Text.translatable("jetlag.speedlineplacementandvel").formatted(formatting)));
+            this.group.option(LabelOption.create(Text.translatable("jetlag.speedline.placementandvel").formatted(formatting)));
             this.group.option(spawnRadius);
             this.group.option(velBasedSpawnRadius);
             this.group.option(randomSpawnRadius);
             this.group.option(speed);
             this.group.option(velMultiplier);
-            this.group.option(LabelOption.create(Text.translatable("jetlag.speedlinecolorandopacity").formatted(formatting)));
+            this.group.option(LabelOption.create(Text.translatable("jetlag.speedline.colorandopacity").formatted(formatting)));
             this.group.option(color);
             this.group.option(velBasedOpacity);
             this.group.option(fadeIn);
             this.group.option(rainbowMode);
-            this.group.option(LabelOption.create(Text.translatable("jetlag.speedlinelifetime").formatted(formatting)));
+            this.group.option(LabelOption.create(Text.translatable("jetlag.speedline.cameramovement").formatted(formatting)));
+            this.group.option(moveFromTurn);
+            this.group.option(moveMultiplier);
+            this.group.option(maxMoveAmountX);
+            this.group.option(maxMoveAmountY);
+            this.group.option(LabelOption.create(Text.translatable("jetlag.speedline.lifetime").formatted(formatting)));
             this.group.option(maxAge);
             this.group.option(minAge);
         }

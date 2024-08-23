@@ -14,7 +14,8 @@ import net.superkat.jetlag.rendering.ContrailRenderer;
 import net.superkat.jetlag.speedline.SpeedlineHandler;
 
 public class JetLagClient implements ClientModInitializer {
-    public static ShaderProgram rainbowShader;
+//    public static ShaderProgram rainbowShader;
+    public static ShaderProgram rainbowParticle;
 
     @Override
     public void onInitializeClient() {
@@ -30,8 +31,11 @@ public class JetLagClient implements ClientModInitializer {
         ParticleFactoryRegistry.getInstance().register(JetLagMain.ROCKET_SPEEDLINE, RocketSpeedlineParticle.Factory::new);
 
         CoreShaderRegistrationCallback.EVENT.register(context -> {
-            Identifier id = new Identifier(JetLagMain.MOD_ID, "rainbow");
-            context.register(id, VertexFormats.POSITION, program -> rainbowShader = program);
+//            Identifier rainbowId = new Identifier(JetLagMain.MOD_ID, "rainbow");
+//            context.register(rainbowId, VertexFormats.POSITION, program -> rainbowShader = program);
+
+            Identifier fancyId = new Identifier(JetLagMain.MOD_ID, "fancyparticle");
+            context.register(fancyId, VertexFormats.POSITION_TEXTURE_COLOR_LIGHT, program -> rainbowParticle = program);
         });
 
         //BEFORE_DEBUG_RENDER is called as closely to the particles being rendered as I can get with Fabric API.

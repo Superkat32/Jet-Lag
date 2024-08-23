@@ -124,8 +124,8 @@ public class ContrailHandler {
         }
 
         if(player.isUsingRiptide()) {
-            //needs some work for a perfect spiral, but fun for now
-            roll = ((Math.sin(player.age) + tickDelta));
+            //still needs some work for a perfect spiral, but fun for now
+            roll = (Math.toRadians(360 * (Math.sin((double) player.age / 4))));
         } else {
             Vec3d rotationVec = player.getRotationVec(tickDelta);
             Vec3d lerpVelocity = player.lerpVelocity(tickDelta);

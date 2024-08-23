@@ -1,5 +1,6 @@
 package net.superkat.jetlag.particles;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.particle.*;
@@ -9,6 +10,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.particle.DefaultParticleType;
 import net.minecraft.util.math.MathHelper;
+import net.superkat.jetlag.JetLagClient;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -67,6 +69,11 @@ public class CameraParticle extends SpriteBillboardParticle {
             float m = this.getMinV();
             float n = this.getMaxV();
             int o = this.getBrightness(tickDelta);
+
+            if(fancyRainbowMode()) {
+                RenderSystem.setShader(() -> JetLagClient.rainbowParticle);
+            }
+
             Matrix4f posMatrix = matrices.peek().getPositionMatrix();
             vertexConsumer.vertex(posMatrix, vector3fs[0].x(), vector3fs[0].y(), vector3fs[0].z())
                     .texture(l, n)
@@ -88,14 +95,23 @@ public class CameraParticle extends SpriteBillboardParticle {
                     .color(this.red, this.green, this.blue, this.alpha)
                     .light(o)
                     .next();
-        }
 
+//            if(fancyRainbowMode()) {
+//                RenderSystem.setShader(GameRenderer::getParticleProgram);
+//            }
+
+        }
 
         matrices.pop();
     }
 
     public boolean shouldRender() {
         return true;
+    }
+
+    //funnily enough, my poor shader work due to inexperience makes this effect look crazy cool
+    public boolean fancyRainbowMode() {
+        return false;
     }
 
     @Override
