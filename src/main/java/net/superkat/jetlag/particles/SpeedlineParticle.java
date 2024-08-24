@@ -28,18 +28,8 @@ public class SpeedlineParticle extends CameraParticle {
     protected final ParticleTextureSheet particleTextureSheet;
     public SpeedlineParticle(ClientWorld clientWorld, double x, double y, double z, double velX, double velY, double velZ) {
         super(clientWorld, 0, 0, 1, velX, velY, velZ);
-//        //TODO - if the sideways or upwards offset from yaw/pitch is greater than a or b(configurable), limit angle to adjust for that
-//
-//        int maxAngle = 360;
-//        int minAngle = 0;
-//
-//        if(SpeedlineHandler.speedlineXOffset() < -0.1) {
-//            maxAngle = 90;
-//            minAngle = -90;
-//        }
         //determine random rotation
         this.angle = (float) Math.toRadians(this.random.nextBetween(0, 360));
-//        this.angle = (float) Math.toRadians(0);
         this.prevAngle = this.angle;
 
         //find position based on rotation
@@ -149,6 +139,11 @@ public class SpeedlineParticle extends CameraParticle {
         }
 
         return shouldRender;
+    }
+
+    @Override
+    public boolean ignoreFov() {
+        return JetLagConfig.getInstance().speedlinesIgnoreFov;
     }
 
     @Override

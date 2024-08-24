@@ -3,8 +3,10 @@ package net.superkat.jetlag.particles;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.particle.*;
 import net.minecraft.client.render.Camera;
+import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
@@ -29,7 +31,7 @@ public class CameraParticle extends SpriteBillboardParticle {
     }
 
     /**
-     * Render a particle right in front of the camera.
+     * Render a particle right in front of the camera. This is basically the Billboard Particle without translating to world space, and with some misc additions I wanted.
      * @param vertexConsumer The buffer to render to
      * @param camera         The current active game {@link Camera}
      * @param tickDelta      Frame tick delta amount
@@ -40,13 +42,18 @@ public class CameraParticle extends SpriteBillboardParticle {
         matrices.push();
         matrices.multiply(camera.getRotation());
 
+        if(ignoreFov()) {
+            //Surely this won't cause any issues... right?
+            GameRenderer gameRenderer = MinecraftClient.getInstance().gameRenderer;
+            gameRenderer.loadProjectionMatrix(gameRenderer.getBasicProjectionMatrix(gameRenderer.getFov(camera, tickDelta, false)));
+        }
+
         float x = (float) MathHelper.lerp(tickDelta, this.prevPosX, this.x);
         float y = (float) MathHelper.lerp(tickDelta, this.prevPosY, this.y);
         float z = (float) MathHelper.lerp(tickDelta, this.prevPosZ, this.z);
         this.rotation.set(new Quaternionf());
         if (this.angle != 0.0F) {
             this.rotation.rotateZ(MathHelper.lerp(tickDelta, this.prevAngle, this.angle));
-//            this.rotation.z = (float) Math.toRadians(MathHelper.lerp(tickDelta, this.prevAngle, this.angle));
         }
 
         if(this.shouldRender()) {
@@ -95,17 +102,16 @@ public class CameraParticle extends SpriteBillboardParticle {
                     .color(this.red, this.green, this.blue, this.alpha)
                     .light(o)
                     .next();
-
-//            if(fancyRainbowMode()) {
-//                RenderSystem.setShader(GameRenderer::getParticleProgram);
-//            }
-
         }
 
         matrices.pop();
     }
 
     public boolean shouldRender() {
+        return true;
+    }
+
+    public boolean ignoreFov() {
         return true;
     }
 

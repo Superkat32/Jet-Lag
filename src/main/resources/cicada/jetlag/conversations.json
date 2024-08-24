@@ -1,0 +1,53 @@
+{
+  "mod_id": "jetlag",
+
+  "conversations": {
+    "cicada:greetings": {
+      "lines": [
+        {
+          "order": 30,
+          "text": "I'm here! Ready for take off!"
+        }
+      ]
+    },
+    "cicada:good_old_days": {
+      "lines": [
+        {
+          "order": 20,
+          "text": "Haha, imagine how funny that would be? I'd say that is a Hampter approved idea."
+        }
+      ]
+    },
+    "do_a_barrel_roll:flight_sim": {
+      "lines": [
+        {
+          "order": 1,
+          "text": "This is your pilot speaking - facts."
+        }
+      ]
+    },
+    "jetlag:jetlagged": {
+      "priority": {
+        "priority": 50
+      },
+      "lines": [
+        {
+          "order": 0,
+          "text": "\"I'm feeling jet-lagged!\""
+        },
+        {
+          "order": 1,
+          "text": "Ohhh he said the thing!"
+        },
+        {
+          "order": 2,
+          "text": "Oooohhh!!!"
+        },
+        {
+          "order": 3,
+          "text": "ooohhhh he said it!"
+        }
+      ]
+    }
+  }
+}

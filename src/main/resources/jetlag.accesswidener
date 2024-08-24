@@ -7,3 +7,4 @@ accessible class net/minecraft/client/render/RenderLayer$MultiPhaseParameters
 accessible class net/minecraft/client/render/RenderPhase$Texture
 
 accessible field net/minecraft/client/particle/ParticleManager PARTICLE_TEXTURE_SHEETS Ljava/util/List;
+accessible method net/minecraft/client/render/GameRenderer getFov (Lnet/minecraft/client/render/Camera;FZ)D

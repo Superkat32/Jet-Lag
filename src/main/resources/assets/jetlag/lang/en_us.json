@@ -52,10 +52,14 @@
   "jetlag.speedlinesenabled.tooltip": "Visual lines of wind on your screen when flying.",
   "jetlag.rocketspeedlinesenabled": "Rocket Speedlines",
   "jetlag.rocketspeedlinesenabled.tooltip": "A different set of speedlines for when you boost with a firework rocket.",
+  "jetlag.riptidemakesrocket": "Riptide Equals Rocket",
+  "jetlag.riptidemakesrocket.tooltip": "Using a riptide trident acts the same as boosting with a firework rocket.",
   "jetlag.thirdpersonspeedlines": "Third Person Speedlines",
   "jetlag.thirdpersonspeedlines.tooltip": "Show speedlines in third person.",
   "jetlag.hidespeedlinesfone": "Hide Speedlines With Hidden Hud",
   "jetlag.hidespeedlinesfone.tooltip": "Determines if speedlines should be hidden while the hud is hidden.",
+  "jetlag.speedlinesignorefov": "Ignore FOV",
+  "jetlag.speedlinesignorefov.tooltip": "If enabled, speedlines will stay the same size despite your FOV setting. If disabled, speedlines will decrease in size as you increase your FOV.",
 
   "jetlag.speedlinepresets.group": "Presets",
   "jetlag.speedlinepresets.group.tooltip": "Some presets for the speedlines based on different types of speedlines.",
@@ -63,11 +67,6 @@
   "jetlag.speedlines.group.tooltip": "Config options related to how the individual speedlines should act.",
   "jetlag.rocketspeedlines.group": "Rocket Speedlines",
   "jetlag.rocketspeedlines.group.tooltip": "Config options related to how the individual rocket speedlines should act.",
-
-  "jetlag.attemptfov": "Attempt FOV Based Adjustment",
-  "jetlag.attemptfov.tooltip": "Attempts to change speedline related config settings which are affected by your FOV. This is mostly helpful for the available presets. The changes applied are not permanent until you save the config.",
-  "jetlag.fovbasedadjustment": "FOV based adjustment attempted with FOV: ",
-  "jetlag.fovadjuststart": "Execute!",
 
   "jetlag.speedline.preset.preview": "Set",
   "jetlag.speedline.preset.previewing": "Previewing ",

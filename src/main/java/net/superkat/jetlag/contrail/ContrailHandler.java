@@ -15,6 +15,7 @@ import org.joml.Vector3d;
 
 public class ContrailHandler {
     private static final float maxElytraRoll = 1.5707958f; //can probably be modified by other mods... hopefully shouldn't though
+    public static float fakePlayerElytraRoll = 0f;
 
     public static void tickJetlagPlayer(ClientPlayerEntity player) {
         //TODO - move most of this back into ClientPlayerEntityMixin because I don't like the way this looks
@@ -72,7 +73,7 @@ public class ContrailHandler {
         double rollRadians = getPlayerRoll(player, MinecraftClient.getInstance().getTickDelta());
         float delta = MinecraftClient.getInstance().getTickDelta();
 
-        double elytraWingOffset = -player.elytraRoll / maxElytraRoll;
+        double elytraWingOffset = -getElytraRoll(player) / maxElytraRoll;
         double width = 1.45;
         double height = 0.65;
         double forward = 0.45;
@@ -116,26 +117,27 @@ public class ContrailHandler {
         boolean DABRLoaded = JetLagClient.DABRLoaded();
         double roll = 0;
 
+        //DABR doesn't edit this, so this takes priority
+        if(player.isUsingRiptide()) {
+            return getRiptideRoll(player);
+        }
+
+        //DABR elytra
         if(DABRLoaded) {
             if(DABRCompat.DABREnabled()) {
-                //FIXME - riptide don't work here
                 return Math.toRadians(DABRCompat.getPlayerRoll(player, tickDelta));
             }
         }
 
-        if(player.isUsingRiptide()) {
-            //still needs some work for a perfect spiral, but fun for now
-            roll = (Math.toRadians(360 * (Math.sin((double) player.age / 4))));
-        } else {
-            Vec3d rotationVec = player.getRotationVec(tickDelta);
-            Vec3d lerpVelocity = player.lerpVelocity(tickDelta);
-            double d = rotationVec.horizontalLengthSquared();
-            double e = lerpVelocity.horizontalLengthSquared();
-            if(d > 0 && e > 0) {
-                double m = (lerpVelocity.x * rotationVec.x + lerpVelocity.z * rotationVec.z) / Math.sqrt(d * e);
-                double n = lerpVelocity.x * rotationVec.z - lerpVelocity.z * rotationVec.x;
-                roll = Math.signum(n) * Math.acos(m);
-            }
+        //normal elytra
+        Vec3d rotationVec = player.getRotationVec(tickDelta);
+        Vec3d lerpVelocity = player.lerpVelocity(tickDelta);
+        double d = rotationVec.horizontalLengthSquared();
+        double e = lerpVelocity.horizontalLengthSquared();
+        if(d > 0 && e > 0) {
+            double m = (lerpVelocity.x * rotationVec.x + lerpVelocity.z * rotationVec.z) / Math.sqrt(d * e);
+            double n = lerpVelocity.x * rotationVec.z - lerpVelocity.z * rotationVec.x;
+            roll = Math.signum(n) * Math.acos(m);
         }
 
         //fixes flickering while flying without moving(player model still flickers)
@@ -144,5 +146,33 @@ public class ContrailHandler {
         }
 
         return roll;
+    }
+
+    private static double getRiptideRoll(AbstractClientPlayerEntity player) {
+        //not sure why putting this in degrees work but it does
+        return -(player.age) % 360;
+    }
+
+    /**
+     * Get the player's elytra WING roll, not the player's actual roll!! The AbstractClientPlayerEntity's elytraRoll field does not get updated in first person, so it is manually calculated here if needed.
+     *
+     * @param player The player who's elytra wing roll should be gotten
+     * @return The player's elytra wing roll
+     */
+    public static float getElytraRoll(ClientPlayerEntity player) {
+        if(!MinecraftClient.getInstance().options.getPerspective().isFirstPerson()) {
+            return player.elytraRoll;
+        } else {
+            float l = (float) (-Math.PI / 12);
+            float o = 1.0F;
+            Vec3d vec3d = player.getVelocity();
+            if (vec3d.y < 0.0) {
+                Vec3d vec3d2 = vec3d.normalize();
+                o = 1.0F - (float)Math.pow(-vec3d2.y, 1.5);
+            }
+            l = o * (float) (-Math.PI / 2) + (1.0F - o) * l;
+            fakePlayerElytraRoll += (l - fakePlayerElytraRoll) * 0.1F;
+            return fakePlayerElytraRoll;
+        }
     }
 }

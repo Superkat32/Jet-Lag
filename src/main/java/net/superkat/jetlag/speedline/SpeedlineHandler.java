@@ -33,7 +33,8 @@ public class SpeedlineHandler {
                 if(!JetLagConfig.getInstance().speedlinesEnabled) return;
 
                 JetLagPlayer jetLagPlayer = (JetLagPlayer) player;
-                speedlineTicks = addSpeedline(player, jetLagPlayer.jetlag$rocketBoosting() && JetLagConfig.getInstance().rocketSpeedlinesEnabled);
+                boolean rocketBoosted = jetLagPlayer.jetlag$rocketBoosting() || (JetLagConfig.getInstance().riptideMakesRocket && player.isUsingRiptide());
+                speedlineTicks = addSpeedline(player, rocketBoosted && JetLagConfig.getInstance().rocketSpeedlinesEnabled);
             }
         }
     }

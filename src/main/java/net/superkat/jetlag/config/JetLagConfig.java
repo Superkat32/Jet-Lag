@@ -65,8 +65,10 @@ public class JetLagConfig {
     @SerialEntry public SpeedlineConfigInstance speedlineConfig = new SpeedlineConfigInstance();
     @SerialEntry public boolean rocketSpeedlinesEnabled = true;
     @SerialEntry public SpeedlineConfigInstance rocketConfig = new SpeedlineConfigInstance().rocketMode();
+    @SerialEntry public boolean riptideMakesRocket = true;
     @SerialEntry public boolean thirdPersonSpeedlines = false;
     @SerialEntry public boolean hideSpeedlinesInF1 = true;
+    @SerialEntry public boolean speedlinesIgnoreFov = true;
 
     //particles
     @SerialEntry public boolean windLines = true;
@@ -352,6 +354,19 @@ public class JetLagConfig {
                     .customController(opt -> new BooleanController(opt, BooleanController.ON_OFF_FORMATTER, true))
                     .build();
 
+            var riptideEnablesRocket = Option.<Boolean>createBuilder()
+                    .name(Text.translatable("jetlag.riptidemakesrocket"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("jetlag.riptidemakesrocket.tooltip"))
+                            .build())
+                    .binding(
+                            defaults.riptideMakesRocket,
+                            () -> config.riptideMakesRocket,
+                            val -> config.riptideMakesRocket = val
+                    )
+                    .customController(opt -> new BooleanController(opt, BooleanController.TRUE_FALSE_FORMATTER, true))
+                    .build();
+
             var thirdPersonSpeedlines = Option.<Boolean>createBuilder()
                     .name(Text.translatable("jetlag.thirdpersonspeedlines"))
                     .description(OptionDescription.createBuilder()
@@ -362,7 +377,7 @@ public class JetLagConfig {
                             () -> config.thirdPersonSpeedlines,
                             val -> config.thirdPersonSpeedlines = val
                     )
-                    .customController(opt -> new BooleanController(opt, BooleanController.YES_NO_FORMATTER, true))
+                    .customController(opt -> new BooleanController(opt, BooleanController.ON_OFF_FORMATTER, true))
                     .build();
 
             var hideSpeedlinesInF1 = Option.<Boolean>createBuilder()
@@ -378,11 +393,26 @@ public class JetLagConfig {
                     .customController(opt -> new BooleanController(opt, BooleanController.TRUE_FALSE_FORMATTER, true))
                     .build();
 
+            var speedlinesIgnoreFov = Option.<Boolean>createBuilder()
+                    .name(Text.translatable("jetlag.speedlinesignorefov"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("jetlag.speedlinesignorefov.tooltip"))
+                            .build())
+                    .binding(
+                            defaults.speedlinesIgnoreFov,
+                            () -> config.speedlinesIgnoreFov,
+                            val -> config.speedlinesIgnoreFov = val
+                    )
+                    .customController(opt -> new BooleanController(opt, BooleanController.YES_NO_FORMATTER, true))
+                    .build();
+
             speedlinesGeneralGroup.option(speedlinesEnabled);
             speedlinesGeneralGroup.option(rocketSpeedlinesEnabled);
+            speedlinesGeneralGroup.option(riptideEnablesRocket);
             speedlinesGeneralGroup.option(LabelOption.create(Text.of("")));
             speedlinesGeneralGroup.option(thirdPersonSpeedlines);
             speedlinesGeneralGroup.option(hideSpeedlinesInF1);
+            speedlinesGeneralGroup.option(speedlinesIgnoreFov);
 
             var speedlinePresetsGroup = OptionGroup.createBuilder()
                     .name(Text.translatable("jetlag.speedlinepresets.group"))
@@ -468,27 +498,10 @@ public class JetLagConfig {
                     .text(Text.translatable("jetlag.speedline.preset.preview"))
                     .build();
 
-            var attemptFovAdjust = ButtonOption.createBuilder()
-                    .name(Text.translatable("jetlag.attemptfov"))
-                    .description(OptionDescription.createBuilder().text(Text.translatable("jetlag.attemptfov.tooltip")).build())
-                    .action(((yaclScreen, buttonOption) -> {
-                        //TODO - eh fov stuff here i guess
-                        MinecraftClient.getInstance().getToastManager().add(
-                                new SystemToast(new SystemToast.Type(3500),
-                                        Text.translatable("jetlag.title"),
-                                        Text.translatable("jetlag.fovbasedadjustment").append(String.valueOf(MinecraftClient.getInstance().options.getFov().getValue()))
-                                )
-                        );
-                    }))
-                    .text(Text.translatable("jetlag.fovadjuststart"))
-                    .build();
-
             speedlinePresetsGroup.option(subtlePreset);
             speedlinePresetsGroup.option(boldPreset);
             speedlinePresetsGroup.option(animePreset);
             speedlinePresetsGroup.option(hyperdrivePreset);
-            speedlinePresetsGroup.option(LabelOption.create(Text.of("")));
-            speedlinePresetsGroup.option(attemptFovAdjust);
 
             speedlinesCategoryBuilder.group(speedlinesGeneralGroup.build());
             speedlinesCategoryBuilder.group(speedlinePresetsGroup.build());
