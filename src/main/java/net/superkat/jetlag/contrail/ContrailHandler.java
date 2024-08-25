@@ -74,9 +74,14 @@ public class ContrailHandler {
         float delta = MinecraftClient.getInstance().getTickDelta();
 
         double elytraWingOffset = -getElytraRoll(player) / maxElytraRoll;
-        double width = 1.45;
-        double height = 0.65;
-        double forward = 0.45;
+
+        JetLagConfig config = JetLagConfig.getInstance();
+        double leftWidth = config.contrailLeftOffsetWidth;
+        double leftLength = config.contrailLeftOffsetLength;
+        double leftHeight = config.contrailLeftOffsetHeight;
+        double rightWidth = config.mirrorContrailOffset ? leftWidth : config.contrailRightOffsetWidth;
+        double rightLength = config.mirrorContrailOffset ? leftLength : config.contrailRightOffsetLength;
+        double rightHeight = config.mirrorContrailOffset ? leftHeight : config.contrailRightOffsetHeight;
 
         Vec3d lerpedVel = player.lerpVelocity(delta);
 
@@ -92,9 +97,9 @@ public class ContrailHandler {
         // ¯\_(ツ)_/¯ <- my honest reaction to any of this actually making sense... because it doesn't
         // ¯\(°_o)/¯ <- also my honest reaction
         Quaterniond rotation = new Quaterniond().rotateZYX(yawRadians, -rollRadians, -pitchRadians);
-        Vector3d leftRot = new Vector3d(width, forward, height).rotate(rotation).mul(elytraWingOffset);
+        Vector3d leftRot = new Vector3d(leftWidth, leftLength, leftHeight).rotate(rotation).mul(elytraWingOffset);
         Vec3d left = new Vec3d(leftRot.x, leftRot.z, leftRot.y).add(playerPos);
-        Vector3d rightRot = new Vector3d(-width, forward, height).rotate(rotation).mul(elytraWingOffset);
+        Vector3d rightRot = new Vector3d(-rightWidth, rightLength, rightHeight).rotate(rotation).mul(elytraWingOffset);
         Vec3d right = new Vec3d(rightRot.x, rightRot.z, rightRot.y).add(playerPos);
 
 //        MinecraftClient.getInstance().world.addParticle(ParticleTypes.END_ROD, left.getX(), left.getY(), left.getZ(), 0, 0, 0);

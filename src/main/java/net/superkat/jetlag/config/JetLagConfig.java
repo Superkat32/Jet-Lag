@@ -56,6 +56,13 @@ public class JetLagConfig {
     @SerialEntry public float contrailOpacityAdjustment = 0.25f;
     @SerialEntry public boolean mirrorOpacity = false;
     @SerialEntry public boolean velocityBasedOpacityAdjust = true;
+    @SerialEntry public boolean mirrorContrailOffset = true;
+    @SerialEntry public double contrailLeftOffsetWidth = 1.45;
+    @SerialEntry public double contrailLeftOffsetHeight = 0.65;
+    @SerialEntry public double contrailLeftOffsetLength = 0.45;
+    @SerialEntry public double contrailRightOffsetWidth = 1.45;
+    @SerialEntry public double contrailRightOffsetHeight = 0.65;
+    @SerialEntry public double contrailRightOffsetLength = 0.45;
     @SerialEntry public int ticksPerPoint = 1;
     @SerialEntry public int contrailDeletionDelay = 1;
     @SerialEntry public int pointsDeletedPerDelay = 1;
@@ -254,6 +261,125 @@ public class JetLagConfig {
                     .customController(opt -> new BooleanController(opt, BooleanController.ON_OFF_FORMATTER, true))
                     .build();
 
+            var positionGroup = OptionGroup.createBuilder()
+                    .name(Text.translatable("jetlag.position.group"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("jetlag.position.group.tooltip"))
+                            .build());
+
+            var leftOffsetWidth = Option.<Double>createBuilder()
+                    .name(Text.translatable("jetlag.widthoffset"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("jetlag.widthoffset.tooltip"))
+                            .build())
+                    .binding(
+                            defaults.contrailLeftOffsetWidth,
+                            () -> config.contrailLeftOffsetWidth,
+                            val -> config.contrailLeftOffsetWidth = val
+                    )
+                    .customController(opt -> new DoubleSliderController(opt, 0, 2, 0.01))
+                    .build();
+
+            var leftOffsetHeight = Option.<Double>createBuilder()
+                    .name(Text.translatable("jetlag.heightoffset"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("jetlag.heightoffset.tooltip"))
+                            .build())
+                    .binding(
+                            defaults.contrailLeftOffsetHeight,
+                            () -> config.contrailLeftOffsetHeight,
+                            val -> config.contrailLeftOffsetHeight = val
+                    )
+                    .customController(opt -> new DoubleSliderController(opt, 0, 2, 0.01))
+                    .build();
+
+            var leftOffsetLength = Option.<Double>createBuilder()
+                    .name(Text.translatable("jetlag.lengthoffset"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("jetlag.lengthoffset.tooltip"))
+                            .build())
+                    .binding(
+                            defaults.contrailLeftOffsetLength,
+                            () -> config.contrailLeftOffsetLength,
+                            val -> config.contrailLeftOffsetLength = val
+                    )
+                    .customController(opt -> new DoubleSliderController(opt, 0, 2, 0.01))
+                    .build();
+
+            var rightOffsetWidth = Option.<Double>createBuilder()
+                    .name(Text.translatable("jetlag.widthoffset")
+                            .append(Text.translatable("jetlag.offsetright"))
+                    )
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("jetlag.widthoffset.tooltip"))
+                            .build())
+                    .binding(
+                            defaults.contrailRightOffsetWidth,
+                            () -> config.contrailRightOffsetWidth,
+                            val -> config.contrailRightOffsetWidth = val
+                    )
+                    .available(!config.mirrorContrailOffset)
+                    .customController(opt -> new DoubleSliderController(opt, 0, 2, 0.01))
+                    .build();
+
+            var rightOffsetHeight = Option.<Double>createBuilder()
+                    .name(Text.translatable("jetlag.heightoffset")
+                            .append(Text.translatable("jetlag.offsetright"))
+                    )
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("jetlag.heightoffset.tooltip"))
+                            .build())
+                    .binding(
+                            defaults.contrailRightOffsetHeight,
+                            () -> config.contrailRightOffsetHeight,
+                            val -> config.contrailRightOffsetHeight = val
+                    )
+                    .available(!config.mirrorContrailOffset)
+                    .customController(opt -> new DoubleSliderController(opt, 0, 2, 0.01))
+                    .build();
+
+            var rightOffsetLength = Option.<Double>createBuilder()
+                    .name(Text.translatable("jetlag.lengthoffset")
+                            .append(Text.translatable("jetlag.offsetright"))
+                    )
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("jetlag.lengthoffset.tooltip"))
+                            .build())
+                    .binding(
+                            defaults.contrailRightOffsetLength,
+                            () -> config.contrailRightOffsetLength,
+                            val -> config.contrailRightOffsetLength = val
+                    )
+                    .available(!config.mirrorContrailOffset)
+                    .customController(opt -> new DoubleSliderController(opt, 0, 2, 0.01))
+                    .build();
+
+            var mirrorContrailOffset = Option.<Boolean>createBuilder()
+                    .name(Text.translatable("jetlag.mirrorcontrailoffset"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("jetlag.mirrorcontrailoffset.tooltip"))
+                            .build())
+                    .binding(
+                            defaults.mirrorContrailOffset,
+                            () -> config.mirrorContrailOffset,
+                            val -> config.mirrorContrailOffset = val
+                    )
+                    .customController(opt -> new BooleanController(opt, BooleanController.TRUE_FALSE_FORMATTER, true))
+                    .listener((opt, value) -> {
+                        rightOffsetWidth.setAvailable(!value);
+                        rightOffsetLength.setAvailable(!value);
+                        rightOffsetHeight.setAvailable(!value);
+                    })
+                    .build();
+
+            positionGroup.option(mirrorContrailOffset);
+            positionGroup.option(leftOffsetWidth);
+            positionGroup.option(leftOffsetHeight);
+            positionGroup.option(leftOffsetLength);
+            positionGroup.option(rightOffsetWidth);
+            positionGroup.option(rightOffsetHeight);
+            positionGroup.option(rightOffsetLength);
+
             var spawningAndDeletingGroup = OptionGroup.createBuilder()
                     .name(Text.translatable("jetlag.spawndelete.group"))
                     .description(OptionDescription.createBuilder()
@@ -316,6 +442,7 @@ public class JetLagConfig {
 
             contrailCategoryBuilder.group(pointsGroup.build());
             contrailCategoryBuilder.group(widthAndOpacityGroup.build());
+            contrailCategoryBuilder.group(positionGroup.build());
             contrailCategoryBuilder.group(spawningAndDeletingGroup.build());
 
             var speedlinesCategoryBuilder = ConfigCategory.createBuilder()
@@ -341,6 +468,20 @@ public class JetLagConfig {
                     .customController(opt -> new BooleanController(opt, BooleanController.ON_OFF_FORMATTER, true))
                     .build();
 
+            var riptideEnablesRocket = Option.<Boolean>createBuilder()
+                    .name(Text.translatable("jetlag.riptidemakesrocket"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("jetlag.riptidemakesrocket.tooltip"))
+                            .build())
+                    .binding(
+                            defaults.riptideMakesRocket,
+                            () -> config.riptideMakesRocket,
+                            val -> config.riptideMakesRocket = val
+                    )
+                    .available(config.rocketSpeedlinesEnabled)
+                    .customController(opt -> new BooleanController(opt, BooleanController.TRUE_FALSE_FORMATTER, true))
+                    .build();
+
             var rocketSpeedlinesEnabled = Option.<Boolean>createBuilder()
                     .name(Text.translatable("jetlag.rocketspeedlinesenabled"))
                     .description(OptionDescription.createBuilder()
@@ -352,19 +493,9 @@ public class JetLagConfig {
                             val -> config.rocketSpeedlinesEnabled = val
                     )
                     .customController(opt -> new BooleanController(opt, BooleanController.ON_OFF_FORMATTER, true))
-                    .build();
-
-            var riptideEnablesRocket = Option.<Boolean>createBuilder()
-                    .name(Text.translatable("jetlag.riptidemakesrocket"))
-                    .description(OptionDescription.createBuilder()
-                            .text(Text.translatable("jetlag.riptidemakesrocket.tooltip"))
-                            .build())
-                    .binding(
-                            defaults.riptideMakesRocket,
-                            () -> config.riptideMakesRocket,
-                            val -> config.riptideMakesRocket = val
-                    )
-                    .customController(opt -> new BooleanController(opt, BooleanController.TRUE_FALSE_FORMATTER, true))
+                    .listener((opt, value) -> {
+                        riptideEnablesRocket.setAvailable(value);
+                    })
                     .build();
 
             var thirdPersonSpeedlines = Option.<Boolean>createBuilder()
@@ -437,6 +568,11 @@ public class JetLagConfig {
 
             SpeedlineConfigOptionContainer rocketSpeedlineOptions = new SpeedlineConfigOptionContainer(rocketSpeedlinesGroup, defaults.rocketConfig, config.rocketConfig, Formatting.AQUA);
             rocketSpeedlineOptions.buildOptions();
+            rocketSpeedlineOptions.setAvailable(config.rocketSpeedlinesEnabled);
+
+            rocketSpeedlinesEnabled.addListener((opt, value) -> {
+                rocketSpeedlineOptions.setAvailable(value);
+            });
 
             var subtlePreset = ButtonOption.createBuilder()
                     .name(Text.translatable("jetlag.speedline.preset.subtle"))
@@ -543,6 +679,7 @@ public class JetLagConfig {
                             () -> config.windLinesColor,
                             val -> config.windLinesColor = val
                     )
+                    .available(config.windLines)
                     .customController(opt -> new ColorController(opt, false))
                     .build();
 
@@ -556,6 +693,26 @@ public class JetLagConfig {
                             () -> config.windLinesInFirstPerson,
                             val -> config.windLinesInFirstPerson = val
                     )
+                    .available(config.windLines)
+                    .customController(opt -> new BooleanController(opt, BooleanController.YES_NO_FORMATTER, true))
+                    .build();
+
+            windLines.addListener((opt, value) -> {
+                windLinesColor.setAvailable(value);
+                firstPersonWindLines.setAvailable(value);
+            });
+
+            var useMCWindGusts = Option.<Boolean>createBuilder()
+                    .name(Text.translatable("jetlag.mcwindgusts"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("jetlag.mcwindgusts.tooltip"))
+                            .build())
+                    .binding(
+                            defaults.useMinecraftWindGusts,
+                            () -> config.useMinecraftWindGusts,
+                            val -> config.useMinecraftWindGusts = val
+                    )
+                    .available(config.windGusts)
                     .customController(opt -> new BooleanController(opt, BooleanController.YES_NO_FORMATTER, true))
                     .build();
 
@@ -569,20 +726,8 @@ public class JetLagConfig {
                             () -> config.windGusts,
                             val -> config.windGusts = val
                     )
+                    .listener((opt, value) -> useMCWindGusts.setAvailable(value))
                     .customController(opt -> new BooleanController(opt, BooleanController.ON_OFF_FORMATTER, true))
-                    .build();
-
-            var useMCWindGusts = Option.<Boolean>createBuilder()
-                    .name(Text.translatable("jetlag.mcwindgusts"))
-                    .description(OptionDescription.createBuilder()
-                            .text(Text.translatable("jetlag.mcwindgusts.tooltip"))
-                            .build())
-                    .binding(
-                            defaults.useMinecraftWindGusts,
-                            () -> config.useMinecraftWindGusts,
-                            val -> config.useMinecraftWindGusts = val
-                    )
-                    .customController(opt -> new BooleanController(opt, BooleanController.YES_NO_FORMATTER, true))
                     .build();
 
             var fireworkGroup = OptionGroup.createBuilder()
@@ -590,19 +735,6 @@ public class JetLagConfig {
                     .description(OptionDescription.createBuilder()
                             .text(Text.translatable("jetlag.firework.group.tooltip"))
                             .build());
-
-            var altFireworkParticles = Option.<Boolean>createBuilder()
-                    .name(Text.translatable("jetlag.altfirework"))
-                    .description(OptionDescription.createBuilder()
-                            .text(Text.translatable("jetlag.altfirework.tooltip"))
-                            .build())
-                    .binding(
-                            defaults.altFireworkParticles,
-                            () -> config.altFireworkParticles,
-                            val -> config.altFireworkParticles = val
-                    )
-                    .customController(opt -> new BooleanController(opt, BooleanController.ON_OFF_FORMATTER, true))
-                    .build();
 
             var alwaysUseAltFireworkParticles = Option.<Boolean>createBuilder()
                     .name(Text.translatable("jetlag.alwaysaltfirework"))
@@ -614,7 +746,22 @@ public class JetLagConfig {
                             () -> config.alwaysUseAltFireworkParticles,
                             val -> config.alwaysUseAltFireworkParticles = val
                     )
+                    .available(config.altFireworkParticles)
                     .customController(opt -> new BooleanController(opt, BooleanController.YES_NO_FORMATTER, true))
+                    .build();
+
+            var altFireworkParticles = Option.<Boolean>createBuilder()
+                    .name(Text.translatable("jetlag.altfirework"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("jetlag.altfirework.tooltip"))
+                            .build())
+                    .binding(
+                            defaults.altFireworkParticles,
+                            () -> config.altFireworkParticles,
+                            val -> config.altFireworkParticles = val
+                    )
+                    .listener((opt, value) -> alwaysUseAltFireworkParticles.setAvailable(value))
+                    .customController(opt -> new BooleanController(opt, BooleanController.ON_OFF_FORMATTER, true))
                     .build();
 
             windGroup.option(windLines);
@@ -629,382 +776,97 @@ public class JetLagConfig {
             particlesCategoryBuilder.group(windGroup.build());
             particlesCategoryBuilder.group(fireworkGroup.build());
 
-            var screenEffectsCategoryBuilder = ConfigCategory.createBuilder()
-                    .name(Text.translatable("jetlag.category.screen"))
-                    .tooltip(Text.translatable("jetlag.category.screen.tooltip"));
-
-            var oldSpeedlinesGroup = OptionGroup.createBuilder()
-                    .name(Text.translatable("jetlag.oldspeedlines.group"))
-                    .description(OptionDescription.createBuilder()
-                            .text(Text.translatable("jetlag.oldspeedlines.group.tooltip"))
-                            .build());
-
-            var showSpeedlines = Option.<Boolean>createBuilder()
-                    .name(Text.translatable("jetlag.showspeedlines"))
-                    .description(OptionDescription.createBuilder()
-                            .text(Text.translatable("jetlag.showspeedlines.tooltip"))
-                            .build())
-                    .binding(
-                            defaults.showSpeedlinesTexture,
-                            () -> config.showSpeedlinesTexture,
-                            val -> config.showSpeedlinesTexture = val
-                    )
-                    .customController(opt -> new BooleanController(opt, BooleanController.ON_OFF_FORMATTER, true))
-                    .build();
-
-            var velBasedSpeedlinesOpacity = Option.<Boolean>createBuilder()
-                    .name(Text.translatable("jetlag.velspeedlinesopacity"))
-                    .description(OptionDescription.createBuilder()
-                            .text(Text.translatable("jetlag.velspeedlinesopacity.tooltip"))
-                            .build())
-                    .binding(
-                            defaults.velocityBasedSpeedlinesOpacity,
-                            () -> config.velocityBasedSpeedlinesOpacity,
-                            val -> config.velocityBasedSpeedlinesOpacity = val
-                    )
-                    .customController(opt -> new BooleanController(opt, BooleanController.ON_OFF_FORMATTER, true))
-                    .build();
-
-            var speedlinesColor = Option.<Color>createBuilder()
-                    .name(Text.translatable("jetlag.speedlinescolor"))
-                    .description(OptionDescription.createBuilder()
-                            .text(Text.translatable("jetlag.speedlinescolor.tooltip"))
-                            .build())
-                    .binding(
-                            defaults.speedlinesColor,
-                            () -> config.speedlinesColor,
-                            val -> config.speedlinesColor = val
-                    )
-                    .customController(opt -> new ColorController(opt, true))
-                    .build();
-
-            var rainbowSpeedlines = Option.<Boolean>createBuilder()
-                    .name(Text.translatable("jetlag.rainbowspeedlines"))
-                    .description(OptionDescription.createBuilder()
-                            .text(Text.translatable("jetlag.rainbowspeedlines.tooltip"))
-                            .build())
-                    .binding(
-                            defaults.rainbowSpeedlines,
-                            () -> config.rainbowSpeedlines,
-                            val -> config.rainbowSpeedlines = val
-                    )
-                    .customController(opt -> new BooleanController(opt, BooleanController.ON_OFF_FORMATTER, true))
-                    .build();
-
-            var onlyFirstPersonSpeedlines = Option.<Boolean>createBuilder()
-                    .name(Text.translatable("jetlag.firstpersonspeedlines"))
-                    .description(OptionDescription.createBuilder()
-                            .text(Text.translatable("jetlag.firstpersonspeedlines.tooltip"))
-                            .build())
-                    .binding(
-                            defaults.onlyShowSpeedlinesInFirstPerson,
-                            () -> config.onlyShowSpeedlinesInFirstPerson,
-                            val -> config.onlyShowSpeedlinesInFirstPerson = val
-                    )
-                    .customController(opt -> new BooleanController(opt, BooleanController.TRUE_FALSE_FORMATTER, true))
-                    .build();
-
-            oldSpeedlinesGroup.option(showSpeedlines);
-            oldSpeedlinesGroup.option(velBasedSpeedlinesOpacity);
-            oldSpeedlinesGroup.option(speedlinesColor);
-            oldSpeedlinesGroup.option(rainbowSpeedlines);
-            oldSpeedlinesGroup.option(onlyFirstPersonSpeedlines);
-
-            screenEffectsCategoryBuilder.group(oldSpeedlinesGroup.build());
+//            var screenEffectsCategoryBuilder = ConfigCategory.createBuilder()
+//                    .name(Text.translatable("jetlag.category.screen"))
+//                    .tooltip(Text.translatable("jetlag.category.screen.tooltip"));
+//
+//            var oldSpeedlinesGroup = OptionGroup.createBuilder()
+//                    .name(Text.translatable("jetlag.oldspeedlines.group"))
+//                    .description(OptionDescription.createBuilder()
+//                            .text(Text.translatable("jetlag.oldspeedlines.group.tooltip"))
+//                            .build());
+//
+//            var showSpeedlines = Option.<Boolean>createBuilder()
+//                    .name(Text.translatable("jetlag.showspeedlines"))
+//                    .description(OptionDescription.createBuilder()
+//                            .text(Text.translatable("jetlag.showspeedlines.tooltip"))
+//                            .build())
+//                    .binding(
+//                            defaults.showSpeedlinesTexture,
+//                            () -> config.showSpeedlinesTexture,
+//                            val -> config.showSpeedlinesTexture = val
+//                    )
+//                    .customController(opt -> new BooleanController(opt, BooleanController.ON_OFF_FORMATTER, true))
+//                    .build();
+//
+//            var velBasedSpeedlinesOpacity = Option.<Boolean>createBuilder()
+//                    .name(Text.translatable("jetlag.velspeedlinesopacity"))
+//                    .description(OptionDescription.createBuilder()
+//                            .text(Text.translatable("jetlag.velspeedlinesopacity.tooltip"))
+//                            .build())
+//                    .binding(
+//                            defaults.velocityBasedSpeedlinesOpacity,
+//                            () -> config.velocityBasedSpeedlinesOpacity,
+//                            val -> config.velocityBasedSpeedlinesOpacity = val
+//                    )
+//                    .customController(opt -> new BooleanController(opt, BooleanController.ON_OFF_FORMATTER, true))
+//                    .build();
+//
+//            var speedlinesColor = Option.<Color>createBuilder()
+//                    .name(Text.translatable("jetlag.speedlinescolor"))
+//                    .description(OptionDescription.createBuilder()
+//                            .text(Text.translatable("jetlag.speedlinescolor.tooltip"))
+//                            .build())
+//                    .binding(
+//                            defaults.speedlinesColor,
+//                            () -> config.speedlinesColor,
+//                            val -> config.speedlinesColor = val
+//                    )
+//                    .customController(opt -> new ColorController(opt, true))
+//                    .build();
+//
+//            var rainbowSpeedlines = Option.<Boolean>createBuilder()
+//                    .name(Text.translatable("jetlag.rainbowspeedlines"))
+//                    .description(OptionDescription.createBuilder()
+//                            .text(Text.translatable("jetlag.rainbowspeedlines.tooltip"))
+//                            .build())
+//                    .binding(
+//                            defaults.rainbowSpeedlines,
+//                            () -> config.rainbowSpeedlines,
+//                            val -> config.rainbowSpeedlines = val
+//                    )
+//                    .customController(opt -> new BooleanController(opt, BooleanController.ON_OFF_FORMATTER, true))
+//                    .build();
+//
+//            var onlyFirstPersonSpeedlines = Option.<Boolean>createBuilder()
+//                    .name(Text.translatable("jetlag.firstpersonspeedlines"))
+//                    .description(OptionDescription.createBuilder()
+//                            .text(Text.translatable("jetlag.firstpersonspeedlines.tooltip"))
+//                            .build())
+//                    .binding(
+//                            defaults.onlyShowSpeedlinesInFirstPerson,
+//                            () -> config.onlyShowSpeedlinesInFirstPerson,
+//                            val -> config.onlyShowSpeedlinesInFirstPerson = val
+//                    )
+//                    .customController(opt -> new BooleanController(opt, BooleanController.TRUE_FALSE_FORMATTER, true))
+//                    .build();
+//
+//            oldSpeedlinesGroup.option(showSpeedlines);
+//            oldSpeedlinesGroup.option(velBasedSpeedlinesOpacity);
+//            oldSpeedlinesGroup.option(speedlinesColor);
+//            oldSpeedlinesGroup.option(rainbowSpeedlines);
+//            oldSpeedlinesGroup.option(onlyFirstPersonSpeedlines);
+//
+//            screenEffectsCategoryBuilder.group(oldSpeedlinesGroup.build());
 
             return builder
                 .title(Text.translatable("jetlag.title"))
                 .category(contrailCategoryBuilder.build())
                     .category(speedlinesCategoryBuilder.build())
-                    .category(particlesCategoryBuilder.build())
-                    .category(screenEffectsCategoryBuilder.build());
-//
-//            var screenEffectsGroup = OptionGroup.createBuilder()
-//                    .name(Text.translatable("jetlag.screeneffects.group"))
-//                    .description(OptionDescription.createBuilder()
-//                            .text(Text.translatable("jetlag.screeneffects.group.tooltip"))
-//                            .build());
-//            var showSpeedlines = Option.<Boolean>createBuilder()
-//                    .name(Text.translatable("jetlag.speedlines"))
-//                    .description(OptionDescription.createBuilder()
-//                            .text(Text.translatable("jetlag.speedlines.tooltip"))
-//                            .build())
-//                    .binding(
-//                            defaults.showSpeedlines,
-//                            () -> config.showSpeedlines,
-//                            val -> config.showSpeedlines = val
-//                    )
-//                    .customController(booleanOption -> new BooleanController(booleanOption, true))
-//                    .build();
-//            var altSpeedlines = Option.<Boolean>createBuilder()
-//                    .name(Text.translatable("jetlag.speedlines.alt"))
-//                    .description(OptionDescription.createBuilder()
-//                            .text(Text.translatable("jetlag.speedlines.alt.tooltip"))
-//                            .build())
-//                    .binding(
-//                            defaults.altSpeedlineTextures,
-//                            () -> config.altSpeedlineTextures,
-//                            val -> config.altSpeedlineTextures = val
-//                    )
-//                    .customController(booleanOption -> new BooleanController(booleanOption, true))
-//                    .build();
-//            screenEffectsGroup.option(showSpeedlines);
-//            screenEffectsGroup.option(altSpeedlines);
-//            defaultCategoryBuilder.group(screenEffectsGroup.build());
-//
-//            var particlesGroup = OptionGroup.createBuilder()
-//                    .name(Text.translatable("jetlag.particles.group"))
-//                    .description(OptionDescription.createBuilder()
-//                            .text(Text.translatable("jetlag.particles.group.tooltip"))
-//                            .build());
-//            var showWindGusts = Option.<Boolean>createBuilder()
-//                    .name(Text.translatable("jetlag.wind"))
-//                    .description(OptionDescription.createBuilder()
-//                            .text(Text.translatable("jetlag.wind.tooltip"))
-//                            .build())
-//                    .binding(
-//                            defaults.windGusts,
-//                            () -> config.windGusts,
-//                            val -> config.windGusts = val
-//                    )
-//                    .customController(booleanOption -> new BooleanController(booleanOption, true))
-//                    .build();
-//            var altFireworkParticles = Option.<Boolean>createBuilder()
-//                    .name(Text.translatable("jetlag.altfirework"))
-//                    .description(OptionDescription.createBuilder()
-//                            .text(Text.translatable("jetlag.altfirework.tooltip"))
-//                            .build())
-//                    .binding(
-//                            defaults.altFireworkParticles,
-//                            () -> config.altFireworkParticles,
-//                            val -> config.altFireworkParticles = val
-//                    )
-//                    .customController(booleanOption -> new BooleanController(booleanOption, true))
-//                    .build();
-//            var alwaysUseAltFireworkParticles = Option.<Boolean>createBuilder()
-//                    .name(Text.translatable("jetlag.altfireworkeverywhere"))
-//                    .description(OptionDescription.createBuilder()
-//                            .text(Text.translatable("jetlag.altfireworkeverywhere.tooltip"))
-//                            .build())
-//                    .description(OptionDescription.createBuilder()
-//                            .text(Text.translatable("jetlag.altfireworkeverywhere.tooltip.examples"))
-//                            .build())
-//                    .binding(
-//                            defaults.alwaysUseAltFireworkParticles,
-//                            () -> config.alwaysUseAltFireworkParticles,
-//                            val -> config.alwaysUseAltFireworkParticles = val
-//                    )
-//                    .customController(booleanOption -> new BooleanController(booleanOption, true))
-//                    .build();
-//            particlesGroup.option(showWindGusts);
-//            particlesGroup.option(altFireworkParticles);
-//            particlesGroup.option(alwaysUseAltFireworkParticles);
-//            defaultCategoryBuilder.group(particlesGroup.build());
-
-//            return builder
-//                    .title(Text.translatable("jetlag.title"))
-//                    .category(defaultCategoryBuilder.build());
+                    .category(particlesCategoryBuilder.build());
+//                    .category(screenEffectsCategoryBuilder.build());
         }).generateScreen(parent);
     }
-
-//    private static void buildSpeedlineConfigInstance(OptionGroup.Builder group, SpeedlineConfigInstance defaults, SpeedlineConfigInstance config, Formatting titleFormatting) {
-//        var width = Option.<Float>createBuilder()
-//            .name(Text.translatable("jetlag.speedlinewidth"))
-//            .description(OptionDescription.createBuilder()
-//                    .text(Text.translatable("jetlag.speedlinewidth.tooltip"))
-//                    .build())
-//            .binding(
-//                    defaults.width,
-//                    () -> config.width,
-//                    val -> config.width = val
-//            )
-//            .customController(opt -> new FloatSliderController(opt, 0, 5f, 0.1f))
-//            .build();
-//
-//        var length = Option.<Float>createBuilder()
-//                .name(Text.translatable("jetlag.speedlinelength"))
-//                .description(OptionDescription.createBuilder()
-//                        .text(Text.translatable("jetlag.speedlinelength.tooltip"))
-//                        .build())
-//                .binding(
-//                        defaults.length,
-//                        () -> config.length,
-//                        val -> config.length = val
-//                )
-//                .customController(opt -> new FloatSliderController(opt, 0, 5f, 0.1f))
-//                .build();
-//
-//        var spawnRadius = Option.<Float>createBuilder()
-//                .name(Text.translatable("jetlag.speedlinespawnradius"))
-//                .description(OptionDescription.createBuilder()
-//                        .text(Text.translatable("jetlag.speedlinespawnradius.tooltip"))
-//                        .build())
-//                .binding(
-//                        defaults.spawnRadius,
-//                        () -> config.spawnRadius,
-//                        val -> config.spawnRadius = val
-//                )
-//                .customController(opt -> new FloatSliderController(opt, 0, 20f, 0.1f))
-//                .build();
-//
-//        var velBasedSpawnRadius = Option.<Boolean>createBuilder()
-//                .name(Text.translatable("jetlag.speedlinevelbasedspawnradius"))
-//                .description(OptionDescription.createBuilder()
-//                        .text(Text.translatable("jetlag.speedlinevelbasedspawnradius.tooltip"))
-//                        .build())
-//                .binding(
-//                        defaults.velBasedSpawnRadius,
-//                        () -> config.velBasedSpawnRadius,
-//                        val -> config.velBasedSpawnRadius = val
-//                )
-//                .customController(opt -> new BooleanController(opt, BooleanController.YES_NO_FORMATTER, true))
-//                .build();
-//
-//        var speed = Option.<Float>createBuilder()
-//                .name(Text.translatable("jetlag.speedlinespeed"))
-//                .description(OptionDescription.createBuilder()
-//                        .text(Text.translatable("jetlag.speedlinespeed.tooltip"))
-//                        .build())
-//                .binding(
-//                        defaults.speed,
-//                        () -> config.speed,
-//                        val -> config.speed = val
-//                )
-//                .customController(opt -> new FloatSliderController(opt, 0, 2f, 0.05f))
-//                .build();
-//
-//        var velMultiplier = Option.<Float>createBuilder()
-//                .name(Text.translatable("jetlag.speedlinevelmultipler"))
-//                .description(OptionDescription.createBuilder()
-//                        .text(Text.translatable("jetlag.speedlinevelmultipler.tooltip"))
-//                        .build())
-//                .binding(
-//                        defaults.velMultiplier,
-//                        () -> config.velMultiplier,
-//                        val -> config.velMultiplier = val
-//                )
-//                .customController(opt -> new FloatSliderController(opt, 0, 2f, 0.05f))
-//                .build();
-//
-//        var color = Option.<Color>createBuilder()
-//                .name(Text.translatable("jetlag.speedlinecolor"))
-//                .description(OptionDescription.createBuilder()
-//                        .text(Text.translatable("jetlag.speedlinecolor.tooltip"))
-//                        .build())
-//                .binding(
-//                        defaults.color,
-//                        () -> config.color,
-//                        val -> config.color = val
-//                )
-//                .customController(opt -> new ColorController(opt, true))
-//                .build();
-//
-//        var velBasedOpacity = Option.<Boolean>createBuilder()
-//                .name(Text.translatable("jetlag.speedlinevelbasedopacity"))
-//                .description(OptionDescription.createBuilder()
-//                        .text(Text.translatable("jetlag.speedlinevelbasedopacity.tooltip"))
-//                        .build())
-//                .binding(
-//                        defaults.velBasedOpacity,
-//                        () -> config.velBasedOpacity,
-//                        val -> config.velBasedOpacity = val
-//                )
-//                .customController(opt -> new BooleanController(opt, BooleanController.ON_OFF_FORMATTER, true))
-//                .build();
-//
-//        var fadeIn = Option.<Boolean>createBuilder()
-//                .name(Text.translatable("jetlag.speedlinefadein"))
-//                .description(OptionDescription.createBuilder()
-//                        .text(Text.translatable("jetlag.speedlinefadein.tooltip"))
-//                        .build())
-//                .binding(
-//                        defaults.fadeIn,
-//                        () -> config.fadeIn,
-//                        val -> config.fadeIn = val
-//                )
-//                .customController(opt -> new BooleanController(opt, BooleanController.YES_NO_FORMATTER, true))
-//                .build();
-//
-//        var rainbowMode = Option.<Boolean>createBuilder()
-//                .name(Text.translatable("jetlag.speedlinerainbowmode"))
-//                .description(OptionDescription.createBuilder()
-//                        .text(Text.translatable("jetlag.speedlinerainbowmode.tooltip"))
-//                        .build())
-//                .binding(
-//                        defaults.rainbowMode,
-//                        () -> config.rainbowMode,
-//                        val -> config.rainbowMode = val
-//                )
-//                .customController(opt -> new BooleanController(opt, BooleanController.TRUE_FALSE_FORMATTER, true))
-//                .build();
-//
-//        //pure magic this works but really happy with it
-//        AtomicInteger pendingMaxAge = new AtomicInteger(config.maxAge);
-//        AtomicInteger pendingMinAge = new AtomicInteger(config.minAge);
-//
-//        var maxAge = Option.<Integer>createBuilder()
-//                .name(Text.translatable("jetlag.speedlinemaxage"))
-//                .description(OptionDescription.createBuilder()
-//                        .text(Text.translatable("jetlag.speedlinemaxage.tooltip"))
-//                        .text(Text.translatable("jetlag.speedlineagenotice"))
-//                        .build())
-//                .binding(
-//                        defaults.maxAge,
-//                        () -> config.maxAge,
-//                        val -> {
-//                            config.maxAge = val;
-//                            pendingMaxAge.set(config.maxAge);
-//                        }
-//                )
-//                .customController(opt -> new IntegerSliderController(opt, 1, 100, 1))
-//                .listener((integerOption, integer) -> {
-//                    pendingMaxAge.set(integer);
-//                    if(integer < pendingMinAge.get()) {
-//                        integerOption.requestSet(pendingMinAge.get());
-//                    }
-//                })
-//                .build();
-//
-//        var minAge = Option.<Integer>createBuilder()
-//                .name(Text.translatable("jetlag.speedlineminage"))
-//                .description(OptionDescription.createBuilder()
-//                        .text(Text.translatable("jetlag.speedlineminage.tooltip"))
-//                        .text(Text.translatable("jetlag.speedlineagenotice"))
-//                        .build())
-//                .binding(
-//                        defaults.minAge,
-//                        () -> config.minAge,
-//                        val -> {
-//                            config.minAge = val;
-//                            pendingMinAge.set(config.minAge);
-//                        }
-//                )
-//                .customController(opt -> new IntegerSliderController(opt, 1, 100, 1))
-//                .listener((integerOption, integer) -> {
-//                    pendingMinAge.set(integer);
-//                    if(integer > pendingMaxAge.get()) {
-//                        integerOption.requestSet(pendingMaxAge.get());
-//                    }
-//                })
-//                .build();
-//
-//        group.option(LabelOption.create(Text.translatable("jetlag.speedlinescale").formatted(titleFormatting)));
-//        group.option(width);
-//        group.option(length);
-//        group.option(LabelOption.create(Text.translatable("jetlag.speedlineplacementandvel").formatted(titleFormatting)));
-//        group.option(spawnRadius);
-//        group.option(velBasedSpawnRadius);
-//        group.option(speed);
-//        group.option(velMultiplier);
-//        group.option(LabelOption.create(Text.translatable("jetlag.speedlinecolorandopacity").formatted(titleFormatting)));
-//        group.option(color);
-//        group.option(velBasedOpacity);
-//        group.option(fadeIn);
-//        group.option(rainbowMode);
-//        group.option(LabelOption.create(Text.translatable("jetlag.speedlinelifetime").formatted(titleFormatting)));
-//        group.option(maxAge);
-//        group.option(minAge);
-//    }
 
     private static class SpeedlineConfigOptionContainer {
         public OptionGroup.Builder group;
@@ -1042,8 +904,36 @@ public class JetLagConfig {
             this.formatting = titleFormatting;
         }
 
+        public void setAvailable(boolean available) {
+            this.maxSpawnTicks.setAvailable(available);
+            this.minSpawnTicks.setAvailable(available);
+            this.maxSpawnCount.setAvailable(available);
+            this.minSpawnCount.setAvailable(available);
+            this.velBasedSpawnCount.setAvailable(available);
+            this.width.setAvailable(available);
+            this.length.setAvailable(available);
+            this.spawnRadius.setAvailable(available);
+            this.randomSpawnRadius.setAvailable(available);
+            this.velBasedSpawnRadius.setAvailable(available);
+            this.speed.setAvailable(available);
+            this.velMultiplier.setAvailable(available);
+            this.color.setAvailable(available);
+            this.velBasedOpacity.setAvailable(available);
+            this.fadeIn.setAvailable(available);
+            this.rainbowMode.setAvailable(available);
+            this.moveFromTurn.setAvailable(available);
+            this.moveMultiplier.setAvailable(available);
+            this.maxMoveAmountX.setAvailable(available);
+            this.maxMoveAmountY.setAvailable(available);
+            this.maxAge.setAvailable(available);
+            this.minAge.setAvailable(available);
+        }
+
         public void applySpeedlineConfig(SpeedlineConfigInstance instance) {
-            //FIXME - Sometimes the min/max doesn't set correctly
+            this.applySpeedlineConfig(instance, true);
+        }
+
+        public void applySpeedlineConfig(SpeedlineConfigInstance instance, boolean repeat) {
             this.maxSpawnTicks.requestSet(instance.maxSpawnTicks);
             this.minSpawnTicks.requestSet(instance.minSpawnTicks);
             this.maxSpawnCount.requestSet(instance.maxSpawnAmount);
@@ -1066,6 +956,11 @@ public class JetLagConfig {
             this.maxMoveAmountY.requestSet(instance.maxMoveAmountY);
             this.maxAge.requestSet(instance.maxAge);
             this.minAge.requestSet(instance.minAge);
+
+            if(repeat) {
+                //repeats to ensure options with min/max will be properly set
+                this.applySpeedlineConfig(instance, false);
+            }
         }
 
         public void buildOptions() {

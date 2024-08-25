@@ -28,6 +28,7 @@ public class CameraParticle extends SpriteBillboardParticle {
      */
     public CameraParticle(ClientWorld clientWorld, double x, double y, double z, double velX, double velY, double velZ) {
         super(clientWorld, x, y, z, velX, velY, velZ);
+        this.collidesWithWorld = false;
     }
 
     /**

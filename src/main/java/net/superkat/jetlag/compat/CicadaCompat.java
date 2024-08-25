@@ -11,7 +11,7 @@ public class CicadaCompat implements CicadaEntrypoint {
     public void registerConversations(ConversationManager conversationManager) {
         conversationManager.registerSource(
                 JsonSource.fromResource("cicada/jetlag/conversations.json"),
-                JetLagMain.LOGGER::info
+                str -> JetLagMain.LOGGER.info("[jetlag] " + str)
         );
     }
 }

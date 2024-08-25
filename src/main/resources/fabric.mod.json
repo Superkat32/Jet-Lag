@@ -12,7 +12,7 @@
 	},
 	"license": "MIT",
 	"icon": "assets/jetlag/icon.png",
-	"environment": "*",
+	"environment": "client",
 	"entrypoints": {
 		"main": [
 			"net.superkat.jetlag.JetLagMain"
