@@ -21,31 +21,19 @@
     "do_a_barrel_roll:flight_sim": {
       "lines": [
         {
-          "order": 1,
+          "order": 10,
           "text": "This is your pilot speaking - facts."
         }
       ]
     },
-    "jetlag:jetlagged": {
+    "jetlag:atc": {
       "priority": {
         "priority": 50
       },
       "lines": [
         {
           "order": 0,
-          "text": "\"I'm feeling jet-lagged!\""
-        },
-        {
-          "order": 1,
-          "text": "Ohhh he said the thing!"
-        },
-        {
-          "order": 2,
-          "text": "Oooohhh!!!"
-        },
-        {
-          "order": 3,
-          "text": "ooohhhh he said it!"
+          "text": "\"*Psst* Jet Lag Logger, caution for game-breaking bugs. Runway 18R, you are clear for take off! *Beep!* \""
         }
       ]
     }
