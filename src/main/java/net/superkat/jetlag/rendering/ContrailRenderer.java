@@ -4,7 +4,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
@@ -19,10 +18,8 @@ import net.superkat.jetlag.contrail.JetLagPlayer;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.spongepowered.include.com.google.common.collect.Lists;
-
 import java.awt.*;
 import java.util.List;
-
 import static net.superkat.jetlag.config.JetLagConfig.getInstance;
 
 public class ContrailRenderer {
@@ -44,12 +41,12 @@ public class ContrailRenderer {
                     .build(false)
     );
 
-    public static void airStreakWorldRendering(WorldRenderContext context) {
+    public static void contrailWorldRendering(WorldRenderContext context) {
         List<AbstractClientPlayerEntity> players = context.world().getPlayers();
-        for(AbstractClientPlayerEntity abstractPlayer : players) {
-            if(abstractPlayer instanceof ClientPlayerEntity player) {
-                renderContrails(player, context);
-            }
+        for(AbstractClientPlayerEntity player : players) {
+//            if(abstractPlayer instanceof ClientPlayerEntity player) {
+            renderContrails(player, context);
+//            }
         }
     }
 
@@ -58,7 +55,7 @@ public class ContrailRenderer {
      *
      * @param player Renders this player's existing contrails
      */
-    public static void renderContrails(ClientPlayerEntity player, WorldRenderContext context) {
+    public static void renderContrails(AbstractClientPlayerEntity player, WorldRenderContext context) {
         JetLagPlayer jetLagPlayer = (JetLagPlayer) player;
         List<Contrail> playerContrails = jetLagPlayer.jetlag$getContrails();
         playerContrails.forEach(contrail -> renderContrail(contrail, context));
@@ -386,71 +383,4 @@ public class ContrailRenderer {
         }
         return LightmapTextureManager.pack(7, 15);
     }
-
-    //All the methods beneath this comment have a 1% of actually working
-
-    private static void drawCube(MatrixStack matrixStack, BufferBuilder buffer, Vec3d origin, Vec3d target) {
-        Vec3d vec3d = target.subtract(origin);
-        float y = (float)(vec3d.length()); //needs to be calculated here
-        vec3d = vec3d.normalize();
-        float n = (float)Math.acos(vec3d.y);
-        float o = (float)Math.atan2(vec3d.z, vec3d.x);
-        matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees((1.5707964F - o) * 57.295776F));
-//        matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(n * 57.295776F));
-        float value = MathHelper.cos(1) * 0.2f; //multiplying here to reduce the size of the beam
-        Matrix4f matrix4f = matrixStack.peek().getPositionMatrix();
-
-        drawTopAndBottom(buffer, matrix4f, value, o, -value, -value, y, 1f);
-//        drawSides(buffer, matrix4f, value, value, -value, -value, y);
-//        drawEdges(buffer, matrix4f, value, value, -value, -value, y);
-    }
-
-    private static void drawEdges(BufferBuilder buffer, Matrix4f matrix, float x1, float z1, float x2, float z2, float y) {
-        //origin edge - Note: Has to be rendered in very specifically this order for some reason for both edges
-        buffer.vertex(matrix, x1, 0f, z1).color(1f, 1f, 1f, 1f).texture(1f, 1f).next();
-        buffer.vertex(matrix, x2, 0f, z1).color(1f, 1f, 1f, 1f).texture(1f, 1f).next();
-        buffer.vertex(matrix, x2, 0f, z2).color(1f, 1f, 1f, 1f).texture(1f, 1f).next();
-        buffer.vertex(matrix, x1, 0f, z2).color(1f, 1f, 1f, 1f).texture(1f, 1f).next();
-
-        //target pos edge
-        buffer.vertex(matrix, x1, y, z1).color(1f, 1f, 1f, 1f).texture(1f, 1f).next();
-        buffer.vertex(matrix, x2, y, z1).color(1f, 1f, 1f, 1f).texture(1f, 1f).next();
-        buffer.vertex(matrix, x2, y, z2).color(1f, 1f, 1f, 1f).texture(1f, 1f).next();
-        buffer.vertex(matrix, x1, y, z2).color(1f, 1f, 1f, 1f).texture(1f, 1f).next();
-
-    }
-
-    private static void drawSides(BufferBuilder buffer, Matrix4f matrix, float x1, float z1, float x2, float z2, float y) {
-        //left side(when facing north)
-        buffer.vertex(matrix, x1, y, z1).color(1f, 1f, 1f, 1f).texture(1f, 1f).next();
-        buffer.vertex(matrix, x1, 0.0F, z1).color(1f, 1f, 1f, 1f).texture(1f, 1f).next();
-        buffer.vertex(matrix, x1, 0.0F, z2).color(1f, 1f, 1f, 1f).texture(1f, 1f).next();
-        buffer.vertex(matrix, x1, y, z2).color(1f, 1f, 1f, 1f).texture(1f, 1f).next();
-
-        //right side(when facing north)
-        buffer.vertex(matrix, x2, y, z1).color(1f, 1f, 1f, 1f).texture(1f, 1f).next();
-        buffer.vertex(matrix, x2, 0.0F, z1).color(1f, 1f, 1f, 1f).texture(1f, 1f).next();
-        buffer.vertex(matrix, x2, 0.0F, z2).color(1f, 1f, 1f, 1f).texture(1f, 1f).next();
-        buffer.vertex(matrix, x2, y, z2).color(1f, 1f, 1f, 1f).texture(1f, 1f).next();
-    }
-
-    private static void drawTopAndBottom(BufferBuilder buffer, Matrix4f matrix, float x1, float z1, float x2, float z2, float y, float opacity) {
-        //top center
-        buffer.vertex(matrix, 0, 0, y).color(1f, 1f, 1f, opacity).texture(1f, 1f).next();
-        buffer.vertex(matrix, 0, 0, 0).color(1f, 1f, 1f, opacity).texture(1f, 1f).next();
-        buffer.vertex(matrix, x1, 0, 0).color(1f, 1f, 1f, opacity).texture(1f, 1f).next();
-        buffer.vertex(matrix, x1, 0, y).color(1f, 1f, 1f, opacity).texture(1f, 1f).next();
-
-//        buffer.vertex(matrix, 0, 0, 1).color(1f, 1f, 1f, opacity).texture(1f, 1f).next();
-//        buffer.vertex(matrix, 0, 0, 0).color(1f, 1f, 1f, opacity).texture(1f, 1f).next();
-//        buffer.vertex(matrix, 1, 0, 0).color(1f, 1f, 1f, opacity).texture(1f, 1f).next();
-//        buffer.vertex(matrix, 1, 0, 1).color(1f, 1f, 1f, opacity).texture(1f, 1f).next();
-
-        //bottom center
-//        buffer.vertex(matrix, x1, y, z2).color(1f, 1f, 1f, 1f).texture(1f, 1f).next();
-//        buffer.vertex(matrix, x1, 0.0F, z2).color(1f, 1f, 1f, 1f).texture(1f, 1f).next();
-//        buffer.vertex(matrix, x2, 0.0F, z2).color(1f, 1f, 1f, 1f).texture(1f, 1f).next();
-//        buffer.vertex(matrix, x2, y, z2).color(1f, 1f, 1f, 1f).texture(1f, 1f).next();
-    }
-
 }

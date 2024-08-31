@@ -121,6 +121,12 @@ public class CameraParticle extends SpriteBillboardParticle {
         return false;
     }
 
+    //Prevents speedlines from appearing very dark when in a world coordinate far from the player
+    @Override
+    protected int getBrightness(float tint) {
+        return 15728880;
+    }
+
     @Override
     public ParticleTextureSheet getType() {
         return ParticleTextureSheet.PARTICLE_SHEET_TRANSLUCENT;

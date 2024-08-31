@@ -168,6 +168,15 @@
 
 
 
+  "jetlag.category.extras": "Extras",
+  "jetlag.category.extras.tooltip": "Extra config options.",
+  "jetlag.extras.group": "Extras",
+  "jetlag.extras.group.tooltip": "The aforementioned extra config options.",
+  "jetlag.modenabled": "Mod Enabled",
+  "jetlag.modenabled.tooltip": "Determines if the mod should be enabled or not.",
+
+
+
   "jetlag.category.screen": "Screen VFXs",
   "jetlag.category.screen.tooltip": "Config options related to on-screen visual effects.",
   "jetlag.oldspeedlines.group": "Speedlines",

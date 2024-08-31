@@ -40,7 +40,7 @@ public class JetLagClient implements ClientModInitializer {
 
         //BEFORE_DEBUG_RENDER is called as closely to the particles being rendered as I can get with Fabric API.
         //In theory, no matrix stack changes should be made between the debug render and the particles render
-        WorldRenderEvents.BEFORE_DEBUG_RENDER.register(ContrailRenderer::airStreakWorldRendering);
+        WorldRenderEvents.BEFORE_DEBUG_RENDER.register(ContrailRenderer::contrailWorldRendering);
 
         ClientTickEvents.END_CLIENT_TICK.register(SpeedlineHandler::tickSpeedlines);
 //        HudRenderCallback.EVENT.register(SpeedlineRenderer::speedlineRendering);

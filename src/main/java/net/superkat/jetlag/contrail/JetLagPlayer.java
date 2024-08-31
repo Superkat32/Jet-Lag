@@ -1,13 +1,16 @@
 package net.superkat.jetlag.contrail;
 
 import org.jetbrains.annotations.Nullable;
-
 import java.util.List;
 
 public interface JetLagPlayer {
     //General
     boolean jetlag$rocketBoosting();
     void jetlag$setRocketBoosting(boolean boosting);
+
+    //Contrail technically but whatever
+    float jetlag$playerFakeElytraRoll();
+    void jetlag$setPlayerFakeElytraRoll(float roll);
 
     //Contrails
     List<Contrail> jetlag$getContrails();
@@ -17,10 +20,4 @@ public interface JetLagPlayer {
     void jetlag$removeAllContrails();
     void jetlag$endCurrentContrail();
     boolean jetlag$hasContrails();
-    int jetlag$pointTicks();
-    void jetlag$setPointTicks(int ticks);
-
-    //Wind lines
-    int jetlag$windLineTicks();
-    void jetlag$setWindLineTicks(int ticks);
 }

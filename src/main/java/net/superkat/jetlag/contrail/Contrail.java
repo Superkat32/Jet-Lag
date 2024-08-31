@@ -1,16 +1,15 @@
 package net.superkat.jetlag.contrail;
 
-import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 import net.superkat.jetlag.config.JetLagConfig;
 import org.spongepowered.include.com.google.common.collect.Lists;
-
 import java.util.List;
 
 public class Contrail {
-    public final ClientPlayerEntity player;
+    public final AbstractClientPlayerEntity player;
     public List<ContrailPos> contrailPoints = Lists.newArrayList();
     @Deprecated
     public List<Float> contrailOpacityAdjustments = Lists.newArrayList();
@@ -19,7 +18,7 @@ public class Contrail {
     public int deleteTicks = 10;
     public final Random random = Random.create();
 
-    public Contrail(ClientPlayerEntity player) {
+    public Contrail(AbstractClientPlayerEntity player) {
         this.player = player;
         this.maxPoints = JetLagConfig.getInstance().maxPoints;
     }

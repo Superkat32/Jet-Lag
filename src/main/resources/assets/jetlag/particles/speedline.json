@@ -1,5 +1,9 @@
 {
   "textures": [
-    "jetlag:speedline1"
+    "jetlag:speedline1",
+    "jetlag:speedline2",
+    "jetlag:speedline3",
+    "jetlag:speedline4",
+    "jetlag:speedline5"
   ]
 }

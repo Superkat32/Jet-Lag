@@ -58,7 +58,7 @@ public abstract class FireworkRocketEntityMixin {
             ci.cancel();
         }
 
-        //wind particles //FIXME - place this in ClientPlayerEntityMixin?
+        //wind particles
         if(getInstance().windGusts && self.age == 2 && this.shooter != null) {
             int windAmount = self.getWorld().random.nextBetween(4, 7);
             for (int i = 0; i < windAmount; i++) {

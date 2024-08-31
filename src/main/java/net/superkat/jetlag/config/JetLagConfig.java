@@ -93,6 +93,9 @@ public class JetLagConfig {
     @SerialEntry public Color speedlinesColor = Color.white;
     @SerialEntry public boolean onlyShowSpeedlinesInFirstPerson = true;
 
+    //extras
+    @SerialEntry public boolean modEnabled = true;
+
     public static Screen makeScreen(Screen parent) {
         return YetAnotherConfigLib.create(INSTANCE, (defaults, config, builder) -> {
 
@@ -776,6 +779,32 @@ public class JetLagConfig {
             particlesCategoryBuilder.group(windGroup.build());
             particlesCategoryBuilder.group(fireworkGroup.build());
 
+            var extrasCategoryBuilder = ConfigCategory.createBuilder()
+                    .name(Text.translatable("jetlag.category.extras"))
+                    .tooltip(Text.translatable("jetlag.category.extras.tooltip"));
+
+            var extrasGroup = OptionGroup.createBuilder()
+                    .name(Text.translatable("jetlag.extras.group"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("jetlag.extras.group.tooltip"))
+                            .build());
+
+            var modEnabled = Option.<Boolean>createBuilder()
+                    .name(Text.translatable("jetlag.modenabled"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("jetlag.modenabled.tooltip"))
+                            .build())
+                    .binding(
+                            defaults.modEnabled,
+                            () -> config.modEnabled,
+                            val -> config.modEnabled = val
+                    )
+                    .customController(opt -> new BooleanController(opt, BooleanController.TRUE_FALSE_FORMATTER, true))
+                    .build();
+
+            extrasGroup.option(modEnabled);
+            extrasCategoryBuilder.group(extrasGroup.build());
+
 //            var screenEffectsCategoryBuilder = ConfigCategory.createBuilder()
 //                    .name(Text.translatable("jetlag.category.screen"))
 //                    .tooltip(Text.translatable("jetlag.category.screen.tooltip"));
@@ -863,7 +892,8 @@ public class JetLagConfig {
                 .title(Text.translatable("jetlag.title"))
                 .category(contrailCategoryBuilder.build())
                     .category(speedlinesCategoryBuilder.build())
-                    .category(particlesCategoryBuilder.build());
+                    .category(particlesCategoryBuilder.build())
+                    .category(extrasCategoryBuilder.build());
 //                    .category(screenEffectsCategoryBuilder.build());
         }).generateScreen(parent);
     }
