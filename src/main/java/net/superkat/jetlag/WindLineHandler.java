@@ -10,22 +10,6 @@ import net.superkat.jetlag.particles.WindLineParticleEffect;
 
 public class WindLineHandler {
 
-//    public static void tickJetlagPlayer(ClientPlayerEntity player) {
-//        if(player.isFallFlying()) {
-//            //TODO - move most of this back into ClientPlayerEntityMixin because I don't like the way this looks
-//            JetLagPlayer jetLagPlayer = (JetLagPlayer) player;
-//            int windLineTicks = jetLagPlayer.jetlag$windLineTicks();
-//            windLineTicks--;
-//            jetLagPlayer.jetlag$setWindLineTicks(windLineTicks);
-//            if(windLineTicks <= 0) {
-//                spawnWindLineParticles(player);
-//                int max = (int) MathHelper.clamp(8 - (player.getVelocity().lengthSquared()), 3, 7);
-//                windLineTicks = player.getWorld().random.nextBetween(2, max);
-//                jetLagPlayer.jetlag$setWindLineTicks(windLineTicks);
-//            }
-//        }
-//    }
-
     public static void spawnWindLineParticles(LivingEntity entity) {
         JetLagConfig config = JetLagConfig.getInstance();
         if(!config.modEnabled) return;

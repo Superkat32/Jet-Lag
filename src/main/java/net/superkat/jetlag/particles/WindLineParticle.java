@@ -65,14 +65,6 @@ public class WindLineParticle extends SpriteBillboardParticle {
                 this.stretch -= 0.05f;
                 this.stretch *= 0.8f;
             }
-//            this.setSpriteForAge(this.spriteProvider);
-//            velocityX *= 1.025;
-//            velocityY *= 1.025;
-//            velocityZ *= 1.025;
-//            if(this.age >= this.maxAge * 0.85) {
-//                this.scale *= 0.92;
-//                this.alpha *= 0.90;
-//            }
             this.move(this.velocityX, this.velocityY, this.velocityZ);
         }
     }

@@ -31,7 +31,6 @@ public class SpeedlineRenderer {
             if(config.onlyShowSpeedlinesInFirstPerson && !client.options.getPerspective().isFirstPerson()) return;
 
 //            Identifier blank = new Identifier(JetLagMain.MOD_ID, "blank"); //debug texture for making the rainbow shader
-//            Identifier speedline = new Identifier(JetLagMain.MOD_ID, "speedlinemain");
 
             Color speedlinesColor = config.speedlinesColor;
             float alpha = speedlinesColor.getAlpha() / 255f;

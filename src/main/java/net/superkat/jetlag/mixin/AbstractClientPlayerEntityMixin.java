@@ -17,7 +17,6 @@ import java.util.List;
 
 @Mixin(AbstractClientPlayerEntity.class)
 public class AbstractClientPlayerEntityMixin implements JetLagPlayer {
-//    @Unique public List<Contrail> contrails = Lists.newArrayList();
     @Nullable @Unique
     public Contrail currentContrail = null;
     @Unique public int pointTicks = 0;
@@ -50,11 +49,6 @@ public class AbstractClientPlayerEntityMixin implements JetLagPlayer {
         return ContrailHandler.getPlayerContrail((AbstractClientPlayerEntity) (Object) this);
     }
 
-//    @Override
-//    public List<Contrail> jetlag$getContrails() {
-//        return contrails;
-//    }
-
     @Override
     public Contrail jetlag$getCurrentContrail() {
         return currentContrail;
@@ -66,13 +60,7 @@ public class AbstractClientPlayerEntityMixin implements JetLagPlayer {
         AbstractClientPlayerEntity self = (AbstractClientPlayerEntity) (Object) this;
         currentContrail = new Contrail(self);
         ContrailHandler.addPlayerContrail(self, currentContrail);
-//        ContrailHandler.contrails.put(self, currentContrail);
     }
-
-//    @Override @Deprecated
-//    public void jetlag$removeAllContrails() {
-//        contrails = Lists.newArrayList();
-//    }
 
     @Inject(
             method = "tick",
@@ -88,17 +76,6 @@ public class AbstractClientPlayerEntityMixin implements JetLagPlayer {
     private void jetlag$tickElytraRoll() {
         AbstractClientPlayerEntity player = (AbstractClientPlayerEntity) (Object) this;
         this.fakeElytraRoll = ContrailHandler.calculateElytraRoll(player);
-//        float l = (float) (-Math.PI / 12);
-//        if(player.isFallFlying()) {
-//            float o = 1.0F;
-//            Vec3d vec3d = player.getVelocity();
-//            if (vec3d.y < 0.0) {
-//                Vec3d vec3d2 = vec3d.normalize();
-//                o = 1.0F - (float)Math.pow(-vec3d2.y, 1.5);
-//            }
-//            l = o * (float) (-Math.PI / 2) + (1.0F - o) * l;
-//        }
-//        this.fakeElytraRoll += (l - this.fakeElytraRoll) * 0.1f;
     }
 
     @Unique
@@ -126,10 +103,6 @@ public class AbstractClientPlayerEntityMixin implements JetLagPlayer {
             //player has just landed
             jetlag$endCurrentContrail();
         }
-//
-//        for (Contrail contrail : jetlag$getContrails()) {
-//            contrail.tick();
-//        }
     }
 
     @Unique
@@ -152,29 +125,4 @@ public class AbstractClientPlayerEntityMixin implements JetLagPlayer {
             this.currentContrail = null;
         }
     }
-
-//    @Override
-//    public boolean jetlag$hasContrails() {
-//        return !contrails.isEmpty();
-//    }
-
-//    @Override
-//    public int jetlag$pointTicks() {
-//        return pointTicks;
-//    }
-//
-//    @Override
-//    public void jetlag$setPointTicks(int ticks) {
-//        this.pointTicks = ticks;
-//    }
-//
-//    @Override
-//    public int jetlag$windLineTicks() {
-//        return windLineTicks;
-//    }
-//
-//    @Override
-//    public void jetlag$setWindLineTicks(int ticks) {
-//        this.windLineTicks = ticks;
-//    }
 }

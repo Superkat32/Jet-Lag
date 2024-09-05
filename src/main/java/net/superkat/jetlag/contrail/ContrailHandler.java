@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 
 public class ContrailHandler {
-//    public static List<Contrail> contrails = Lists.newArrayList();
     public static Map<AbstractClientPlayerEntity, List<Contrail>> contrails = Maps.newHashMap();
 
     private static final float maxElytraRoll = 1.5707958f; //can probably be modified by other mods... hopefully shouldn't though
@@ -182,35 +181,6 @@ public class ContrailHandler {
         }
 
         return player.elytraRoll;
-
-        //checks if the player is the client's player and then checks if manual calculation should be done
-//        if(player instanceof ClientPlayerEntity && MinecraftClient.getInstance().options.getPerspective().isFirstPerson()) {
-//        boolean self = player instanceof ClientPlayerEntity;
-//        if(self) {
-//            if(!MinecraftClient.getInstance().options.getPerspective().isFirstPerson()) {
-//                return player.elytraRoll;
-//            }
-//        }
-//        return ((JetLagPlayer) player).jetlag$playerFakeElytraRoll();
-////        return player.elytraRoll - (self ? 0f : MinecraftClient.getInstance().getTickDelta());
-////        return -maxElytraRoll;
-////        return ((JetLagPlayer) player).jetlag$playerFakeElytraRoll();
-////            float l = (float) (-Math.PI / 12);
-////            float o = 1.0F;
-////            Vec3d vec3d = player.getVelocity();
-////            if (vec3d.y < 0.0) {
-////                Vec3d vec3d2 = vec3d.normalize();
-////                o = 1.0F - (float)Math.pow(-vec3d2.y, 1.5);
-////            }
-////            l = o * (float) (-Math.PI / 2) + (1.0F - o) * l;
-////            JetLagPlayer jetLagPlayer = (JetLagPlayer) player;
-////            float fakeElytraRoll = jetLagPlayer.jetlag$playerFakeElytraRoll();
-////            fakeElytraRoll += (l - fakeElytraRoll) * 0.1F;
-////            jetLagPlayer.jetlag$setPlayerFakeElytraRoll(fakeElytraRoll);
-////            return player.elytraRoll;
-////        } else {
-////            return player.elytraRoll;
-////        }
     }
 
     private static boolean shouldCalculateElytraRoll(AbstractClientPlayerEntity player) {

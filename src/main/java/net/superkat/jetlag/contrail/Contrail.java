@@ -11,8 +11,6 @@ import java.util.List;
 public class Contrail {
     public final AbstractClientPlayerEntity player;
     public List<ContrailPos> contrailPoints = Lists.newArrayList();
-    @Deprecated
-    public List<Float> contrailOpacityAdjustments = Lists.newArrayList();
     public int maxPoints;
     public boolean startDeletingPoints = false;
     public int deleteTicks = 10;

@@ -3,7 +3,6 @@ package net.superkat.jetlag.rendering;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
@@ -54,21 +53,9 @@ public class ContrailRenderer {
      * @param context The WorldRenderContext
      */
     public static void renderAllContrails(WorldRenderContext context) {
-//        ContrailHandler.contrails.forEach(contrail -> renderContrail(contrail, context));
         ContrailHandler.contrails.values().forEach(contrails -> {
             contrails.forEach(contrail -> renderContrail(contrail, context));
         });
-    }
-
-    /**
-     * Render a player's contrail's points.
-     *
-     * @param player Renders this player's existing contrails
-     */
-    public static void renderContrails(AbstractClientPlayerEntity player, WorldRenderContext context) {
-        JetLagPlayer jetLagPlayer = (JetLagPlayer) player;
-        List<Contrail> playerContrails = jetLagPlayer.jetlag$getContrails();
-        playerContrails.forEach(contrail -> renderContrail(contrail, context));
     }
 
     /**
