@@ -14,6 +14,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.LightType;
 import net.superkat.jetlag.JetLagMain;
 import net.superkat.jetlag.contrail.Contrail;
+import net.superkat.jetlag.contrail.ContrailHandler;
 import net.superkat.jetlag.contrail.JetLagPlayer;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
@@ -42,12 +43,21 @@ public class ContrailRenderer {
     );
 
     public static void contrailWorldRendering(WorldRenderContext context) {
-        List<AbstractClientPlayerEntity> players = context.world().getPlayers();
-        for(AbstractClientPlayerEntity player : players) {
-//            if(abstractPlayer instanceof ClientPlayerEntity player) {
-            renderContrails(player, context);
-//            }
+        if(getInstance().modEnabled) {
+            renderAllContrails(context);
         }
+    }
+
+    /**
+     * Render all the contrails from
+     *
+     * @param context The WorldRenderContext
+     */
+    public static void renderAllContrails(WorldRenderContext context) {
+//        ContrailHandler.contrails.forEach(contrail -> renderContrail(contrail, context));
+        ContrailHandler.contrails.values().forEach(contrails -> {
+            contrails.forEach(contrail -> renderContrail(contrail, context));
+        });
     }
 
     /**

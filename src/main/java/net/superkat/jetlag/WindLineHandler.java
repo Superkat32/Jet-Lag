@@ -27,8 +27,11 @@ public class WindLineHandler {
 //    }
 
     public static void spawnWindLineParticles(LivingEntity entity) {
+        JetLagConfig config = JetLagConfig.getInstance();
+        if(!config.modEnabled) return;
+
         if(entity instanceof ClientPlayerEntity) {
-            if(!JetLagConfig.getInstance().windLinesInFirstPerson && MinecraftClient.getInstance().options.getPerspective().isFirstPerson()) return;
+            if(!config.windLinesInFirstPerson && MinecraftClient.getInstance().options.getPerspective().isFirstPerson()) return;
         }
 
         int max = (int) Math.round(entity.getVelocity().lengthSquared()) + 2;

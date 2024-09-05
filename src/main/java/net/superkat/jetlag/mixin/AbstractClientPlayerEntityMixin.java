@@ -1,6 +1,5 @@
 package net.superkat.jetlag.mixin;
 
-import com.google.common.collect.Lists;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.util.math.MathHelper;
 import net.superkat.jetlag.WindLineHandler;
@@ -18,13 +17,13 @@ import java.util.List;
 
 @Mixin(AbstractClientPlayerEntity.class)
 public class AbstractClientPlayerEntityMixin implements JetLagPlayer {
-    public List<Contrail> contrails = Lists.newArrayList();
-    @Nullable
+//    @Unique public List<Contrail> contrails = Lists.newArrayList();
+    @Nullable @Unique
     public Contrail currentContrail = null;
-    public int pointTicks = 0;
-    public int windLineTicks = 20;
-    public boolean rocketBoosted = false;
-    public float fakeElytraRoll = 0f;
+    @Unique public int pointTicks = 0;
+    @Unique public int windLineTicks = 20;
+    @Unique public boolean rocketBoosted = false;
+    @Unique public float fakeElytraRoll = 0f;
 
     @Override
     public boolean jetlag$rocketBoosting() {
@@ -48,8 +47,13 @@ public class AbstractClientPlayerEntityMixin implements JetLagPlayer {
 
     @Override
     public List<Contrail> jetlag$getContrails() {
-        return contrails;
+        return ContrailHandler.getPlayerContrail((AbstractClientPlayerEntity) (Object) this);
     }
+
+//    @Override
+//    public List<Contrail> jetlag$getContrails() {
+//        return contrails;
+//    }
 
     @Override
     public Contrail jetlag$getCurrentContrail() {
@@ -59,14 +63,16 @@ public class AbstractClientPlayerEntityMixin implements JetLagPlayer {
     @Override
     public void jetlag$createContrail() {
         if(!JetLagConfig.getInstance().contrailsEnabled) return;
-        currentContrail = new Contrail((AbstractClientPlayerEntity) (Object) this);
-        contrails.add(currentContrail);
+        AbstractClientPlayerEntity self = (AbstractClientPlayerEntity) (Object) this;
+        currentContrail = new Contrail(self);
+        ContrailHandler.addPlayerContrail(self, currentContrail);
+//        ContrailHandler.contrails.put(self, currentContrail);
     }
 
-    @Override
-    public void jetlag$removeAllContrails() {
-        contrails = Lists.newArrayList();
-    }
+//    @Override @Deprecated
+//    public void jetlag$removeAllContrails() {
+//        contrails = Lists.newArrayList();
+//    }
 
     @Inject(
             method = "tick",
@@ -120,10 +126,10 @@ public class AbstractClientPlayerEntityMixin implements JetLagPlayer {
             //player has just landed
             jetlag$endCurrentContrail();
         }
-
-        for (Contrail contrail : jetlag$getContrails()) {
-            contrail.tick();
-        }
+//
+//        for (Contrail contrail : jetlag$getContrails()) {
+//            contrail.tick();
+//        }
     }
 
     @Unique
@@ -147,10 +153,10 @@ public class AbstractClientPlayerEntityMixin implements JetLagPlayer {
         }
     }
 
-    @Override
-    public boolean jetlag$hasContrails() {
-        return !contrails.isEmpty();
-    }
+//    @Override
+//    public boolean jetlag$hasContrails() {
+//        return !contrails.isEmpty();
+//    }
 
 //    @Override
 //    public int jetlag$pointTicks() {

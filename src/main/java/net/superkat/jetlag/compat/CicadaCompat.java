@@ -10,7 +10,8 @@ public class CicadaCompat implements CicadaEntrypoint {
     @Override
     public void registerConversations(ConversationManager conversationManager) {
         conversationManager.registerSource(
-                JsonSource.fromResource("cicada/jetlag/conversations.json"),
+                JsonSource.fromUrl("https://raw.githubusercontent.com/Superkat32/Jet-Lag/master/src/main/resources/cicada/jetlag/conversations.json")
+                        .or(JsonSource.fromResource("cicada/jetlag/conversations.json")),
                 str -> JetLagMain.LOGGER.info("[jetlag] " + str)
         );
     }

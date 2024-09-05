@@ -13,6 +13,7 @@ import dev.isxander.yacl3.gui.controllers.slider.IntegerSliderController;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.option.ParticlesMode;
 import net.minecraft.client.toast.SystemToast;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -20,6 +21,7 @@ import net.minecraft.util.Identifier;
 import net.superkat.jetlag.JetLagMain;
 import java.awt.*;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class JetLagConfig {
@@ -63,9 +65,12 @@ public class JetLagConfig {
     @SerialEntry public double contrailRightOffsetWidth = 1.45;
     @SerialEntry public double contrailRightOffsetHeight = 0.65;
     @SerialEntry public double contrailRightOffsetLength = 0.45;
+    @SerialEntry public double contrailLengthOffsetForFirstPerson = -0.50;
     @SerialEntry public int ticksPerPoint = 1;
     @SerialEntry public int contrailDeletionDelay = 1;
     @SerialEntry public int pointsDeletedPerDelay = 1;
+    @SerialEntry public boolean manualSelfRollCalc = true;
+    @SerialEntry public boolean manualOtherPlayerRollCalc = true;
 
     //speedlines
     @SerialEntry public boolean speedlinesEnabled = true;
@@ -87,7 +92,7 @@ public class JetLagConfig {
     @SerialEntry public boolean alwaysUseAltFireworkParticles = false;
 
     //screen VFX
-    @SerialEntry public boolean showSpeedlinesTexture = true;
+    @SerialEntry public boolean showSpeedlinesTexture = false;
     @SerialEntry public boolean velocityBasedSpeedlinesOpacity = true;
     @SerialEntry public boolean rainbowSpeedlines = false;
     @SerialEntry public Color speedlinesColor = Color.white;
@@ -191,6 +196,13 @@ public class JetLagConfig {
                     .customController(opt -> new ColorController(opt, true))
                     .build();
 
+            contrailCategoryBuilder.option(contrailsEnabled);
+            pointsGroup.option(maxPoints);
+            pointsGroup.option(fadeInPoints);
+            pointsGroup.option(fadeOutPoints);
+            pointsGroup.option(curvePoints);
+            pointsGroup.option(contrailColor);
+
             var widthAndOpacityGroup = OptionGroup.createBuilder()
                     .name(Text.translatable("jetlag.widthopacity.group"))
                     .description(OptionDescription.createBuilder()
@@ -263,6 +275,12 @@ public class JetLagConfig {
                     )
                     .customController(opt -> new BooleanController(opt, BooleanController.ON_OFF_FORMATTER, true))
                     .build();
+
+            widthAndOpacityGroup.option(contrailWidth);
+            widthAndOpacityGroup.option(contrailWidthAddition);
+            widthAndOpacityGroup.option(contrailOpacityAdjustment);
+            widthAndOpacityGroup.option(mirrorOpacity);
+            widthAndOpacityGroup.option(velocityBasedOpacityAdjust);
 
             var positionGroup = OptionGroup.createBuilder()
                     .name(Text.translatable("jetlag.position.group"))
@@ -375,6 +393,19 @@ public class JetLagConfig {
                     })
                     .build();
 
+            var firstPersonLengthOffset = Option.<Double>createBuilder()
+                    .name(Text.translatable("jetlag.firstpersoncontrailoffset"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("jetlag.firstpersoncontrailoffset.tooltip"), Text.of(""), Text.translatable("jetlag.firstpersoncontrailoffset.why"))
+                            .build())
+                    .binding(
+                            defaults.contrailLengthOffsetForFirstPerson,
+                            () -> config.contrailLengthOffsetForFirstPerson,
+                            val -> config.contrailLengthOffsetForFirstPerson = val
+                    )
+                    .customController(opt -> new DoubleSliderController(opt, -2, 2, 0.01))
+                    .build();
+
             positionGroup.option(mirrorContrailOffset);
             positionGroup.option(leftOffsetWidth);
             positionGroup.option(leftOffsetHeight);
@@ -382,6 +413,8 @@ public class JetLagConfig {
             positionGroup.option(rightOffsetWidth);
             positionGroup.option(rightOffsetHeight);
             positionGroup.option(rightOffsetLength);
+            positionGroup.option(LabelOption.create(Text.of("")));
+            positionGroup.option(firstPersonLengthOffset);
 
             var spawningAndDeletingGroup = OptionGroup.createBuilder()
                     .name(Text.translatable("jetlag.spawndelete.group"))
@@ -428,25 +461,50 @@ public class JetLagConfig {
                     .customController(opt -> new IntegerSliderController(opt, 1, 10, 1))
                     .build();
 
-            contrailCategoryBuilder.option(contrailsEnabled);
-            pointsGroup.option(maxPoints);
-            pointsGroup.option(fadeInPoints);
-            pointsGroup.option(fadeOutPoints);
-            pointsGroup.option(curvePoints);
-            pointsGroup.option(contrailColor);
-            widthAndOpacityGroup.option(contrailWidth);
-            widthAndOpacityGroup.option(contrailWidthAddition);
-            widthAndOpacityGroup.option(contrailOpacityAdjustment);
-            widthAndOpacityGroup.option(mirrorOpacity);
-            widthAndOpacityGroup.option(velocityBasedOpacityAdjust);
             spawningAndDeletingGroup.option(ticksPerPoint);
             spawningAndDeletingGroup.option(deleteDelay);
             spawningAndDeletingGroup.option(pointsPerDelete);
+
+            var calculationGroup = OptionGroup.createBuilder()
+                    .name(Text.translatable("jetlag.calculations.group"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("jetlag.calculations.group.tooltip"))
+                            .build());
+
+            var selfRollCalc = Option.<Boolean>createBuilder()
+                    .name(Text.translatable("jetlag.selfrollcalc"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("jetlag.selfrollcalc.tooltip"))
+                            .build())
+                    .binding(
+                            defaults.manualSelfRollCalc,
+                            () -> config.manualSelfRollCalc,
+                            val -> config.manualSelfRollCalc = val
+                    )
+                    .customController(opt -> new BooleanController(opt, BooleanController.ON_OFF_FORMATTER, true))
+                    .build();
+
+            var otherPlayerRollCalc = Option.<Boolean>createBuilder()
+                    .name(Text.translatable("jetlag.otherplayerrollcalc"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("jetlag.otherplayerrollcalc.tooltip"))
+                            .build())
+                    .binding(
+                            defaults.manualOtherPlayerRollCalc,
+                            () -> config.manualOtherPlayerRollCalc,
+                            val -> config.manualOtherPlayerRollCalc = val
+                    )
+                    .customController(opt -> new BooleanController(opt, BooleanController.ON_OFF_FORMATTER, true))
+                    .build();
+
+            calculationGroup.option(selfRollCalc);
+            calculationGroup.option(otherPlayerRollCalc);
 
             contrailCategoryBuilder.group(pointsGroup.build());
             contrailCategoryBuilder.group(widthAndOpacityGroup.build());
             contrailCategoryBuilder.group(positionGroup.build());
             contrailCategoryBuilder.group(spawningAndDeletingGroup.build());
+            contrailCategoryBuilder.group(calculationGroup.build());
 
             var speedlinesCategoryBuilder = ConfigCategory.createBuilder()
                     .name(Text.translatable("jetlag.category.speedlines"))
@@ -470,6 +528,13 @@ public class JetLagConfig {
                     )
                     .customController(opt -> new BooleanController(opt, BooleanController.ON_OFF_FORMATTER, true))
                     .build();
+
+            var speedlineParticleNotice = LabelOption.createBuilder().lines(
+                    Arrays.asList(Text.translatable("jetlag.category.speedlines.particlenotice"), Text.of(""),
+                            Text.translatable("jetlag.category.speedlines.particlenoticeparttwoelectricboogaloo",
+                                    MinecraftClient.getInstance().options.getParticles().getValue().getText().copy().formatted(Formatting.BOLD),
+                            Text.translatable(ParticlesMode.ALL.getTranslationKey()).formatted(Formatting.BOLD)))
+            ).build();
 
             var riptideEnablesRocket = Option.<Boolean>createBuilder()
                     .name(Text.translatable("jetlag.riptidemakesrocket"))
@@ -540,6 +605,7 @@ public class JetLagConfig {
                     .customController(opt -> new BooleanController(opt, BooleanController.YES_NO_FORMATTER, true))
                     .build();
 
+            speedlinesGeneralGroup.optionIf(!MinecraftClient.getInstance().options.getParticles().getValue().equals(ParticlesMode.ALL), speedlineParticleNotice);
             speedlinesGeneralGroup.option(speedlinesEnabled);
             speedlinesGeneralGroup.option(rocketSpeedlinesEnabled);
             speedlinesGeneralGroup.option(riptideEnablesRocket);
@@ -805,88 +871,96 @@ public class JetLagConfig {
             extrasGroup.option(modEnabled);
             extrasCategoryBuilder.group(extrasGroup.build());
 
-//            var screenEffectsCategoryBuilder = ConfigCategory.createBuilder()
-//                    .name(Text.translatable("jetlag.category.screen"))
-//                    .tooltip(Text.translatable("jetlag.category.screen.tooltip"));
-//
-//            var oldSpeedlinesGroup = OptionGroup.createBuilder()
-//                    .name(Text.translatable("jetlag.oldspeedlines.group"))
-//                    .description(OptionDescription.createBuilder()
-//                            .text(Text.translatable("jetlag.oldspeedlines.group.tooltip"))
-//                            .build());
-//
-//            var showSpeedlines = Option.<Boolean>createBuilder()
-//                    .name(Text.translatable("jetlag.showspeedlines"))
-//                    .description(OptionDescription.createBuilder()
-//                            .text(Text.translatable("jetlag.showspeedlines.tooltip"))
-//                            .build())
-//                    .binding(
-//                            defaults.showSpeedlinesTexture,
-//                            () -> config.showSpeedlinesTexture,
-//                            val -> config.showSpeedlinesTexture = val
-//                    )
-//                    .customController(opt -> new BooleanController(opt, BooleanController.ON_OFF_FORMATTER, true))
-//                    .build();
-//
-//            var velBasedSpeedlinesOpacity = Option.<Boolean>createBuilder()
-//                    .name(Text.translatable("jetlag.velspeedlinesopacity"))
-//                    .description(OptionDescription.createBuilder()
-//                            .text(Text.translatable("jetlag.velspeedlinesopacity.tooltip"))
-//                            .build())
-//                    .binding(
-//                            defaults.velocityBasedSpeedlinesOpacity,
-//                            () -> config.velocityBasedSpeedlinesOpacity,
-//                            val -> config.velocityBasedSpeedlinesOpacity = val
-//                    )
-//                    .customController(opt -> new BooleanController(opt, BooleanController.ON_OFF_FORMATTER, true))
-//                    .build();
-//
-//            var speedlinesColor = Option.<Color>createBuilder()
-//                    .name(Text.translatable("jetlag.speedlinescolor"))
-//                    .description(OptionDescription.createBuilder()
-//                            .text(Text.translatable("jetlag.speedlinescolor.tooltip"))
-//                            .build())
-//                    .binding(
-//                            defaults.speedlinesColor,
-//                            () -> config.speedlinesColor,
-//                            val -> config.speedlinesColor = val
-//                    )
-//                    .customController(opt -> new ColorController(opt, true))
-//                    .build();
-//
-//            var rainbowSpeedlines = Option.<Boolean>createBuilder()
-//                    .name(Text.translatable("jetlag.rainbowspeedlines"))
-//                    .description(OptionDescription.createBuilder()
-//                            .text(Text.translatable("jetlag.rainbowspeedlines.tooltip"))
-//                            .build())
-//                    .binding(
-//                            defaults.rainbowSpeedlines,
-//                            () -> config.rainbowSpeedlines,
-//                            val -> config.rainbowSpeedlines = val
-//                    )
-//                    .customController(opt -> new BooleanController(opt, BooleanController.ON_OFF_FORMATTER, true))
-//                    .build();
-//
-//            var onlyFirstPersonSpeedlines = Option.<Boolean>createBuilder()
-//                    .name(Text.translatable("jetlag.firstpersonspeedlines"))
-//                    .description(OptionDescription.createBuilder()
-//                            .text(Text.translatable("jetlag.firstpersonspeedlines.tooltip"))
-//                            .build())
-//                    .binding(
-//                            defaults.onlyShowSpeedlinesInFirstPerson,
-//                            () -> config.onlyShowSpeedlinesInFirstPerson,
-//                            val -> config.onlyShowSpeedlinesInFirstPerson = val
-//                    )
-//                    .customController(opt -> new BooleanController(opt, BooleanController.TRUE_FALSE_FORMATTER, true))
-//                    .build();
-//
-//            oldSpeedlinesGroup.option(showSpeedlines);
-//            oldSpeedlinesGroup.option(velBasedSpeedlinesOpacity);
-//            oldSpeedlinesGroup.option(speedlinesColor);
-//            oldSpeedlinesGroup.option(rainbowSpeedlines);
-//            oldSpeedlinesGroup.option(onlyFirstPersonSpeedlines);
-//
-//            screenEffectsCategoryBuilder.group(oldSpeedlinesGroup.build());
+            var oldSpeedlinesGroup = OptionGroup.createBuilder()
+                    .name(Text.translatable("jetlag.oldspeedlines.group"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("jetlag.oldspeedlines.group.tooltip"), Text.of(""), Text.translatable("jetlag.deprecatedwarning"))
+                            .build())
+                    .collapsed(true);
+
+            var showSpeedlines = Option.<Boolean>createBuilder()
+                    .name(Text.translatable("jetlag.showspeedlines"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("jetlag.showspeedlines.tooltip"), Text.of(""), Text.translatable("jetlag.deprecatedwarning"))
+                            .build())
+                    .binding(
+                            defaults.showSpeedlinesTexture,
+                            () -> config.showSpeedlinesTexture,
+                            val -> config.showSpeedlinesTexture = val
+                    )
+                    .customController(opt -> new BooleanController(opt, BooleanController.ON_OFF_FORMATTER, true))
+                    .build();
+
+            var velBasedSpeedlinesOpacity = Option.<Boolean>createBuilder()
+                    .name(Text.translatable("jetlag.velspeedlinesopacity"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("jetlag.velspeedlinesopacity.tooltip"))
+                            .build())
+                    .binding(
+                            defaults.velocityBasedSpeedlinesOpacity,
+                            () -> config.velocityBasedSpeedlinesOpacity,
+                            val -> config.velocityBasedSpeedlinesOpacity = val
+                    )
+                    .customController(opt -> new BooleanController(opt, BooleanController.ON_OFF_FORMATTER, true))
+                    .available(config.showSpeedlinesTexture)
+                    .build();
+
+            var speedlinesColor = Option.<Color>createBuilder()
+                    .name(Text.translatable("jetlag.speedlinescolor"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("jetlag.speedlinescolor.tooltip"))
+                            .build())
+                    .binding(
+                            defaults.speedlinesColor,
+                            () -> config.speedlinesColor,
+                            val -> config.speedlinesColor = val
+                    )
+                    .customController(opt -> new ColorController(opt, true))
+                    .available(config.showSpeedlinesTexture)
+                    .build();
+
+            var rainbowSpeedlines = Option.<Boolean>createBuilder()
+                    .name(Text.translatable("jetlag.rainbowspeedlines"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("jetlag.rainbowspeedlines.tooltip"))
+                            .build())
+                    .binding(
+                            defaults.rainbowSpeedlines,
+                            () -> config.rainbowSpeedlines,
+                            val -> config.rainbowSpeedlines = val
+                    )
+                    .customController(opt -> new BooleanController(opt, BooleanController.ON_OFF_FORMATTER, true))
+                    .available(config.showSpeedlinesTexture)
+                    .build();
+
+            var onlyFirstPersonSpeedlines = Option.<Boolean>createBuilder()
+                    .name(Text.translatable("jetlag.firstpersonspeedlines"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("jetlag.firstpersonspeedlines.tooltip"))
+                            .build())
+                    .binding(
+                            defaults.onlyShowSpeedlinesInFirstPerson,
+                            () -> config.onlyShowSpeedlinesInFirstPerson,
+                            val -> config.onlyShowSpeedlinesInFirstPerson = val
+                    )
+                    .customController(opt -> new BooleanController(opt, BooleanController.TRUE_FALSE_FORMATTER, true))
+                    .available(config.showSpeedlinesTexture)
+                    .build();
+
+            showSpeedlines.addListener((opt, value) -> {
+                velBasedSpeedlinesOpacity.setAvailable(value);
+                speedlinesColor.setAvailable(value);
+                rainbowSpeedlines.setAvailable(value);
+                onlyFirstPersonSpeedlines.setAvailable(value);
+            });
+
+            oldSpeedlinesGroup.option(showSpeedlines);
+            oldSpeedlinesGroup.option(velBasedSpeedlinesOpacity);
+            oldSpeedlinesGroup.option(speedlinesColor);
+            oldSpeedlinesGroup.option(rainbowSpeedlines);
+            oldSpeedlinesGroup.option(onlyFirstPersonSpeedlines);
+
+            extrasCategoryBuilder.group(oldSpeedlinesGroup.build());
 
             return builder
                 .title(Text.translatable("jetlag.title"))

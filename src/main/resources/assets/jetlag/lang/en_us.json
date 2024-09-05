@@ -44,6 +44,9 @@
   "jetlag.heightoffset.tooltip": "The offset in the y axis(up or down).",
   "jetlag.lengthoffset": "Z Offset",
   "jetlag.lengthoffset.tooltip": "The offset in the z axis(towards or away from the player's feet).",
+  "jetlag.firstpersoncontrailoffset": "First Person Z Offset",
+  "jetlag.firstpersoncontrailoffset.tooltip": "An extra offset specifically in the Z axis for when you are flying in first person. This offset only applies to your contrails.",
+  "jetlag.firstpersoncontrailoffset.why": "This is helpful for keeping the contrails spawning position behind the camera instead of right in front of the camera.",
 
   "jetlag.spawndelete.group": "Points Spawning & Deleting",
   "jetlag.spawndelete.group.tooltip": "Config options related to spawning and deleting points",
@@ -54,11 +57,19 @@
   "jetlag.pointsperdelete": "Points Deleted Per Deletion",
   "jetlag.pointsperdelete.tooltip": "The amount of points deleted per delete delay ticks.",
 
+  "jetlag.calculations.group": "Calculations",
+  "jetlag.calculations.group.tooltip": "Config options related to specific calculations.",
+  "jetlag.selfrollcalc": "Calculate Self Elytra Wing Roll",
+  "jetlag.selfrollcalc.tooltip": "Minecraft does not update your player's elytra wing roll when in first person. Turning this option on will manually calculate your player's elytra wing roll, providing a more accurate contrail path when flying in first person.",
+  "jetlag.otherplayerrollcalc": "Calculate Other Player's Elytra Wing Roll",
+  "jetlag.otherplayerrollcalc.tooltip": "Minecraft does not update other player's elytra wing roll when their player model is not actively being rendered. Turning this option on will manually calculate other players' elytra wing roll(technically at all times), providing a more accurate contrail path when they are flying.",
+
 
 
   "jetlag.category.speedlines": "Speedlines",
   "jetlag.category.speedlines.tooltip": "Config options related to speedlines.",
-  "jetlag.category.speedlines.wipwarning": "§6Notice§r: This feature is a Work In Progress! Things may change in the future!",
+  "jetlag.category.speedlines.particlenotice": "§6Notice§r: The speedlines effect uses particles! Setting your particle visibility to a lower value may hide the speedlines!",
+  "jetlag.category.speedlines.particlenoticeparttwoelectricboogaloo": "Current particle visibility: %1$s. Setting it to %2$s is recommended!",
   "jetlag.speedlinesgeneral.group": "General",
   "jetlag.speedlinesgeneral.group.tooltip": "Config options related to general speedlines behaviour.",
   "jetlag.speedlinesenabled": "Speedlines",
@@ -153,7 +164,7 @@
   "jetlag.windlinescolor": "Wind Lines Color",
   "jetlag.windlinescolor.tooltip": "The color of the wind lines.",
   "jetlag.firstpersonwindlines": "Show Wind Lines In First Person",
-  "jetlag.firstpersonwindlines.tooltip": "Spawn the wind lines while in first person.",
+  "jetlag.firstpersonwindlines.tooltip": "Spawn the wind lines for your player while in first person.",
   "jetlag.windgusts": "Elytra Wind Gusts",
   "jetlag.windgusts.tooltip": "Shows wind gusts after using a firework rocket whilst flying.",
   "jetlag.mcwindgusts": "Use Minecraft's Wind Gust",
@@ -179,9 +190,9 @@
 
   "jetlag.category.screen": "Screen VFXs",
   "jetlag.category.screen.tooltip": "Config options related to on-screen visual effects.",
-  "jetlag.oldspeedlines.group": "Speedlines",
-  "jetlag.oldspeedlines.group.tooltip": "Config options related to speedlines.",
-  "jetlag.showspeedlines": "Screen Speedlines",
+  "jetlag.oldspeedlines.group": "(Deprecated) Screen Speedlines",
+  "jetlag.oldspeedlines.group.tooltip": "An alternative speedline effect which uses an animation instead of particles. This was the original speedline effect before being replaced in favor of the speedline particles, but has been left in the mod in case others wish for an alternative effect.",
+  "jetlag.showspeedlines": "(Deprecated) Screen Speedlines",
   "jetlag.showspeedlines.tooltip": "On-screen speedlines to help give a feeling of speed.",
   "jetlag.velspeedlinesopacity": "Velocity Based Opacity Adjustment",
   "jetlag.velspeedlinesopacity.tooltip": "The opacity of the speedlines effect is determined by your velocity. If enabled, this option overrides the opacity value of the speedlines' color.",
@@ -197,5 +208,6 @@
   "jetlag.lagwarning": "§cWarning§r: Setting this option to a high number may cause lag!",
   "jetlag.superlagwarning": "§c§lWARNING§r: Setting this option to a high number will likely cause lag!!!",
   "jetlag.artifactwarning": "§6Warning§r: Settings this option to a high number may cause rendering artifacts, such as opacity overlapping. This does NOT cause any performance issues, but may look slightly odd in small spots of the contrail.",
-  "jetlag.motionwarning": "§6Warning§r: Setting this option to a high number may cause motion sickness if you are sensitive to high amounts of motion!"
+  "jetlag.motionwarning": "§6Warning§r: Setting this option to a high number may cause motion sickness if you are sensitive to high amounts of motion!",
+  "jetlag.deprecatedwarning": "§6Warning§r: This feature is old, and is unlikely to receive bug fixes. It has been left in mostly as a fun gimmick rather than an actual feature."
 }

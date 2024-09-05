@@ -7,7 +7,7 @@ in vec2 UV0;
 uniform vec2 OutSize;
 
 uniform mat4 ProjMat;
-uniform mat4 ModelViewMat;
+//uniform mat4 ModelViewMat;
 
 out vec2 texCoord0;
 out vec2 uv;

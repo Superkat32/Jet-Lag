@@ -16,6 +16,9 @@ public class SpeedlineHandler {
     public static double y = 0;
 
     public static void tickSpeedlines(MinecraftClient client) {
+        JetLagConfig config = JetLagConfig.getInstance();
+        if(!config.modEnabled) return;
+
         if(client.world != null && client.player != null && ContrailHandler.shouldTick()) {
             ClientPlayerEntity player = client.player;
 
@@ -33,8 +36,8 @@ public class SpeedlineHandler {
                 if(!JetLagConfig.getInstance().speedlinesEnabled) return;
 
                 JetLagPlayer jetLagPlayer = (JetLagPlayer) player;
-                boolean rocketBoosted = jetLagPlayer.jetlag$rocketBoosting() || (JetLagConfig.getInstance().riptideMakesRocket && player.isUsingRiptide());
-                speedlineTicks = addSpeedline(player, rocketBoosted && JetLagConfig.getInstance().rocketSpeedlinesEnabled);
+                boolean rocketBoosted = jetLagPlayer.jetlag$rocketBoosting() || (config.riptideMakesRocket && player.isUsingRiptide());
+                speedlineTicks = addSpeedline(player, rocketBoosted && config.rocketSpeedlinesEnabled);
             }
         }
     }

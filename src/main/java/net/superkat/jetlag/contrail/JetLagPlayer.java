@@ -17,7 +17,5 @@ public interface JetLagPlayer {
     @Nullable
     Contrail jetlag$getCurrentContrail();
     void jetlag$createContrail();
-    void jetlag$removeAllContrails();
     void jetlag$endCurrentContrail();
-    boolean jetlag$hasContrails();
 }

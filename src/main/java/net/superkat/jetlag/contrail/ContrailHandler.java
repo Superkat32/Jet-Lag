@@ -1,53 +1,58 @@
 package net.superkat.jetlag.contrail;
 
+import com.google.common.collect.Maps;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
+import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.superkat.jetlag.JetLagClient;
 import net.superkat.jetlag.compat.DABRCompat;
 import net.superkat.jetlag.config.JetLagConfig;
 import net.superkat.jetlag.contrail.Contrail.ContrailPos;
+import org.apache.commons.compress.utils.Lists;
 import org.joml.Quaterniond;
 import org.joml.Vector3d;
+import java.util.List;
+import java.util.Map;
 
 public class ContrailHandler {
-    private static final float maxElytraRoll = 1.5707958f; //can probably be modified by other mods... hopefully shouldn't though
-    public static float fakePlayerElytraRoll = 0f;
+//    public static List<Contrail> contrails = Lists.newArrayList();
+    public static Map<AbstractClientPlayerEntity, List<Contrail>> contrails = Maps.newHashMap();
 
-//    public static void tickJetlagPlayer(ClientPlayerEntity player) {
-//        //TODO - move most of this back into ClientPlayerEntityMixin because I don't like the way this looks
-//        JetLagPlayer jetLagPlayer = (JetLagPlayer) player;
-//        Contrail currentContrail = jetLagPlayer.jetlag$getCurrentContrail();
-//
-//        //if player is flying with an elytra
-//        if(player.isFallFlying()) {
-//            //tick current contrail
-//            if(currentContrail != null) {
-//                //adds new points to the current contrail
-//                if (JetLagConfig.getInstance().contrailsEnabled && shouldTick()) {
-//                    int pointTicks = jetLagPlayer.jetlag$pointTicks();
-//                    jetLagPlayer.jetlag$setPointTicks(pointTicks--);
-//                    if(pointTicks <= 0) {
-//                        currentContrail.addPoint();
-//                        jetLagPlayer.jetlag$setPointTicks(JetLagConfig.getInstance().ticksPerPoint);
-//                    }
-//                }
-//            } else {
-//                //no current contrail exists yet
-//                jetLagPlayer.jetlag$createContrail();
-//            }
-//        } else if(currentContrail != null) {
-//            //player has just landed
-//            jetLagPlayer.jetlag$endCurrentContrail();
-//        }
-//
-//        for (Contrail contrail : jetLagPlayer.jetlag$getContrails()) {
-//            contrail.tick();
-//        }
-//    }
+    private static final float maxElytraRoll = 1.5707958f; //can probably be modified by other mods... hopefully shouldn't though
+
+    public static List<Contrail> getPlayerContrail(AbstractClientPlayerEntity player) {
+        return contrails.getOrDefault(player, Lists.newArrayList());
+    }
+
+    public static void addPlayerContrail(AbstractClientPlayerEntity player, Contrail contrail) {
+        List<Contrail> playerContrails = getPlayerContrail(player);
+        playerContrails.add(contrail);
+        contrails.put(player, playerContrails);
+    }
+
+    public static void tickContrails(ClientWorld world) {
+        if(JetLagConfig.getInstance().modEnabled) {
+            contrails.values().forEach(contrailList -> {
+                contrailList.forEach(Contrail::tick);
+            });
+        } else if (!contrails.isEmpty()) {
+            removeAllContrails();
+        }
+
+    }
+
+    public static void removeAllContrails() {
+        contrails.clear();
+    }
+
+    public static void onDisconnect(ClientPlayNetworkHandler handler, MinecraftClient client) {
+        removeAllContrails();
+    }
 
     /**
      * @return If the contrails tick(add/delete points)
@@ -66,21 +71,28 @@ public class ContrailHandler {
      * @see Contrail#addPoint()
      */
     public static ContrailPos getContrailPos(AbstractClientPlayerEntity player) {
-        double yaw = player.getYaw(MinecraftClient.getInstance().getTickDelta());
-        double pitch = player.getPitch(MinecraftClient.getInstance().getTickDelta());
+        MinecraftClient client = MinecraftClient.getInstance();
+        float delta = client.getTickDelta();
+        double yaw = player.getYaw(delta);
+        double pitch = player.getPitch(delta);
         double yawRadians = Math.toRadians(yaw);
         double pitchRadians = Math.toRadians(pitch);
-        double rollRadians = getPlayerRoll(player, MinecraftClient.getInstance().getTickDelta());
-        float delta = MinecraftClient.getInstance().getTickDelta();
+        double rollRadians = getPlayerRoll(player, delta);
 
         double elytraWingOffset = -getElytraRoll(player) / maxElytraRoll;
 
         JetLagConfig config = JetLagConfig.getInstance();
+
+        double extraLength = 0;
+        if(player instanceof ClientPlayerEntity && client.options.getPerspective().isFirstPerson()) {
+            extraLength = config.contrailLengthOffsetForFirstPerson;
+        }
+
         double leftWidth = config.contrailLeftOffsetWidth;
-        double leftLength = config.contrailLeftOffsetLength;
+        double leftLength = config.contrailLeftOffsetLength + extraLength;
         double leftHeight = config.contrailLeftOffsetHeight;
         double rightWidth = config.mirrorContrailOffset ? leftWidth : config.contrailRightOffsetWidth;
-        double rightLength = config.mirrorContrailOffset ? leftLength : config.contrailRightOffsetLength;
+        double rightLength = config.mirrorContrailOffset ? leftLength : config.contrailRightOffsetLength + extraLength;
         double rightHeight = config.mirrorContrailOffset ? leftHeight : config.contrailRightOffsetHeight;
 
         Vec3d lerpedVel = player.lerpVelocity(delta);
@@ -165,39 +177,61 @@ public class ContrailHandler {
      * @return The player's elytra wing roll
      */
     public static float getElytraRoll(AbstractClientPlayerEntity player) {
+        if(shouldCalculateElytraRoll(player)) {
+            return ((JetLagPlayer) player).jetlag$playerFakeElytraRoll();
+        }
+
+        return player.elytraRoll;
+
         //checks if the player is the client's player and then checks if manual calculation should be done
 //        if(player instanceof ClientPlayerEntity && MinecraftClient.getInstance().options.getPerspective().isFirstPerson()) {
+//        boolean self = player instanceof ClientPlayerEntity;
+//        if(self) {
+//            if(!MinecraftClient.getInstance().options.getPerspective().isFirstPerson()) {
+//                return player.elytraRoll;
+//            }
+//        }
+//        return ((JetLagPlayer) player).jetlag$playerFakeElytraRoll();
+////        return player.elytraRoll - (self ? 0f : MinecraftClient.getInstance().getTickDelta());
+////        return -maxElytraRoll;
+////        return ((JetLagPlayer) player).jetlag$playerFakeElytraRoll();
+////            float l = (float) (-Math.PI / 12);
+////            float o = 1.0F;
+////            Vec3d vec3d = player.getVelocity();
+////            if (vec3d.y < 0.0) {
+////                Vec3d vec3d2 = vec3d.normalize();
+////                o = 1.0F - (float)Math.pow(-vec3d2.y, 1.5);
+////            }
+////            l = o * (float) (-Math.PI / 2) + (1.0F - o) * l;
+////            JetLagPlayer jetLagPlayer = (JetLagPlayer) player;
+////            float fakeElytraRoll = jetLagPlayer.jetlag$playerFakeElytraRoll();
+////            fakeElytraRoll += (l - fakeElytraRoll) * 0.1F;
+////            jetLagPlayer.jetlag$setPlayerFakeElytraRoll(fakeElytraRoll);
+////            return player.elytraRoll;
+////        } else {
+////            return player.elytraRoll;
+////        }
+    }
+
+    private static boolean shouldCalculateElytraRoll(AbstractClientPlayerEntity player) {
+        JetLagConfig config = JetLagConfig.getInstance();
         boolean self = player instanceof ClientPlayerEntity;
         if(self) {
-            if(!MinecraftClient.getInstance().options.getPerspective().isFirstPerson()) {
-                return player.elytraRoll;
+            if(config.manualSelfRollCalc && MinecraftClient.getInstance().options.getPerspective().isFirstPerson()) {
+                return true;
             }
+        } else if(config.manualOtherPlayerRollCalc){
+            return true;
         }
-        //TODO - move contrails from player to common list maybe in here
-        //TODO - add config option for custom calculation of elytra roll if player is visible
-        return ((JetLagPlayer) player).jetlag$playerFakeElytraRoll();
-//        return player.elytraRoll - (self ? 0f : MinecraftClient.getInstance().getTickDelta());
-//        return -maxElytraRoll;
-//        return ((JetLagPlayer) player).jetlag$playerFakeElytraRoll();
-//            float l = (float) (-Math.PI / 12);
-//            float o = 1.0F;
-//            Vec3d vec3d = player.getVelocity();
-//            if (vec3d.y < 0.0) {
-//                Vec3d vec3d2 = vec3d.normalize();
-//                o = 1.0F - (float)Math.pow(-vec3d2.y, 1.5);
-//            }
-//            l = o * (float) (-Math.PI / 2) + (1.0F - o) * l;
-//            JetLagPlayer jetLagPlayer = (JetLagPlayer) player;
-//            float fakeElytraRoll = jetLagPlayer.jetlag$playerFakeElytraRoll();
-//            fakeElytraRoll += (l - fakeElytraRoll) * 0.1F;
-//            jetLagPlayer.jetlag$setPlayerFakeElytraRoll(fakeElytraRoll);
-//            return player.elytraRoll;
-//        } else {
-//            return player.elytraRoll;
-//        }
+        return false;
     }
 
     public static float calculateElytraRoll(AbstractClientPlayerEntity player) {
+
+        if(!shouldCalculateElytraRoll(player)) {
+            return player.elytraRoll;
+        }
+
         float l = (float) (-Math.PI / 12);
         if(player.isFallFlying()) {
             float o = 1.0F;
