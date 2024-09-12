@@ -71,7 +71,12 @@ public class ContrailHandler {
      */
     public static ContrailPos getContrailPos(AbstractClientPlayerEntity player) {
         MinecraftClient client = MinecraftClient.getInstance();
-        float delta = client.getTickDelta();
+        float delta =
+                //? if (>=1.21) {
+                client.getRenderTickCounter().getTickDelta(true);
+                //?} else {
+//                client.getTickDelta();
+                //?}
         double yaw = player.getYaw(delta);
         double pitch = player.getPitch(delta);
         double yawRadians = Math.toRadians(yaw);
@@ -129,7 +134,6 @@ public class ContrailHandler {
      * @see DABRCompat
      */
     public static double getPlayerRoll(AbstractClientPlayerEntity player, float tickDelta) {
-        MinecraftClient.getInstance().getTickDelta();
         boolean DABRLoaded = JetLagClient.DABRLoaded();
         double roll = 0;
 
@@ -205,7 +209,13 @@ public class ContrailHandler {
         float l = (float) (-Math.PI / 12);
         if(player.isFallFlying()) {
             float o = 1.0F;
-            Vec3d vec3d = player.lerpVelocity(MinecraftClient.getInstance().getTickDelta());
+            float tickDelta =
+                    //? if (>=1.21) {
+                    MinecraftClient.getInstance().getRenderTickCounter().getTickDelta(true);
+                    //?} else {
+//                MinecraftClient.getInstance().getTickDelta();
+                    //?}
+            Vec3d vec3d = player.lerpVelocity(tickDelta);
             if (vec3d.y < 0.0) {
                 Vec3d vec3d2 = vec3d.normalize();
                 o = 1.0F - (float)Math.pow(-vec3d2.y, 1.5);

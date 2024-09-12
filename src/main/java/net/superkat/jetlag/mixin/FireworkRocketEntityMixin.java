@@ -5,9 +5,9 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.projectile.FireworkRocketEntity;
-import net.minecraft.particle.DefaultParticleType;
+import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
-import net.superkat.jetlag.JetLagMain;
+import net.superkat.jetlag.JetLagParticles;
 import net.superkat.jetlag.config.JetLagConfig;
 import net.superkat.jetlag.contrail.JetLagPlayer;
 import org.jetbrains.annotations.Nullable;
@@ -33,7 +33,11 @@ public abstract class FireworkRocketEntityMixin {
         }
     }
 
-    @Inject(method = "handleStatus", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/projectile/FireworkRocketEntity;hasExplosionEffects()Z"))
+    //? if (<=1.20.4) {
+    /*@Inject(method = "handleStatus", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/projectile/FireworkRocketEntity;hasExplosionEffects()Z"))
+    *///?} else {
+    @Inject(method = "handleStatus", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;addFireworkParticle(DDDDDDLjava/util/List;)V"))
+    //?}
     public void jetlag$removePlayerRocketBoosting(byte status, CallbackInfo ci) {
         if(this.shooter != null) {
             if(this.shooter instanceof ClientPlayerEntity player) {
@@ -65,7 +69,7 @@ public abstract class FireworkRocketEntityMixin {
         if(config.windGusts && self.age == 2 && this.shooter != null) {
             int windAmount = self.getWorld().random.nextBetween(4, 7);
             for (int i = 0; i < windAmount; i++) {
-                DefaultParticleType windParticle = getWindParticleType();
+                ParticleEffect windParticle = getWindParticleType();
                 self.getWorld().addParticle(windParticle, self.getX() + self.getWorld().random.nextBetween(-2, 2), self.getY() + self.getWorld().random.nextBetween(-2, 2), self.getZ() + self.getWorld().random.nextBetween(-2, 2), self.getWorld().random.nextGaussian() * 0.07, self.getVelocity().y * 0.7, self.getWorld().random.nextGaussian() * 0.07);
             }
         }
@@ -74,16 +78,16 @@ public abstract class FireworkRocketEntityMixin {
     @Unique
     private void spawnAltFireworkParticles(float xzVelAdjust, float yVelAdjust) {
         FireworkRocketEntity self = (FireworkRocketEntity) (Object) this;
-        self.getWorld().addParticle(JetLagMain.FIREWORKPARTICLE, self.getX(), self.getY(), self.getZ(), self.getWorld().random.nextGaussian() * xzVelAdjust, self.getVelocity().y * yVelAdjust, self.getWorld().random.nextGaussian() * xzVelAdjust);
+        self.getWorld().addParticle(JetLagParticles.FIREWORKPARTICLE, self.getX(), self.getY(), self.getZ(), self.getWorld().random.nextGaussian() * xzVelAdjust, self.getVelocity().y * yVelAdjust, self.getWorld().random.nextGaussian() * xzVelAdjust);
     }
 
     @Unique
-    private DefaultParticleType getWindParticleType() {
+    private ParticleEffect getWindParticleType() {
         FireworkRocketEntity self = (FireworkRocketEntity) (Object) this;
         if(JetLagConfig.getInstance().useMinecraftWindGusts) {
             return ParticleTypes.GUST;
         }
-        int wind = self.getWorld().random.nextBetween(0, JetLagMain.windParticles.size() - 1);
-        return JetLagMain.windParticles.get(wind);
+        int wind = self.getWorld().random.nextBetween(0, JetLagParticles.windParticles.size() - 1);
+        return JetLagParticles.windParticles.get(wind);
     }
 }

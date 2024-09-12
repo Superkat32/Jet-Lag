@@ -28,20 +28,30 @@ public class JetLagClient implements ClientModInitializer {
     public void onInitializeClient() {
 //        JetLagConfig.INSTANCE.load();
 
-        ParticleFactoryRegistry.getInstance().register(JetLagMain.FIREWORKPARTICLE, FireworkParticle.Factory::new);
-        ParticleFactoryRegistry.getInstance().register(JetLagMain.WIND1, WindParticle.Factory::new);
-        ParticleFactoryRegistry.getInstance().register(JetLagMain.WIND2, WindParticle.Factory::new);
-        ParticleFactoryRegistry.getInstance().register(JetLagMain.WIND3, WindParticle.Factory::new);
-        ParticleFactoryRegistry.getInstance().register(JetLagMain.WIND_LINE, WindLineParticle.Factory::new);
-        ParticleFactoryRegistry.getInstance().register(JetLagMain.CAMERA_TEST, CameraParticle.Factory::new);
-        ParticleFactoryRegistry.getInstance().register(JetLagMain.SPEEDLINE, SpeedlineParticle.Factory::new);
-        ParticleFactoryRegistry.getInstance().register(JetLagMain.ROCKET_SPEEDLINE, RocketSpeedlineParticle.Factory::new);
+        ParticleFactoryRegistry.getInstance().register(JetLagParticles.FIREWORKPARTICLE, FireworkParticle.Factory::new);
+        ParticleFactoryRegistry.getInstance().register(JetLagParticles.WIND1, WindParticle.Factory::new);
+        ParticleFactoryRegistry.getInstance().register(JetLagParticles.WIND2, WindParticle.Factory::new);
+        ParticleFactoryRegistry.getInstance().register(JetLagParticles.WIND3, WindParticle.Factory::new);
+        ParticleFactoryRegistry.getInstance().register(JetLagParticles.WIND_LINE, WindLineParticle.Factory::new);
+        ParticleFactoryRegistry.getInstance().register(JetLagParticles.CAMERA_TEST, CameraParticle.Factory::new);
+        ParticleFactoryRegistry.getInstance().register(JetLagParticles.SPEEDLINE, SpeedlineParticle.Factory::new);
+        ParticleFactoryRegistry.getInstance().register(JetLagParticles.ROCKET_SPEEDLINE, RocketSpeedlineParticle.Factory::new);
 
         CoreShaderRegistrationCallback.EVENT.register(context -> {
-            Identifier rainbowId = new Identifier(JetLagMain.MOD_ID, "rainbow");
+            Identifier rainbowId =
+                    //? if (>=1.21) {
+                    Identifier.of(JetLagMain.MOD_ID, "rainbow");
+                    //?} else {
+//                    new Identifier(JetLagMain.MOD_ID, "rainbow");
+                    //?}
             context.register(rainbowId, VertexFormats.POSITION, program -> rainbowShader = program);
 
-            Identifier fancyId = new Identifier(JetLagMain.MOD_ID, "fancyparticle");
+            Identifier fancyId =
+                    //? if (>=1.21) {
+                    Identifier.of(JetLagMain.MOD_ID, "fancyparticle");
+                    //?} else {
+//                    new Identifier(JetLagMain.MOD_ID, "fancyparticle");
+                    //?}
             context.register(fancyId, VertexFormats.POSITION_TEXTURE_COLOR_LIGHT, program -> rainbowParticle = program);
         });
 
@@ -52,6 +62,8 @@ public class JetLagClient implements ClientModInitializer {
         ClientTickEvents.END_CLIENT_TICK.register(SpeedlineHandler::tickSpeedlines);
         ClientTickEvents.END_WORLD_TICK.register(ContrailHandler::tickContrails);
         HudRenderCallback.EVENT.register(SpeedlineRenderer::speedlineRendering);
+
+//        HudRenderCallback.EVENT.register((drawContext, tickCounter) -> );
 
         ClientEntityEvents.ENTITY_UNLOAD.register((entity, world) -> {
             if(entity instanceof AbstractClientPlayerEntity player) {

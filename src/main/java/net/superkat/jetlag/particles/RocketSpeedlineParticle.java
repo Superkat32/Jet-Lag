@@ -3,11 +3,9 @@ package net.superkat.jetlag.particles;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.particle.Particle;
-import net.minecraft.client.particle.ParticleFactory;
 import net.minecraft.client.particle.ParticleTextureSheet;
 import net.minecraft.client.particle.SpriteProvider;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.particle.DefaultParticleType;
 import net.superkat.jetlag.config.JetLagConfig;
 import net.superkat.jetlag.config.SpeedlineConfigInstance;
 import net.superkat.jetlag.speedline.FancyParticleTextureSheet;
@@ -28,14 +26,14 @@ public class RocketSpeedlineParticle extends SpeedlineParticle {
     }
 
     @Environment(EnvType.CLIENT)
-    public static class Factory implements ParticleFactory<DefaultParticleType> {
+    public static class Factory extends JetLagParticleFactory {
         private final SpriteProvider spriteProvider;
         public Factory(SpriteProvider spriteProvider) {
             this.spriteProvider = spriteProvider;
         }
 
-        public Particle createParticle(DefaultParticleType effect, ClientWorld clientWorld, double d, double e, double f, double g, double h, double i) {
-            RocketSpeedlineParticle particle = new RocketSpeedlineParticle(clientWorld, d, e, f, g, h, i);
+        public Particle createParticle(ClientWorld clientWorld, double x, double y, double z, double velX, double velY, double velZ) {
+            RocketSpeedlineParticle particle = new RocketSpeedlineParticle(clientWorld, x, y, z, velX, velY, velZ);
             particle.setSprite(this.spriteProvider);
             return particle;
         }

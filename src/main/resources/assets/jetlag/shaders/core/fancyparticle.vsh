@@ -21,7 +21,11 @@ out vec2 uv;
 void main() {
     gl_Position = ProjMat * ModelViewMat * vec4(Position, 1.0);
 
-    vertexDistance = fog_distance(ModelViewMat, Position, FogShape);
+    //? if (<=1.20.4) {
+//    vertexDistance = fog_distance(ModelViewMat, Position, FogShape);
+    //?} else {
+    vertexDistance = fog_distance(Position, FogShape);
+    //?}
     texCoord0 = UV0;
     vertexColor = Color * texelFetch(Sampler2, UV2 / 16, 0);
     uv = gl_Position.xy;

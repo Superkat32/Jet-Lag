@@ -23,7 +23,12 @@ import java.util.List;
 import static net.superkat.jetlag.config.JetLagConfig.getInstance;
 
 public class ContrailRenderer {
-    public static final Identifier CONTRAIL_TEXTURE = new Identifier(JetLagMain.MOD_ID, "textures/contrail.png");
+    public static final Identifier CONTRAIL_TEXTURE =
+            //? if (>=1.21) {
+            Identifier.of(JetLagMain.MOD_ID, "textures/contrail.png");
+            //?} else {
+//            new Identifier(JetLagMain.MOD_ID, "textures/contrail.png");
+            //?}
 
     public static final RenderLayer CONTRAIL = RenderLayer.of(
             "contrail",
@@ -369,8 +374,20 @@ public class ContrailRenderer {
      */
     private static void drawTriangle(Matrix4f matrix, VertexConsumer vertexConsumer, float width, float length, float opacity, int light) {
         //dividing the width by 2 to ensure that the width given is accurately rendered
-        vertexConsumer.vertex(matrix, width / 2f, 0, length).color(1f, 1f, 1f, opacity).texture(0f, 0f).light(light).next();
-        vertexConsumer.vertex(matrix, -width / 2f, 0, length).color(1f, 1f, 1f, opacity).texture(1f, 1f).light(light).next();
+        vertexConsumer.vertex(matrix, width / 2f, 0, length)
+                .color(1f, 1f, 1f, opacity)
+                .texture(0f, 0f).light(light)
+                //? if (<1.21) {
+//                .next()
+                //?}
+                ;
+        vertexConsumer.vertex(matrix, -width / 2f, 0, length)
+                .color(1f, 1f, 1f, opacity)
+                .texture(1f, 1f).light(light)
+                //? if (<1.21) {
+//                .next()
+                //?}
+                ;
     }
 
     private static int getLightLevel(LightType lightType, Vec3d pos) {

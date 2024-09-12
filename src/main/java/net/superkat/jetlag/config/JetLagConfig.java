@@ -25,10 +25,16 @@ import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class JetLagConfig {
+    public static final Identifier id =
+            //? if (>=1.21) {
+            Identifier.of(JetLagMain.MOD_ID, "config");
+            //?} else {
+//    new Identifier(JetLagMain.MOD_ID, "config")
+            //?}
     public static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve("jetlag.json");
 
     public static final ConfigClassHandler<JetLagConfig> INSTANCE = ConfigClassHandler.<JetLagConfig>createBuilder(JetLagConfig.class)
-            .id(new Identifier(JetLagMain.MOD_ID, "config"))
+            .id(id)
             .serializer(config -> GsonConfigSerializerBuilder.create(config)
                     .setPath(CONFIG_PATH)
                     .build())

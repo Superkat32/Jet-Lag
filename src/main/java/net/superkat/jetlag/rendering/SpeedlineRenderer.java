@@ -17,11 +17,27 @@ import org.joml.Matrix4f;
 
 import java.awt.*;
 
+/**
+ * This is the deprecated speedline screen renderer. If you are looking for the main speedlines, please refer to the speedline package instead.
+ *
+ * @see net.superkat.jetlag.speedline
+ * @see net.superkat.jetlag.speedline.SpeedlineHandler
+ */
 @Environment(EnvType.CLIENT)
 public class SpeedlineRenderer {
-    public static final Identifier SPEEDLINE = new Identifier(JetLagMain.MOD_ID, "speedlinemain");
+    public static final Identifier SPEEDLINE =
+            //? if (>=1.21) {
+            Identifier.of(JetLagMain.MOD_ID, "speedlinemain");
+            //?} else {
+//            new Identifier(JetLagMain.MOD_ID, "speedlinemain");
+            //?}
 
-    public static void speedlineRendering(DrawContext drawContext, float tickDelta) {
+    //I'm sure this is fine, right?
+    //? if (>=1.21) {
+    public static void speedlineRendering(DrawContext drawContext, RenderTickCounter tickDelta) {
+    //?} else {
+//    public static void speedlineRendering(DrawContext drawContext, float tickDelta) {
+    //?}
         JetLagConfig config = JetLagConfig.getInstance();
         if(!config.modEnabled) return;
 
@@ -67,12 +83,29 @@ public class SpeedlineRenderer {
         RenderSystem.setShaderTexture(0, trueTexture);
         RenderSystem.setShader(() -> shaderProgram);
         Matrix4f matrix4f = context.getMatrices().peek().getPositionMatrix();
-        BufferBuilder buffer = Tessellator.getInstance().getBuffer();
-        buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
-        buffer.vertex(matrix4f, x, y, z).texture(u1, v1).next();
-        buffer.vertex(matrix4f, x, y2, z).texture(u1, v2).next();
-        buffer.vertex(matrix4f, x2, y2, z).texture(u2, v2).next();
-        buffer.vertex(matrix4f, x2, y, z).texture(u2, v1).next();
+
+        BufferBuilder buffer =
+                //? if (>=1.21) {
+                Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
+                //?} else {
+//                BufferBuilder buffer = Tessellator.getInstance().getBuffer();
+//                buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
+                //?}
+
+        vertex(buffer, matrix4f, x, y, z, u1, v1);
+        vertex(buffer, matrix4f, x, y2, z, u1, v2);
+        vertex(buffer, matrix4f, x2, y2, z, u2, v2);
+        vertex(buffer, matrix4f, x2, y, z, u2, v1);
+
         BufferRenderer.drawWithGlobalProgram(buffer.end());
+    }
+
+    private static void vertex(BufferBuilder buffer, Matrix4f matrix4f, float x, float y, float z, float u, float v) {
+        buffer.vertex(matrix4f, x, y, z).texture(u, v)
+                //? if (<1.21) {
+//                .next()
+                //?}
+        ;
+
     }
 }

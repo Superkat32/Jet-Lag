@@ -6,11 +6,9 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.Perspective;
 import net.minecraft.client.particle.Particle;
-import net.minecraft.client.particle.ParticleFactory;
 import net.minecraft.client.particle.ParticleTextureSheet;
 import net.minecraft.client.particle.SpriteProvider;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.particle.DefaultParticleType;
 import net.minecraft.util.math.MathHelper;
 import net.superkat.jetlag.config.JetLagConfig;
 import net.superkat.jetlag.config.SpeedlineConfigInstance;
@@ -161,14 +159,14 @@ public class SpeedlineParticle extends CameraParticle {
     }
 
     @Environment(EnvType.CLIENT)
-    public static class Factory implements ParticleFactory<DefaultParticleType> {
+    public static class Factory extends JetLagParticleFactory {
         private final SpriteProvider spriteProvider;
         public Factory(SpriteProvider spriteProvider) {
             this.spriteProvider = spriteProvider;
         }
 
-        public Particle createParticle(DefaultParticleType effect, ClientWorld clientWorld, double d, double e, double f, double g, double h, double i) {
-            SpeedlineParticle particle = new SpeedlineParticle(clientWorld, d, e, f, g, h, i);
+        public Particle createParticle(ClientWorld clientWorld, double x, double y, double z, double velX, double velY, double velZ) {
+            SpeedlineParticle particle = new SpeedlineParticle(clientWorld, x, y, z, velX, velY, velZ);
             particle.setSprite(this.spriteProvider);
             return particle;
         }

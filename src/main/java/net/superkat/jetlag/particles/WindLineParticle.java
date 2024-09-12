@@ -9,8 +9,8 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.superkat.jetlag.config.JetLagConfig;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
-
 import java.awt.*;
 
 @Environment(EnvType.CLIENT)
@@ -77,24 +77,28 @@ public class WindLineParticle extends SpriteBillboardParticle {
         float lerpZ = (float) (MathHelper.lerp(tickDelta, this.prevPosZ, this.z) - cameraPos.getZ());
         int light = this.getBrightness(tickDelta);
 
+        //? if (>=1.21) {
+        Quaternionf rotation = new Quaternionf();
+        //?}
+
         //angle var rotation
-        this.getRotator().setRotation(this.rotation, camera, tickDelta);
+        this.getRotator().setRotation(rotation, camera, tickDelta);
         if (this.angle != 0.0f) {
-            this.rotation.rotateZ(MathHelper.lerp(tickDelta, this.prevAngle, this.angle));
+            rotation.rotateZ(MathHelper.lerp(tickDelta, this.prevAngle, this.angle));
         }
 
-        this.buildGeometry(vertexConsumer, lerpX, lerpY, lerpZ, tickDelta, light);
-        this.rotation.rotateY((float) Math.toRadians(180f));
-        this.rotation.rotateZ((float) Math.toRadians(180f));
-        this.buildGeometry(vertexConsumer, lerpX, lerpY, lerpZ, tickDelta, light);
+        this.buildGeometry(vertexConsumer, rotation, lerpX, lerpY, lerpZ, tickDelta, light);
+        rotation.rotateY((float) Math.toRadians(180f));
+        rotation.rotateZ((float) Math.toRadians(180f));
+        this.buildGeometry(vertexConsumer, rotation, lerpX, lerpY, lerpZ, tickDelta, light);
     }
 
-    private void buildGeometry(VertexConsumer vertexConsumer, float lerpX, float lerpY, float lerpZ, float tickDelta, int light) {
+    private void buildGeometry(VertexConsumer vertexConsumer, Quaternionf rotation, float lerpX, float lerpY, float lerpZ, float tickDelta, int light) {
         float size = this.getSize(tickDelta);
         Vector3f[] vector3fs = new Vector3f[]{new Vector3f(-stretch, -1.0f, 0.0f), new Vector3f(-stretch, 1.0f, 0.0f), new Vector3f(stretch, 1.0f, 0.0f), new Vector3f(stretch, -1.0f, 0.0f)};
         for (int i = 0; i < 4; ++i) {
             Vector3f vector3f = vector3fs[i];
-            vector3f.rotate(this.rotation);
+            vector3f.rotate(rotation);
             vector3f.mul(size);
             vector3f.add(lerpX, lerpY, lerpZ);
         }
@@ -102,10 +106,25 @@ public class WindLineParticle extends SpriteBillboardParticle {
         float maxU = this.getMaxU();
         float minV = this.getMinV();
         float maxV = this.getMaxV();
-        vertexConsumer.vertex(vector3fs[0].x(), vector3fs[0].y(), vector3fs[0].z()).texture(maxU, maxV).color(this.red, this.green, this.blue, this.alpha).light(light).next();
-        vertexConsumer.vertex(vector3fs[1].x(), vector3fs[1].y(), vector3fs[1].z()).texture(maxU, minV).color(this.red, this.green, this.blue, this.alpha).light(light).next();
-        vertexConsumer.vertex(vector3fs[2].x(), vector3fs[2].y(), vector3fs[2].z()).texture(minU, minV).color(this.red, this.green, this.blue, this.alpha).light(light).next();
-        vertexConsumer.vertex(vector3fs[3].x(), vector3fs[3].y(), vector3fs[3].z()).texture(minU, maxV).color(this.red, this.green, this.blue, this.alpha).light(light).next();
+        createVertex(vertexConsumer, vector3fs[0], maxU, maxV, light);
+        createVertex(vertexConsumer, vector3fs[1], maxU, minV, light);
+        createVertex(vertexConsumer, vector3fs[2], minU, minV, light);
+        createVertex(vertexConsumer, vector3fs[3], minU, maxV, light);
+//        vertexConsumer.vertex(vector3fs[0].x(), vector3fs[0].y(), vector3fs[0].z()).texture(maxU, maxV).color(this.red, this.green, this.blue, this.alpha).light(light).next();
+//        vertexConsumer.vertex(vector3fs[1].x(), vector3fs[1].y(), vector3fs[1].z()).texture(maxU, minV).color(this.red, this.green, this.blue, this.alpha).light(light).next();
+//        vertexConsumer.vertex(vector3fs[2].x(), vector3fs[2].y(), vector3fs[2].z()).texture(minU, minV).color(this.red, this.green, this.blue, this.alpha).light(light).next();
+//        vertexConsumer.vertex(vector3fs[3].x(), vector3fs[3].y(), vector3fs[3].z()).texture(minU, maxV).color(this.red, this.green, this.blue, this.alpha).light(light).next();
+    }
+
+    private void createVertex(VertexConsumer vertexConsumer, Vector3f vector3f, float u, float v, int light) {
+        vertexConsumer.vertex(vector3f.x(), vector3f.y(), vector3f.z())
+                .texture(u, v)
+                .color(this.red, this.green, this.blue, this.alpha)
+                .light(light)
+                //? if (<1.21) {
+        /*.next()
+         *///?}
+        ;
     }
 
     public ParticleTextureSheet getType() {

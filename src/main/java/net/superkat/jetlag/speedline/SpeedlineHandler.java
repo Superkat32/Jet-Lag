@@ -3,7 +3,7 @@ package net.superkat.jetlag.speedline;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.util.math.MathHelper;
-import net.superkat.jetlag.JetLagMain;
+import net.superkat.jetlag.JetLagParticles;
 import net.superkat.jetlag.config.JetLagConfig;
 import net.superkat.jetlag.config.SpeedlineConfigInstance;
 import net.superkat.jetlag.contrail.ContrailHandler;
@@ -21,12 +21,18 @@ public class SpeedlineHandler {
 
         if(client.world != null && client.player != null && ContrailHandler.shouldTick()) {
             ClientPlayerEntity player = client.player;
+            float tickDelta =
+                    //? if (>=1.21) {
+                    client.getRenderTickCounter().getTickDelta(true);
+                    //?} else {
+//                   client.getTickDelta();
+                    //?}
 
-            float lerpedYaw = MathHelper.lerp(client.getTickDelta(), player.lastRenderYaw, player.renderYaw);
-            x = -(player.getYaw(client.getTickDelta()) - lerpedYaw);
+            float lerpedYaw = MathHelper.lerp(tickDelta, player.lastRenderYaw, player.renderYaw);
+            x = -(player.getYaw(tickDelta) - lerpedYaw);
 
-            float lerpedPitch = MathHelper.lerp(client.getTickDelta(), player.lastRenderPitch, player.renderPitch);
-            y = -(player.getPitch(client.getTickDelta()) - lerpedPitch);
+            float lerpedPitch = MathHelper.lerp(tickDelta, player.lastRenderPitch, player.renderPitch);
+            y = -(player.getPitch(tickDelta) - lerpedPitch);
 
 
             if(player.isFallFlying()) {
@@ -75,10 +81,10 @@ public class SpeedlineHandler {
     }
 
     private static void addSpeedline(ClientPlayerEntity player) {
-        player.getWorld().addParticle(JetLagMain.SPEEDLINE, player.getX(), player.getY(), player.getZ(), 0, 0, 0);
+        player.getWorld().addParticle(JetLagParticles.SPEEDLINE, player.getX(), player.getY(), player.getZ(), 0, 0, 0);
     }
 
     private static void addRocketSpeedline(ClientPlayerEntity player) {
-        player.getWorld().addParticle(JetLagMain.ROCKET_SPEEDLINE, player.getX(), player.getY(), player.getZ(), 0, 0, 0);
+        player.getWorld().addParticle(JetLagParticles.ROCKET_SPEEDLINE, player.getX(), player.getY(), player.getZ(), 0, 0, 0);
     }
 }
