@@ -84,9 +84,11 @@ public abstract class FireworkRocketEntityMixin {
     @Unique
     private ParticleEffect getWindParticleType() {
         FireworkRocketEntity self = (FireworkRocketEntity) (Object) this;
+        //? if (>=1.20.4) {
         if(JetLagConfig.getInstance().useMinecraftWindGusts) {
             return ParticleTypes.GUST;
         }
+        //?}
         int wind = self.getWorld().random.nextBetween(0, JetLagParticles.windParticles.size() - 1);
         return JetLagParticles.windParticles.get(wind);
     }

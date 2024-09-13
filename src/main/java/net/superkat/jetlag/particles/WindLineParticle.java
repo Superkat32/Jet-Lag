@@ -77,9 +77,7 @@ public class WindLineParticle extends SpriteBillboardParticle {
         float lerpZ = (float) (MathHelper.lerp(tickDelta, this.prevPosZ, this.z) - cameraPos.getZ());
         int light = this.getBrightness(tickDelta);
 
-        //? if (>=1.21) {
         Quaternionf rotation = new Quaternionf();
-        //?}
 
         //angle var rotation
         this.getRotator().setRotation(rotation, camera, tickDelta);
@@ -110,10 +108,6 @@ public class WindLineParticle extends SpriteBillboardParticle {
         createVertex(vertexConsumer, vector3fs[1], maxU, minV, light);
         createVertex(vertexConsumer, vector3fs[2], minU, minV, light);
         createVertex(vertexConsumer, vector3fs[3], minU, maxV, light);
-//        vertexConsumer.vertex(vector3fs[0].x(), vector3fs[0].y(), vector3fs[0].z()).texture(maxU, maxV).color(this.red, this.green, this.blue, this.alpha).light(light).next();
-//        vertexConsumer.vertex(vector3fs[1].x(), vector3fs[1].y(), vector3fs[1].z()).texture(maxU, minV).color(this.red, this.green, this.blue, this.alpha).light(light).next();
-//        vertexConsumer.vertex(vector3fs[2].x(), vector3fs[2].y(), vector3fs[2].z()).texture(minU, minV).color(this.red, this.green, this.blue, this.alpha).light(light).next();
-//        vertexConsumer.vertex(vector3fs[3].x(), vector3fs[3].y(), vector3fs[3].z()).texture(minU, maxV).color(this.red, this.green, this.blue, this.alpha).light(light).next();
     }
 
     private void createVertex(VertexConsumer vertexConsumer, Vector3f vector3f, float u, float v, int light) {
@@ -137,6 +131,13 @@ public class WindLineParticle extends SpriteBillboardParticle {
             quaternion.rotateY((float) Math.toRadians(this.yaw)); //adds custom yaw
         };
     }
+
+    //? if (<=1.20.1) {
+    /*@Environment(EnvType.CLIENT)
+    public interface Rotator {
+        void setRotation(Quaternionf quaternion, Camera camera, float tickDelta);
+    }
+    *///?}
 
     @Environment(EnvType.CLIENT)
     public static class Factory implements ParticleFactory<WindLineParticleEffect> {

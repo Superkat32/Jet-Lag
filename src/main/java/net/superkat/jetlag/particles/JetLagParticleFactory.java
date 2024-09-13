@@ -7,8 +7,8 @@ import net.minecraft.client.world.ClientWorld;
 import org.jetbrains.annotations.Nullable;
 
 //? if (<=1.20.4) {
-//import net.minecraft.particle.DefaultParticleType;
-//?} else {
+/*import net.minecraft.particle.DefaultParticleType;
+*///?} else {
 import net.minecraft.particle.SimpleParticleType;
 //?}
 
@@ -22,8 +22,8 @@ public abstract class JetLagParticleFactory implements IJetLagParticleFactory {
     @Override
     public @Nullable Particle createParticle(
             //? if (<=1.20.4) {
-            //DefaultParticleType parameters,
-            //?} else {
+            /*DefaultParticleType parameters,
+            *///?} else {
             SimpleParticleType parameters,
             //?}
             ClientWorld world, double x, double y, double z, double velX, double velY, double velZ) {

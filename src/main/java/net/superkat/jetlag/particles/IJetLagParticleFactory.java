@@ -5,8 +5,8 @@ import net.minecraft.client.particle.ParticleFactory;
 import net.minecraft.client.world.ClientWorld;
 
 //? if (<=1.20.4) {
-//import net.minecraft.particle.DefaultParticleType;
-//?} else {
+/*import net.minecraft.particle.DefaultParticleType;
+*///?} else {
 import net.minecraft.particle.SimpleParticleType;
 //?}
 
@@ -19,8 +19,8 @@ import net.minecraft.particle.SimpleParticleType;
  */
 public interface IJetLagParticleFactory
     //? if (<=1.20.4) {
-//        extends ParticleFactory<DefaultParticleType> {
-    //?} else {
+        /*extends ParticleFactory<DefaultParticleType> {
+    *///?} else {
     extends ParticleFactory<SimpleParticleType> {
     //?}
 

@@ -25,8 +25,8 @@ public class SpeedlineHandler {
                     //? if (>=1.21) {
                     client.getRenderTickCounter().getTickDelta(true);
                     //?} else {
-//                   client.getTickDelta();
-                    //?}
+                   /*client.getTickDelta();
+                    *///?}
 
             float lerpedYaw = MathHelper.lerp(tickDelta, player.lastRenderYaw, player.renderYaw);
             x = -(player.getYaw(tickDelta) - lerpedYaw);

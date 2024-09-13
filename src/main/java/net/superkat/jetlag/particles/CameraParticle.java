@@ -4,8 +4,10 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
-
-
+import net.minecraft.client.particle.Particle;
+import net.minecraft.client.particle.ParticleTextureSheet;
+import net.minecraft.client.particle.SpriteBillboardParticle;
+import net.minecraft.client.particle.SpriteProvider;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.VertexConsumer;
@@ -50,13 +52,13 @@ public class CameraParticle extends SpriteBillboardParticle {
         matrices.push();
 
         Quaternionf cameraRotation = camera.getRotation();
-        //?if(>=1.21) {
+        //? if (>=1.21) {
         //WHY MOJANG WHY - This literally took 2 days to figure out the issue
         //no clue why the camera rotation's values were moved around but okay
         matrices.multiply(new Quaternionf(cameraRotation.z, -cameraRotation.w, -cameraRotation.x, cameraRotation.y));
         //?} else {
-//        matrices.multiply(camera.getRotation());
-        //?}
+        /*matrices.multiply(cameraRotation);
+        *///?}
 
         if(ignoreFov()) {
             //Surely this won't cause any issues... right?
@@ -67,7 +69,8 @@ public class CameraParticle extends SpriteBillboardParticle {
         float x = (float) MathHelper.lerp(tickDelta, this.prevPosX, this.x);
         float y = (float) MathHelper.lerp(tickDelta, this.prevPosY, this.y);
         float z = (float) MathHelper.lerp(tickDelta, this.prevPosZ, this.z);
-        rotation.set(new Quaternionf());
+
+        Quaternionf rotation = new Quaternionf();
         if (this.angle != 0.0F) {
             rotation.rotateZ(MathHelper.lerp(tickDelta, this.prevAngle, this.angle));
         }

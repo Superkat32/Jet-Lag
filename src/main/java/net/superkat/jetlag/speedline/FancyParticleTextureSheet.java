@@ -15,22 +15,22 @@ public interface FancyParticleTextureSheet {
             return PARTICLE_SHEET_TRANSLUCENT.begin(tessellator, textureManager);
         }
         //?} else {
-//        @Override
-//        public void begin(BufferBuilder builder, TextureManager textureManager) {
-//            PARTICLE_SHEET_TRANSLUCENT.begin(builder, textureManager);
-////            RenderSystem.depthMask(true);
-////            RenderSystem.setShaderTexture(0, SpriteAtlasTexture.PARTICLE_ATLAS_TEXTURE);
-////            RenderSystem.enableBlend();
-////            RenderSystem.defaultBlendFunc();
-////            builder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR_LIGHT);
-//        }
-//
-//        @Override
-//        public void draw(Tessellator tessellator) {
-////            tessellator.draw();
-//            PARTICLE_SHEET_TRANSLUCENT.draw(tessellator);
-//        }
-        //?}
+        /*@Override
+        public void begin(BufferBuilder builder, TextureManager textureManager) {
+            PARTICLE_SHEET_TRANSLUCENT.begin(builder, textureManager);
+//            RenderSystem.depthMask(true);
+//            RenderSystem.setShaderTexture(0, SpriteAtlasTexture.PARTICLE_ATLAS_TEXTURE);
+//            RenderSystem.enableBlend();
+//            RenderSystem.defaultBlendFunc();
+//            builder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR_LIGHT);
+        }
+
+        @Override
+        public void draw(Tessellator tessellator) {
+//            tessellator.draw();
+            PARTICLE_SHEET_TRANSLUCENT.draw(tessellator);
+        }
+        *///?}
 
         public String toString() {
             return "JETLAG_FANCY_RAINBOW_TRANSLUCENT";
@@ -44,23 +44,23 @@ public interface FancyParticleTextureSheet {
             return PARTICLE_SHEET_TRANSLUCENT.begin(tessellator, textureManager);
         }
         //?} else {
-//        @Override
-//        public void begin(BufferBuilder builder, TextureManager textureManager) {
-//            //surely this won't cause any issues, right?
-//            PARTICLE_SHEET_TRANSLUCENT.begin(builder, textureManager);
-////            RenderSystem.depthMask(true);
-////            RenderSystem.setShaderTexture(0, SpriteAtlasTexture.PARTICLE_ATLAS_TEXTURE);
-////            RenderSystem.enableBlend();
-////            RenderSystem.defaultBlendFunc();
-////            builder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR_LIGHT);
-//        }
-//
-//        @Override
-//        public void draw(Tessellator tessellator) {
-////            tessellator.draw();
-//            PARTICLE_SHEET_TRANSLUCENT.draw(tessellator);
-//        }
-        //?}
+        /*@Override
+        public void begin(BufferBuilder builder, TextureManager textureManager) {
+            //surely this won't cause any issues, right?
+            PARTICLE_SHEET_TRANSLUCENT.begin(builder, textureManager);
+//            RenderSystem.depthMask(true);
+//            RenderSystem.setShaderTexture(0, SpriteAtlasTexture.PARTICLE_ATLAS_TEXTURE);
+//            RenderSystem.enableBlend();
+//            RenderSystem.defaultBlendFunc();
+//            builder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR_LIGHT);
+        }
+
+        @Override
+        public void draw(Tessellator tessellator) {
+//            tessellator.draw();
+            PARTICLE_SHEET_TRANSLUCENT.draw(tessellator);
+        }
+        *///?}
 
         public String toString() {
             return "JETLAG_FANCY_RAINBOW_TRANSLUCENT_ROCKET";

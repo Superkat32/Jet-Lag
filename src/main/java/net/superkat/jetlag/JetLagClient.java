@@ -42,16 +42,16 @@ public class JetLagClient implements ClientModInitializer {
                     //? if (>=1.21) {
                     Identifier.of(JetLagMain.MOD_ID, "rainbow");
                     //?} else {
-//                    new Identifier(JetLagMain.MOD_ID, "rainbow");
-                    //?}
+                    /*new Identifier(JetLagMain.MOD_ID, "rainbow");
+                    *///?}
             context.register(rainbowId, VertexFormats.POSITION, program -> rainbowShader = program);
 
             Identifier fancyId =
                     //? if (>=1.21) {
                     Identifier.of(JetLagMain.MOD_ID, "fancyparticle");
                     //?} else {
-//                    new Identifier(JetLagMain.MOD_ID, "fancyparticle");
-                    //?}
+                    /*new Identifier(JetLagMain.MOD_ID, "fancyparticle");
+                    *///?}
             context.register(fancyId, VertexFormats.POSITION_TEXTURE_COLOR_LIGHT, program -> rainbowParticle = program);
         });
 

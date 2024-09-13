@@ -27,8 +27,8 @@ public class ContrailRenderer {
             //? if (>=1.21) {
             Identifier.of(JetLagMain.MOD_ID, "textures/contrail.png");
             //?} else {
-//            new Identifier(JetLagMain.MOD_ID, "textures/contrail.png");
-            //?}
+            /*new Identifier(JetLagMain.MOD_ID, "textures/contrail.png");
+            *///?}
 
     public static final RenderLayer CONTRAIL = RenderLayer.of(
             "contrail",
@@ -378,15 +378,15 @@ public class ContrailRenderer {
                 .color(1f, 1f, 1f, opacity)
                 .texture(0f, 0f).light(light)
                 //? if (<1.21) {
-//                .next()
-                //?}
+                /*.next()
+                *///?}
                 ;
         vertexConsumer.vertex(matrix, -width / 2f, 0, length)
                 .color(1f, 1f, 1f, opacity)
                 .texture(1f, 1f).light(light)
                 //? if (<1.21) {
-//                .next()
-                //?}
+                /*.next()
+                *///?}
                 ;
     }
 

@@ -26,20 +26,25 @@ import java.awt.*;
 @Environment(EnvType.CLIENT)
 public class SpeedlineRenderer {
     public static final Identifier SPEEDLINE =
-            //? if (>=1.21) {
+            //? if (<1.21) {
+            /*new Identifier(JetLagMain.MOD_ID, "speedlinemain");
+            *///?} else {
             Identifier.of(JetLagMain.MOD_ID, "speedlinemain");
-            //?} else {
-//            new Identifier(JetLagMain.MOD_ID, "speedlinemain");
             //?}
 
     //I'm sure this is fine, right?
     //? if (>=1.21) {
     public static void speedlineRendering(DrawContext drawContext, RenderTickCounter tickDelta) {
     //?} else {
-//    public static void speedlineRendering(DrawContext drawContext, float tickDelta) {
-    //?}
+    /*public static void speedlineRendering(DrawContext drawContext, float tickDelta) {
+    *///?}
         JetLagConfig config = JetLagConfig.getInstance();
         if(!config.modEnabled) return;
+
+        //? if (<=1.20.1) {
+        /*//nice
+        if(true) return;
+        *///?}
 
         MinecraftClient client = MinecraftClient.getInstance();
         if(config.showSpeedlinesTexture && client.player.isFallFlying()) {
@@ -60,7 +65,9 @@ public class SpeedlineRenderer {
             if(config.rainbowSpeedlines) {
                 drawSpeedline(drawContext, SPEEDLINE, 0, 0, 0, drawContext.getScaledWindowWidth(), drawContext.getScaledWindowHeight(), JetLagClient.rainbowShader);
             } else { //fallback in case other mods mess with this method
+                //? if (>1.20.1) {
                 drawContext.drawGuiTexture(SPEEDLINE, 0, 0, drawContext.getScaledWindowWidth(), drawContext.getScaledWindowHeight());
+                //?}
             }
 
             RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
@@ -69,6 +76,7 @@ public class SpeedlineRenderer {
     }
 
     private static void drawSpeedline(DrawContext context, Identifier texture, int x, int y, int z, int width, int height, ShaderProgram shaderProgram) {
+        //? if (>1.20.1) {
         int x2 = x + width;
         int y2 = y + height;
 
@@ -88,9 +96,9 @@ public class SpeedlineRenderer {
                 //? if (>=1.21) {
                 Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
                 //?} else {
-//                BufferBuilder buffer = Tessellator.getInstance().getBuffer();
-//                buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
-                //?}
+                /*Tessellator.getInstance().getBuffer();
+                buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
+                *///?}
 
         vertex(buffer, matrix4f, x, y, z, u1, v1);
         vertex(buffer, matrix4f, x, y2, z, u1, v2);
@@ -98,13 +106,14 @@ public class SpeedlineRenderer {
         vertex(buffer, matrix4f, x2, y, z, u2, v1);
 
         BufferRenderer.drawWithGlobalProgram(buffer.end());
+        //?}
     }
 
     private static void vertex(BufferBuilder buffer, Matrix4f matrix4f, float x, float y, float z, float u, float v) {
         buffer.vertex(matrix4f, x, y, z).texture(u, v)
                 //? if (<1.21) {
-//                .next()
-                //?}
+                /*.next()
+                *///?}
         ;
 
     }

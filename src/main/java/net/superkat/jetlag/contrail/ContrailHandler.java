@@ -58,7 +58,12 @@ public class ContrailHandler {
      */
     public static boolean shouldTick() {
         MinecraftClient client = MinecraftClient.getInstance();
-        return !client.isPaused() && (client.world == null || client.world.getTickManager().shouldTick());
+        return !client.isPaused() &&
+                (client.world != null
+                        //? (>=1.20.4) {
+                        || client.world.getTickManager().shouldTick()
+                        //?}
+                );
     }
 
     /**
@@ -75,8 +80,8 @@ public class ContrailHandler {
                 //? if (>=1.21) {
                 client.getRenderTickCounter().getTickDelta(true);
                 //?} else {
-//                client.getTickDelta();
-                //?}
+                /*client.getTickDelta();
+                *///?}
         double yaw = player.getYaw(delta);
         double pitch = player.getPitch(delta);
         double yawRadians = Math.toRadians(yaw);
@@ -130,7 +135,7 @@ public class ContrailHandler {
      * @param tickDelta Minecraft tick delta.
      * @return The player's roll in radians.
      *
-     * @see net.minecraft.client.render.entity.PlayerEntityRenderer#setupTransforms(AbstractClientPlayerEntity, MatrixStack, float, float, float)
+     * @see net.minecraft.client.render.entity.PlayerEntityRenderer#setupTransforms
      * @see DABRCompat
      */
     public static double getPlayerRoll(AbstractClientPlayerEntity player, float tickDelta) {
@@ -213,8 +218,8 @@ public class ContrailHandler {
                     //? if (>=1.21) {
                     MinecraftClient.getInstance().getRenderTickCounter().getTickDelta(true);
                     //?} else {
-//                MinecraftClient.getInstance().getTickDelta();
-                    //?}
+                /*MinecraftClient.getInstance().getTickDelta();
+                    *///?}
             Vec3d vec3d = player.lerpVelocity(tickDelta);
             if (vec3d.y < 0.0) {
                 Vec3d vec3d2 = vec3d.normalize();

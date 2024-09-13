@@ -2,8 +2,10 @@ package net.superkat.jetlag.particles;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-
-
+import net.minecraft.client.particle.Particle;
+import net.minecraft.client.particle.ParticleTextureSheet;
+import net.minecraft.client.particle.SpriteBillboardParticle;
+import net.minecraft.client.particle.SpriteProvider;
 import net.minecraft.client.world.ClientWorld;
 
 @Environment(EnvType.CLIENT)

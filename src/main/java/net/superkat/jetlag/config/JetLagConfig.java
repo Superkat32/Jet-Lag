@@ -29,8 +29,8 @@ public class JetLagConfig {
             //? if (>=1.21) {
             Identifier.of(JetLagMain.MOD_ID, "config");
             //?} else {
-//    new Identifier(JetLagMain.MOD_ID, "config")
-            //?}
+    /*new Identifier(JetLagMain.MOD_ID, "config");
+            *///?}
     public static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve("jetlag.json");
 
     public static final ConfigClassHandler<JetLagConfig> INSTANCE = ConfigClassHandler.<JetLagConfig>createBuilder(JetLagConfig.class)
@@ -649,13 +649,20 @@ public class JetLagConfig {
                 rocketSpeedlineOptions.setAvailable(value);
             });
 
+            SystemToast.Type toastType =
+                    //? (>=1.20.4) {
+                    new SystemToast.Type(3500);
+                    //?} else {
+                    /*SystemToast.Type.TUTORIAL_HINT;
+                    *///?}
+
             var subtlePreset = ButtonOption.createBuilder()
                     .name(Text.translatable("jetlag.speedline.preset.subtle"))
                     .action(((yaclScreen, buttonOption) -> {
                         speedlineOptions.applySpeedlineConfig(new SpeedlineConfigInstance().subtleAndSweet());
                         rocketSpeedlineOptions.applySpeedlineConfig(new SpeedlineConfigInstance().rocket_subtleAndSweet());
                         MinecraftClient.getInstance().getToastManager().add(
-                                new SystemToast(new SystemToast.Type(3500),
+                                new SystemToast(toastType,
                                 Text.translatable("jetlag.title"),
                                 Text.translatable("jetlag.speedline.preset.previewing").append(buttonOption.name())
                             )
@@ -670,7 +677,7 @@ public class JetLagConfig {
                         speedlineOptions.applySpeedlineConfig(new SpeedlineConfigInstance().niceAndNoticeable());
                         rocketSpeedlineOptions.applySpeedlineConfig(new SpeedlineConfigInstance().rocket_niceAndNoticeable());
                         MinecraftClient.getInstance().getToastManager().add(
-                                new SystemToast(new SystemToast.Type(3500),
+                                new SystemToast(toastType,
                                         Text.translatable("jetlag.title"),
                                         Text.translatable("jetlag.speedline.preset.previewing").append(buttonOption.name())
                                 )
@@ -685,7 +692,7 @@ public class JetLagConfig {
                         speedlineOptions.applySpeedlineConfig(new SpeedlineConfigInstance().animeStyled());
                         rocketSpeedlineOptions.applySpeedlineConfig(new SpeedlineConfigInstance().rocket_animeStyled());
                         MinecraftClient.getInstance().getToastManager().add(
-                                new SystemToast(new SystemToast.Type(3500),
+                                new SystemToast(toastType,
                                         Text.translatable("jetlag.title"),
                                         Text.translatable("jetlag.speedline.preset.previewing").append(buttonOption.name())
                                 )
@@ -700,7 +707,7 @@ public class JetLagConfig {
                         speedlineOptions.applySpeedlineConfig(new SpeedlineConfigInstance().HYPERDRIVE());
                         rocketSpeedlineOptions.applySpeedlineConfig(new SpeedlineConfigInstance().rocket_HYPERDRIVE());
                         MinecraftClient.getInstance().getToastManager().add(
-                                new SystemToast(new SystemToast.Type(3500),
+                                new SystemToast(toastType,
                                         Text.translatable("jetlag.title"),
                                         Text.translatable("jetlag.speedline.preset.previewing").append(buttonOption.name())
                                 )
@@ -844,7 +851,9 @@ public class JetLagConfig {
             windGroup.option(firstPersonWindLines);
             windGroup.option(LabelOption.create(Text.empty()));
             windGroup.option(windGusts);
+            //? if (>=1.20.4) {
             windGroup.option(useMCWindGusts);
+            //?}
             fireworkGroup.option(altFireworkParticles);
             fireworkGroup.option(alwaysUseAltFireworkParticles);
 
@@ -973,8 +982,10 @@ public class JetLagConfig {
                 .category(contrailCategoryBuilder.build())
                     .category(speedlinesCategoryBuilder.build())
                     .category(particlesCategoryBuilder.build())
-                    .category(extrasCategoryBuilder.build());
-//                    .category(screenEffectsCategoryBuilder.build());
+                    //? if (>1.20.1) {
+                    .category(extrasCategoryBuilder.build())
+                    //?}
+                    ;
         }).generateScreen(parent);
     }
 
