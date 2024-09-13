@@ -38,11 +38,12 @@ public class ContrailRenderer {
             false,
             true,
             RenderLayer.MultiPhaseParameters.builder()
-                    .program(RenderPhase.TRIPWIRE_PROGRAM)
+                    .program(RenderPhase.TRANSLUCENT_PROGRAM)
                     .texture(new RenderPhase.Texture(CONTRAIL_TEXTURE, false, false))
                     .transparency(RenderLayer.TRANSLUCENT_TRANSPARENCY)
                     .cull(RenderPhase.DISABLE_CULLING)
                     .lightmap(RenderPhase.ENABLE_LIGHTMAP)
+                    .target(RenderPhase.TRANSLUCENT_TARGET)
                     .build(false)
     );
 

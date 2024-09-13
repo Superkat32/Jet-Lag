@@ -55,15 +55,14 @@ public class JetLagClient implements ClientModInitializer {
             context.register(fancyId, VertexFormats.POSITION_TEXTURE_COLOR_LIGHT, program -> rainbowParticle = program);
         });
 
-        //BEFORE_DEBUG_RENDER is called as closely to the particles being rendered as I can get with Fabric API.
+        //AFTER_TRANSLUCENT is called as closely to the particles being rendered as I can get with Fabric API
+        //while still making sure transparency doesn't die(e.g. with water being rendered beneath the contrails).
         //In theory, no matrix stack changes should be made between the debug render and the particles render
-        WorldRenderEvents.BEFORE_DEBUG_RENDER.register(ContrailRenderer::contrailWorldRendering);
+        WorldRenderEvents.AFTER_TRANSLUCENT.register(ContrailRenderer::contrailWorldRendering);
 
         ClientTickEvents.END_CLIENT_TICK.register(SpeedlineHandler::tickSpeedlines);
         ClientTickEvents.END_WORLD_TICK.register(ContrailHandler::tickContrails);
         HudRenderCallback.EVENT.register(SpeedlineRenderer::speedlineRendering);
-
-//        HudRenderCallback.EVENT.register((drawContext, tickCounter) -> );
 
         ClientEntityEvents.ENTITY_UNLOAD.register((entity, world) -> {
             if(entity instanceof AbstractClientPlayerEntity player) {
