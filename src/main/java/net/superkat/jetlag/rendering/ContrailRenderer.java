@@ -75,15 +75,15 @@ public class ContrailRenderer {
 
         RenderSystem.disableCull();
         RenderSystem.enableBlend();
-        Color contrailColor = getInstance().contrailColor;
-        RenderSystem.setShaderColor(contrailColor.getRed() / 255f, contrailColor.getGreen() / 255f, contrailColor.getBlue() / 255f, contrailColor.getAlpha() / 255f);
+//        Color contrailColor = getInstance().contrailColor;
+//        RenderSystem.setShaderColor(contrailColor.getRed() / 255f, contrailColor.getGreen() / 255f, contrailColor.getBlue() / 255f, contrailColor.getAlpha() / 255f);
         MinecraftClient.getInstance().gameRenderer.getLightmapTextureManager().enable();
 
         VertexConsumerProvider consumers = context.consumers();
 
         renderContrail(contrail, matrices, consumers);
 
-        RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
+//        RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
         RenderSystem.disableBlend();
         RenderSystem.enableCull();
         MinecraftClient.getInstance().gameRenderer.getLightmapTextureManager().disable();
@@ -254,6 +254,12 @@ public class ContrailRenderer {
         float width = (float) getInstance().contrailWidth;
         float widthAdd = (float) (getInstance().contrailWidthAddition / 10f);
 
+        Color contrailColor = getInstance().contrailColor;
+        float red = contrailColor.getRed() / 255f;
+        float green = contrailColor.getGreen() / 255f;
+        float blue = contrailColor.getBlue() / 255f;
+        float alpha = contrailColor.getAlpha() / 255f;
+
         for (int i = 0; i < points.size() - 1; i++) {
             //Catmull spline points
             Vec3d prevPoint = points.get(i != 0 ? i - 1 : 0);
@@ -297,7 +303,7 @@ public class ContrailRenderer {
                 float usedOpacity = MathHelper.clamp(opacity + opacityAdjust, minOpacity, 1f);
 
                 if(delta > 0f) {
-                    renderSegment(matrixStack, vertexConsumer, curvePoint, prevCurvePoint, usedOpacity, light, width);
+                    renderSegment(matrixStack, vertexConsumer, curvePoint, prevCurvePoint, red, green, blue, alpha + usedOpacity, light, width);
                 }
                 prevCurvePoint = curvePoint;
             }
@@ -337,9 +343,9 @@ public class ContrailRenderer {
      * @param vertexConsumer The VertexConsumer used for rendering.
      * @param origin The starting point to render from.
      * @param target The ending point to render to.
-     * @param opacity The rendered segment's opacity/alpha value.
+     * @param alpha The rendered segment's opacity/alpha value.
      */
-    private static void renderSegment(MatrixStack matrixStack, VertexConsumer vertexConsumer, Vec3d origin, Vec3d target, float opacity, int light, float width) {
+    private static void renderSegment(MatrixStack matrixStack, VertexConsumer vertexConsumer, Vec3d origin, Vec3d target, float red, float green, float blue, float alpha, int light, float width) {
         Camera camera = MinecraftClient.getInstance().gameRenderer.getCamera();
         Vec3d transformedMatrixPos = origin.subtract(camera.getPos());
         matrixStack.push();
@@ -359,7 +365,7 @@ public class ContrailRenderer {
         matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees((float) Math.toDegrees(rightAngle - o))); //rotates left/right
         matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees((float) Math.toDegrees(rightAngle + n))); //rotates up/down
 
-        drawTriangle(matrixStack.peek().getPositionMatrix(), vertexConsumer, width, -length, opacity, light);
+        drawTriangle(matrixStack.peek().getPositionMatrix(), vertexConsumer, width, -length, red, green, blue, alpha, light);
 
         matrixStack.pop();
     }
@@ -370,20 +376,20 @@ public class ContrailRenderer {
      * @param matrix The MatrixStack's Position Matrix used for rendering.
      * @param vertexConsumer The VertexConsumer used for rendering
      * @param width The rendered rectangle's width. Should be determined by a config option.
-     * @param length The rendered rectangle's length. Should be determined by the length from the origin point to the target point in {@link #renderSegment(MatrixStack, VertexConsumer, Vec3d, Vec3d, float, int, float)}.
-     * @param opacity The rendered rectangle's opacity/alpha value.
+     * @param length The rendered rectangle's length. Should be determined by the length from the origin point to the target point in {@link #renderSegment(MatrixStack, VertexConsumer, Vec3d, Vec3d, float, float, float, float, int, float)}.
+     * @param alpha The rendered rectangle's opacity/alpha value.
      */
-    private static void drawTriangle(Matrix4f matrix, VertexConsumer vertexConsumer, float width, float length, float opacity, int light) {
+    private static void drawTriangle(Matrix4f matrix, VertexConsumer vertexConsumer, float width, float length, float red, float green, float blue, float alpha, int light) {
         //dividing the width by 2 to ensure that the width given is accurately rendered
         vertexConsumer.vertex(matrix, width / 2f, 0, length)
-                .color(1f, 1f, 1f, opacity)
+                .color(red, green, blue, alpha)
                 .texture(0f, 0f).light(light)
                 //? if (<1.21) {
                 /*.next()
                 *///?}
                 ;
         vertexConsumer.vertex(matrix, -width / 2f, 0, length)
-                .color(1f, 1f, 1f, opacity)
+                .color(red, green, blue, alpha)
                 .texture(1f, 1f).light(light)
                 //? if (<1.21) {
                 /*.next()

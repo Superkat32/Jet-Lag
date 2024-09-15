@@ -55,8 +55,9 @@ public class JetLagClient implements ClientModInitializer {
             context.register(fancyId, VertexFormats.POSITION_TEXTURE_COLOR_LIGHT, program -> rainbowParticle = program);
         });
 
+        //FIXME - Iris shaders compat
         //AFTER_TRANSLUCENT is called as closely to the particles being rendered as I can get with Fabric API
-        //while still making sure transparency doesn't die(e.g. with water being rendered beneath the contrails).
+        //while still making sure transparency doesn't die(e.g. with water being rendered beneath the contrails) FIXME - Iris compat
         //In theory, no matrix stack changes should be made between the debug render and the particles render
         WorldRenderEvents.AFTER_TRANSLUCENT.register(ContrailRenderer::contrailWorldRendering);
 
