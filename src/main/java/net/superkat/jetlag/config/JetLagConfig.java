@@ -25,12 +25,7 @@ import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class JetLagConfig {
-    public static final Identifier id =
-            //? if (>=1.21) {
-            Identifier.of(JetLagMain.MOD_ID, "config");
-            //?} else {
-    /*new Identifier(JetLagMain.MOD_ID, "config");
-            *///?}
+    public static final Identifier id = Identifier.of(JetLagMain.MOD_ID, "config");
     public static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve("jetlag.json");
 
     public static final ConfigClassHandler<JetLagConfig> INSTANCE = ConfigClassHandler.<JetLagConfig>createBuilder(JetLagConfig.class)
@@ -649,12 +644,7 @@ public class JetLagConfig {
                 rocketSpeedlineOptions.setAvailable(value);
             });
 
-            SystemToast.Type toastType =
-                    //? (>=1.20.4) {
-                    new SystemToast.Type(3500);
-                    //?} else {
-                    /*SystemToast.Type.TUTORIAL_HINT;
-                    *///?}
+            SystemToast.Type toastType = new SystemToast.Type(3500);
 
             var subtlePreset = ButtonOption.createBuilder()
                     .name(Text.translatable("jetlag.speedline.preset.subtle"))
@@ -851,9 +841,7 @@ public class JetLagConfig {
             windGroup.option(firstPersonWindLines);
             windGroup.option(LabelOption.create(Text.empty()));
             windGroup.option(windGusts);
-            //? if (>=1.20.4) {
             windGroup.option(useMCWindGusts);
-            //?}
             fireworkGroup.option(altFireworkParticles);
             fireworkGroup.option(alwaysUseAltFireworkParticles);
 
@@ -982,9 +970,7 @@ public class JetLagConfig {
                 .category(contrailCategoryBuilder.build())
                     .category(speedlinesCategoryBuilder.build())
                     .category(particlesCategoryBuilder.build())
-                    //? if (>1.20.1) {
                     .category(extrasCategoryBuilder.build())
-                    //?}
                     ;
         }).generateScreen(parent);
     }

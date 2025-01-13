@@ -3,10 +3,12 @@ package net.superkat.jetlag.particles;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.particle.Particle;
+import net.minecraft.client.particle.ParticleFactory;
 import net.minecraft.client.particle.ParticleTextureSheet;
 import net.minecraft.client.particle.SpriteBillboardParticle;
 import net.minecraft.client.particle.SpriteProvider;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.particle.SimpleParticleType;
 
 @Environment(EnvType.CLIENT)
 public class WindParticle extends SpriteBillboardParticle {
@@ -46,14 +48,14 @@ public class WindParticle extends SpriteBillboardParticle {
     }
 
     @Environment(EnvType.CLIENT)
-    public static class Factory extends JetLagParticleFactory {
+    public static class Factory implements ParticleFactory<SimpleParticleType> {
         private final SpriteProvider spriteProvider;
 
         public Factory(SpriteProvider spriteProvider) {
             this.spriteProvider = spriteProvider;
         }
 
-        public Particle createParticle(ClientWorld clientWorld, double x, double y, double z, double velX, double velY, double velZ) {
+        public Particle createParticle(SimpleParticleType type, ClientWorld clientWorld, double x, double y, double z, double velX, double velY, double velZ) {
             return new WindParticle(clientWorld, x, y, z, velX, velY, velZ, this.spriteProvider);
         }
     }

@@ -2,7 +2,11 @@ package net.superkat.jetlag.particles;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.particle.*;
+import net.minecraft.client.particle.Particle;
+import net.minecraft.client.particle.ParticleFactory;
+import net.minecraft.client.particle.ParticleTextureSheet;
+import net.minecraft.client.particle.SpriteBillboardParticle;
+import net.minecraft.client.particle.SpriteProvider;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.world.ClientWorld;
@@ -114,11 +118,7 @@ public class WindLineParticle extends SpriteBillboardParticle {
         vertexConsumer.vertex(vector3f.x(), vector3f.y(), vector3f.z())
                 .texture(u, v)
                 .color(this.red, this.green, this.blue, this.alpha)
-                .light(light)
-                //? if (<1.21) {
-        /*.next()
-         *///?}
-        ;
+                .light(light);
     }
 
     public ParticleTextureSheet getType() {
@@ -131,13 +131,6 @@ public class WindLineParticle extends SpriteBillboardParticle {
             quaternion.rotateY((float) Math.toRadians(this.yaw)); //adds custom yaw
         };
     }
-
-    //? if (<=1.20.1) {
-    /*@Environment(EnvType.CLIENT)
-    public interface Rotator {
-        void setRotation(Quaternionf quaternion, Camera camera, float tickDelta);
-    }
-    *///?}
 
     @Environment(EnvType.CLIENT)
     public static class Factory implements ParticleFactory<WindLineParticleEffect> {

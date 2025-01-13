@@ -23,12 +23,7 @@ import java.util.List;
 import static net.superkat.jetlag.config.JetLagConfig.getInstance;
 
 public class ContrailRenderer {
-    public static final Identifier CONTRAIL_TEXTURE =
-            //? if (>=1.21) {
-            Identifier.of(JetLagMain.MOD_ID, "textures/contrail.png");
-            //?} else {
-            /*new Identifier(JetLagMain.MOD_ID, "textures/contrail.png");
-            *///?}
+    public static final Identifier CONTRAIL_TEXTURE = Identifier.of(JetLagMain.MOD_ID, "textures/contrail.png");
 
     public static final RenderLayer CONTRAIL = RenderLayer.of(
             "contrail",
@@ -383,18 +378,10 @@ public class ContrailRenderer {
         //dividing the width by 2 to ensure that the width given is accurately rendered
         vertexConsumer.vertex(matrix, width / 2f, 0, length)
                 .color(red, green, blue, alpha)
-                .texture(0f, 0f).light(light)
-                //? if (<1.21) {
-                /*.next()
-                *///?}
-                ;
+                .texture(0f, 0f).light(light);
         vertexConsumer.vertex(matrix, -width / 2f, 0, length)
                 .color(red, green, blue, alpha)
-                .texture(1f, 1f).light(light)
-                //? if (<1.21) {
-                /*.next()
-                *///?}
-                ;
+                .texture(1f, 1f).light(light);
     }
 
     private static int getLightLevel(LightType lightType, Vec3d pos) {

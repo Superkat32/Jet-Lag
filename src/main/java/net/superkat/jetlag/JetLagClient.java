@@ -15,7 +15,12 @@ import net.minecraft.client.render.VertexFormats;
 import net.minecraft.util.Identifier;
 import net.superkat.jetlag.contrail.ContrailHandler;
 import net.superkat.jetlag.contrail.JetLagPlayer;
-import net.superkat.jetlag.particles.*;
+import net.superkat.jetlag.particles.CameraParticle;
+import net.superkat.jetlag.particles.FireworkParticle;
+import net.superkat.jetlag.particles.RocketSpeedlineParticle;
+import net.superkat.jetlag.particles.SpeedlineParticle;
+import net.superkat.jetlag.particles.WindLineParticle;
+import net.superkat.jetlag.particles.WindParticle;
 import net.superkat.jetlag.rendering.ContrailRenderer;
 import net.superkat.jetlag.rendering.SpeedlineRenderer;
 import net.superkat.jetlag.speedline.SpeedlineHandler;
@@ -38,20 +43,10 @@ public class JetLagClient implements ClientModInitializer {
         ParticleFactoryRegistry.getInstance().register(JetLagParticles.ROCKET_SPEEDLINE, RocketSpeedlineParticle.Factory::new);
 
         CoreShaderRegistrationCallback.EVENT.register(context -> {
-            Identifier rainbowId =
-                    //? if (>=1.21) {
-                    Identifier.of(JetLagMain.MOD_ID, "rainbow");
-                    //?} else {
-                    /*new Identifier(JetLagMain.MOD_ID, "rainbow");
-                    *///?}
+            Identifier rainbowId = Identifier.of(JetLagMain.MOD_ID, "rainbow");
             context.register(rainbowId, VertexFormats.POSITION, program -> rainbowShader = program);
 
-            Identifier fancyId =
-                    //? if (>=1.21) {
-                    Identifier.of(JetLagMain.MOD_ID, "fancyparticle");
-                    //?} else {
-                    /*new Identifier(JetLagMain.MOD_ID, "fancyparticle");
-                    *///?}
+            Identifier fancyId = Identifier.of(JetLagMain.MOD_ID, "fancyparticle");
             context.register(fancyId, VertexFormats.POSITION_TEXTURE_COLOR_LIGHT, program -> rainbowParticle = program);
         });
 

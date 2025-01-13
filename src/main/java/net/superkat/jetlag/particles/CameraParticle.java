@@ -5,7 +5,9 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.particle.Particle;
+import net.minecraft.client.particle.ParticleFactory;
 import net.minecraft.client.particle.ParticleTextureSheet;
+import net.minecraft.client.particle.ShriekParticle;
 import net.minecraft.client.particle.SpriteBillboardParticle;
 import net.minecraft.client.particle.SpriteProvider;
 import net.minecraft.client.render.Camera;
@@ -13,8 +15,11 @@ import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.particle.ShriekParticleEffect;
+import net.minecraft.particle.SimpleParticleType;
 import net.minecraft.util.math.MathHelper;
 import net.superkat.jetlag.JetLagClient;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -23,10 +28,8 @@ import org.joml.Vector3f;
  * A particle that gets rendered right in front of the camera. The z value is used to determine the distance from the camera(1 should be default).
  */
 public class CameraParticle extends SpriteBillboardParticle {
-    //? if (>=1.21) {
     //for some reason Mojang removed the field this.rotation in 1.21 ¯\_(ツ)_/¯
     private Quaternionf rotation = new Quaternionf();
-    //?}
 
     protected float width = 1f;
     protected float length = 1f;
@@ -52,13 +55,11 @@ public class CameraParticle extends SpriteBillboardParticle {
         matrices.push();
 
         Quaternionf cameraRotation = camera.getRotation();
-        //? if (>=1.21) {
         //WHY MOJANG WHY - This literally took 2 days to figure out the issue
         //no clue why the camera rotation's values were moved around but okay
         matrices.multiply(new Quaternionf(cameraRotation.z, -cameraRotation.w, -cameraRotation.x, cameraRotation.y));
-        //?} else {
-        /*matrices.multiply(cameraRotation);
-        *///?}
+
+//        matrices.multiply(cameraRotation);
 
         if(ignoreFov()) {
             //Surely this won't cause any issues... right?
@@ -112,11 +113,7 @@ public class CameraParticle extends SpriteBillboardParticle {
             vertexConsumer.vertex(posMatrix, vector3f.x(), vector3f.y(), vector3f.z())
                     .texture(u, v)
                     .color(this.red, this.green, this.blue, this.alpha)
-                    .light(light)
-            //? if (<1.21) {
-                    /*.next()
-            *///?}
-                    ;
+                    .light(light);
     }
 
     public boolean shouldRender() {
@@ -143,14 +140,30 @@ public class CameraParticle extends SpriteBillboardParticle {
         return ParticleTextureSheet.PARTICLE_SHEET_TRANSLUCENT;
     }
 
+//    @Environment(EnvType.CLIENT)
+//    public static class Factory implements ParticleFactory<ShriekParticleEffect> {
+//        private final SpriteProvider spriteProvider;
+//
+//        public Factory(SpriteProvider spriteProvider) {
+//            this.spriteProvider = spriteProvider;
+//        }
+//
+//        public Particle createParticle(ShriekParticleEffect shriekParticleEffect, ClientWorld clientWorld, double d, double e, double f, double g, double h, double i) {
+//            ShriekParticle shriekParticle = new ShriekParticle(clientWorld, d, e, f, shriekParticleEffect.getDelay());
+//            shriekParticle.setSprite(this.spriteProvider);
+//            shriekParticle.setAlpha(1.0F);
+//            return shriekParticle;
+//        }
+//    }
+
     @Environment(EnvType.CLIENT)
-    public static class Factory extends JetLagParticleFactory {
+    public static class Factory implements ParticleFactory<SimpleParticleType> {
         private final SpriteProvider spriteProvider;
         public Factory(SpriteProvider spriteProvider) {
             this.spriteProvider = spriteProvider;
         }
 
-        public Particle createParticle(ClientWorld clientWorld, double x, double y, double z, double velX, double velY, double velZ) {
+        public Particle createParticle(SimpleParticleType type, ClientWorld clientWorld, double x, double y, double z, double velX, double velY, double velZ) {
             CameraParticle particle = new CameraParticle(clientWorld, 0, 0, 1, velX, velY, velZ);
             particle.setSprite(this.spriteProvider);
             return particle;

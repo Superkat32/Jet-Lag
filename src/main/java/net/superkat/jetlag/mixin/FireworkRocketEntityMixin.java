@@ -33,11 +33,7 @@ public abstract class FireworkRocketEntityMixin {
         }
     }
 
-    //? if (<=1.20.4) {
-    /*@Inject(method = "handleStatus", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/projectile/FireworkRocketEntity;hasExplosionEffects()Z"))
-    *///?} else {
     @Inject(method = "handleStatus", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;addFireworkParticle(DDDDDDLjava/util/List;)V"))
-    //?}
     public void jetlag$removePlayerRocketBoosting(byte status, CallbackInfo ci) {
         if(this.shooter != null) {
             if(this.shooter instanceof ClientPlayerEntity player) {
@@ -84,11 +80,9 @@ public abstract class FireworkRocketEntityMixin {
     @Unique
     private ParticleEffect getWindParticleType() {
         FireworkRocketEntity self = (FireworkRocketEntity) (Object) this;
-        //? if (>=1.20.4) {
         if(JetLagConfig.getInstance().useMinecraftWindGusts) {
             return ParticleTypes.GUST;
         }
-        //?}
         int wind = self.getWorld().random.nextBetween(0, JetLagParticles.windParticles.size() - 1);
         return JetLagParticles.windParticles.get(wind);
     }

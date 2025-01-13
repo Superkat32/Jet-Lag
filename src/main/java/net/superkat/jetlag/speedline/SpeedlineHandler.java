@@ -21,12 +21,7 @@ public class SpeedlineHandler {
 
         if(client.world != null && client.player != null && ContrailHandler.shouldTick()) {
             ClientPlayerEntity player = client.player;
-            float tickDelta =
-                    //? if (>=1.21) {
-                    client.getRenderTickCounter().getTickDelta(true);
-                    //?} else {
-                   /*client.getTickDelta();
-                    *///?}
+            float tickDelta = client.getRenderTickCounter().getTickDelta(true);
 
             float lerpedYaw = MathHelper.lerp(tickDelta, player.lastRenderYaw, player.renderYaw);
             x = -(player.getYaw(tickDelta) - lerpedYaw);
