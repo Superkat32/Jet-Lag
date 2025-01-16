@@ -19,6 +19,7 @@ import net.minecraft.particle.ShriekParticleEffect;
 import net.minecraft.particle.SimpleParticleType;
 import net.minecraft.util.math.MathHelper;
 import net.superkat.jetlag.JetLagClient;
+import net.superkat.jetlag.JetLagMain;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
@@ -97,7 +98,7 @@ public class CameraParticle extends SpriteBillboardParticle {
         int o = this.getBrightness(tickDelta);
 
         if(fancyRainbowMode()) {
-            RenderSystem.setShader(() -> JetLagClient.rainbowParticle);
+            RenderSystem.setShader(JetLagClient.RAINBOW_PARTICLE_SHADER);
         }
 
         Matrix4f posMatrix = matrices.peek().getPositionMatrix();

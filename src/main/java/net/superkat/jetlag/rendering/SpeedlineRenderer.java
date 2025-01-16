@@ -5,6 +5,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.ShaderProgram;
+import net.minecraft.client.gl.ShaderProgramKey;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
 import net.minecraft.client.texture.Sprite;
@@ -48,9 +49,9 @@ public class SpeedlineRenderer {
             RenderSystem.setShaderColor(speedlinesColor.getRed() / 255f, speedlinesColor.getGreen() / 255f, speedlinesColor.getBlue() / 255f, alpha);
 
             if(config.rainbowSpeedlines) {
-                drawSpeedline(drawContext, SPEEDLINE, 0, 0, 0, drawContext.getScaledWindowWidth(), drawContext.getScaledWindowHeight(), JetLagClient.rainbowShader);
+                drawSpeedline(drawContext, SPEEDLINE, 0, 0, 0, drawContext.getScaledWindowWidth(), drawContext.getScaledWindowHeight(), JetLagClient.RAINBOW_SHADER);
             } else { //fallback in case other mods mess with this method
-                drawContext.drawGuiTexture(SPEEDLINE, 0, 0, drawContext.getScaledWindowWidth(), drawContext.getScaledWindowHeight());
+                drawContext.drawGuiTexture(RenderLayer::getGuiTextured, SPEEDLINE, 0, 0, drawContext.getScaledWindowWidth(), drawContext.getScaledWindowHeight());
             }
 
             RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
@@ -58,7 +59,7 @@ public class SpeedlineRenderer {
         }
     }
 
-    private static void drawSpeedline(DrawContext context, Identifier texture, int x, int y, int z, int width, int height, ShaderProgram shaderProgram) {
+    private static void drawSpeedline(DrawContext context, Identifier texture, int x, int y, int z, int width, int height, ShaderProgramKey shaderProgram) {
         int x2 = x + width;
         int y2 = y + height;
 
@@ -71,7 +72,7 @@ public class SpeedlineRenderer {
         float v2 = sprite.getMaxV();
 
         RenderSystem.setShaderTexture(0, trueTexture);
-        RenderSystem.setShader(() -> shaderProgram);
+        RenderSystem.setShader(shaderProgram);
         Matrix4f matrix4f = context.getMatrices().peek().getPositionMatrix();
 
         BufferBuilder buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);

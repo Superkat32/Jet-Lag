@@ -1,15 +1,18 @@
 package net.superkat.jetlag;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
-import net.fabricmc.fabric.api.client.rendering.v1.CoreShaderRegistrationCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.gl.Defines;
 import net.minecraft.client.gl.ShaderProgram;
+import net.minecraft.client.gl.ShaderProgramKey;
+import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.util.Identifier;
@@ -26,6 +29,16 @@ import net.superkat.jetlag.rendering.SpeedlineRenderer;
 import net.superkat.jetlag.speedline.SpeedlineHandler;
 
 public class JetLagClient implements ClientModInitializer {
+    public static final ShaderProgramKey RAINBOW_SHADER = new ShaderProgramKey(
+            Identifier.of(JetLagMain.MOD_ID, "core/rainbow"),
+            VertexFormats.POSITION, Defines.EMPTY
+    );
+
+    public static final ShaderProgramKey RAINBOW_PARTICLE_SHADER = new ShaderProgramKey(
+            Identifier.of(JetLagMain.MOD_ID, "core/fancyparticle"),
+            VertexFormats.POSITION_TEXTURE_COLOR_LIGHT, Defines.EMPTY
+    );
+
     public static ShaderProgram rainbowShader;
     public static ShaderProgram rainbowParticle;
 
@@ -42,13 +55,13 @@ public class JetLagClient implements ClientModInitializer {
         ParticleFactoryRegistry.getInstance().register(JetLagParticles.SPEEDLINE, SpeedlineParticle.Factory::new);
         ParticleFactoryRegistry.getInstance().register(JetLagParticles.ROCKET_SPEEDLINE, RocketSpeedlineParticle.Factory::new);
 
-        CoreShaderRegistrationCallback.EVENT.register(context -> {
-            Identifier rainbowId = Identifier.of(JetLagMain.MOD_ID, "rainbow");
-            context.register(rainbowId, VertexFormats.POSITION, program -> rainbowShader = program);
-
-            Identifier fancyId = Identifier.of(JetLagMain.MOD_ID, "fancyparticle");
-            context.register(fancyId, VertexFormats.POSITION_TEXTURE_COLOR_LIGHT, program -> rainbowParticle = program);
-        });
+//        CoreShaderRegistrationCallback.EVENT.register(context -> {
+//            Identifier rainbowId = Identifier.of(JetLagMain.MOD_ID, "rainbow");
+//            context.register(rainbowId, VertexFormats.POSITION, program -> rainbowShader = program);
+//
+//            Identifier fancyId = Identifier.of(JetLagMain.MOD_ID, "fancyparticle");
+//            context.register(fancyId, VertexFormats.POSITION_TEXTURE_COLOR_LIGHT, program -> rainbowParticle = program);
+//        });
 
         //FIXME - Iris shaders compat
         //AFTER_TRANSLUCENT is called as closely to the particles being rendered as I can get with Fabric API
